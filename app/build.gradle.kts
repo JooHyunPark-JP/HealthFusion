@@ -72,6 +72,12 @@ dependencies {
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
 
+    //coroutine
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
+
+    //viewModel (MVVM)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
 
     //Test
     testImplementation(libs.junit)
