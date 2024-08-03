@@ -1,9 +1,9 @@
-package com.example.healthfusion.di
+package com.example.healthfusion.workoutTracking.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.healthfusion.data.AppDatabase
-import com.example.healthfusion.data.ExerciseDao
+import com.example.healthfusion.workoutTracking.data.AppDatabase
+import com.example.healthfusion.workoutTracking.data.WorkoutDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,7 +26,7 @@ object DatabaseModule {
     }
 
     @Provides
-    fun provideExerciseDao(database: AppDatabase): ExerciseDao {
+    fun provideExerciseDao(database: AppDatabase): WorkoutDao {
         return database.exerciseDao()
     }
 }

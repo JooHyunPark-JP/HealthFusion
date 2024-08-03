@@ -1,9 +1,9 @@
-package com.example.healthfusion.ui
+package com.example.healthfusion.workoutTracking.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.healthfusion.data.Exercise
-import com.example.healthfusion.data.ExerciseDao
+import com.example.healthfusion.workoutTracking.data.Workout
+import com.example.healthfusion.workoutTracking.data.WorkoutDao
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -13,19 +13,19 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ExerciseViewModel @Inject constructor(
-    private val exerciseDao: ExerciseDao
+class WorkoutViewModel @Inject constructor(
+    private val workoutDao: WorkoutDao
 ) : ViewModel() {
 
     //convert flow to stateFlow by using stainIn
-    val exercises: StateFlow<List<Exercise>> = flow {
-        emit(exerciseDao.getAllExercises())
+    val workouts: StateFlow<List<Workout>> = flow {
+        emit(workoutDao.getAllExercises())
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
 
-    fun addExercise(exercise: Exercise) {
+    fun addWorkout(workout: Workout) {
         viewModelScope.launch {
-            exerciseDao.insert(exercise)
+            workoutDao.insert(workout)
         }
     }
 }
