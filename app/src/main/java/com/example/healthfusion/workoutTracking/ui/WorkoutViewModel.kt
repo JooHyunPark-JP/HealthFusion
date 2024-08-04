@@ -7,7 +7,6 @@ import com.example.healthfusion.workoutTracking.data.WorkoutDao
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -18,9 +17,8 @@ class WorkoutViewModel @Inject constructor(
 ) : ViewModel() {
 
     //convert flow to stateFlow by using stainIn
-    val workouts: StateFlow<List<Workout>> = flow {
-        emit(workoutDao.getAllExercises())
-    }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+    val workouts: StateFlow<List<Workout>> = workoutDao.getAllExercises()
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
 
     fun addWorkout(workout: Workout) {

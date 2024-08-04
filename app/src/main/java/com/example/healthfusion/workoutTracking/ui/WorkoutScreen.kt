@@ -2,6 +2,7 @@ package com.example.healthfusion.workoutTracking.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,8 +16,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.healthfusion.workoutTracking.data.Workout
 import com.example.healthfusion.workoutTracking.data.WorkoutType
 
@@ -29,8 +32,18 @@ fun WorkoutScreen(viewModel: WorkoutViewModel, modifier: Modifier) {
     var caloriesBurned by remember { mutableStateOf("") }
     var type by remember { mutableStateOf(WorkoutType.AEROBIC) }
 
-    Column(modifier = Modifier.padding(16.dp)) {
-        TextField(value = name, onValueChange = { name = it }, label = { Text("Workout Name") })
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 50.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "Workout Page", fontSize = 24.sp)
+
+        TextField(
+            value = name,
+            onValueChange = { name = it },
+            label = { Text("Workout Name") })
         TextField(
             value = duration,
             onValueChange = { duration = it },
@@ -40,7 +53,7 @@ fun WorkoutScreen(viewModel: WorkoutViewModel, modifier: Modifier) {
             onValueChange = { caloriesBurned = it },
             label = { Text("Calories Burned") })
 
-        Row {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             RadioButton(
                 selected = type == WorkoutType.AEROBIC,
                 onClick = { type = WorkoutType.AEROBIC }

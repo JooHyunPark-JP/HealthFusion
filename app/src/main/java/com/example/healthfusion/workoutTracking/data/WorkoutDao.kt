@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface WorkoutDao {
@@ -14,8 +15,8 @@ interface WorkoutDao {
     suspend fun delete(workout: Workout)
 
     @Query("SELECT * FROM workout_table")
-    suspend fun getAllExercises(): List<Workout>
+    fun getAllExercises(): Flow<List<Workout>>
 
     @Query("SELECT * FROM workout_table WHERE type = :type")
-    suspend fun getExercisesByType(type: WorkoutType): List<Workout>
+    fun getExercisesByType(type: WorkoutType): Flow<List<Workout>>
 }
