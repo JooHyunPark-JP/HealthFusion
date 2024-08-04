@@ -18,6 +18,8 @@ import com.example.healthfusion.healthFusionMainFunction.sleepTracking.ui.SleepV
 import com.example.healthfusion.ui.theme.HealthFusionTheme
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutScreen
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutViewModel
+import com.example.healthfusion.healthFusionNav.BottomNavBar
+import com.example.healthfusion.healthFusionNav.NavGraph
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -33,16 +35,15 @@ class MainActivity : ComponentActivity() {
         setContent {
             HealthFusionTheme {
                 val navController = rememberNavController()
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                Scaffold(modifier = Modifier.fillMaxSize(),
+                    bottomBar = { BottomNavBar(navController = navController) }) { innerPadding ->
+
                     Column(modifier = Modifier.padding(innerPadding)) {
-/*                        WorkoutScreen(
-                            viewModel = workoutViewModel,
-                        )
-                        DietScreen(
-                            viewModel = dietViewModel
-                        )*/
-                        SleepScreen(
-                            viewModel = sleepViewModel
+                        NavGraph(
+                            navController = navController,
+                            workoutViewModel = workoutViewModel,
+                            dietViewModel = dietViewModel,
+                            sleepViewModel = sleepViewModel
                         )
                     }
                 }
