@@ -1,15 +1,15 @@
-package com.example.healthfusion.data
+package com.example.healthfusion.workoutTracking.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "exercise_table")
-data class Exercise(
+@Entity(tableName = "workout_table")
+data class Workout(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val name: String,
     val duration: Int, // in minutes
     val caloriesBurned: Int,
-    val type: ExerciseType,
+    val type: WorkoutType,
 )
 
