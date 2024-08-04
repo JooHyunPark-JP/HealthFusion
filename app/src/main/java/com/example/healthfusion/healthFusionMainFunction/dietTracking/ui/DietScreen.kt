@@ -1,4 +1,4 @@
-package com.example.healthfusion.dietTracking.ui
+package com.example.healthfusion.healthFusionMainFunction.dietTracking.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,7 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.healthfusion.dietTracking.data.Diet
+import com.example.healthfusion.healthFusionMainFunction.dietTracking.data.Diet
 
 
 @Composable

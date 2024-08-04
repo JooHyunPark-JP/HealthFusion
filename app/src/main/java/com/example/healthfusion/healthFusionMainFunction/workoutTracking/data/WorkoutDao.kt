@@ -1,4 +1,4 @@
-package com.example.healthfusion.workoutTracking.data
+package com.example.healthfusion.healthFusionMainFunction.workoutTracking.data
 
 import androidx.room.Dao
 import androidx.room.Delete

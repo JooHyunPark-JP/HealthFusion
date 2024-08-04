@@ -1,4 +1,4 @@
-package com.example.healthfusion.workoutTracking.ui
+package com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,8 +20,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.healthfusion.workoutTracking.data.Workout
-import com.example.healthfusion.workoutTracking.data.WorkoutType
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.Workout
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
 
 @Composable
 fun WorkoutScreen(viewModel: WorkoutViewModel, modifier: Modifier = Modifier) {

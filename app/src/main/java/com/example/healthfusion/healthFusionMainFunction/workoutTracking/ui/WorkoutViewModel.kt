@@ -1,9 +1,9 @@
-package com.example.healthfusion.workoutTracking.ui
+package com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.healthfusion.workoutTracking.data.Workout
-import com.example.healthfusion.workoutTracking.data.WorkoutDao
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.Workout
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutDao
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

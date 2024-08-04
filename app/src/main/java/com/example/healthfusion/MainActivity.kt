@@ -11,10 +11,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import com.example.healthfusion.dietTracking.ui.DietScreen
-import com.example.healthfusion.dietTracking.ui.DietViewModel
+import com.example.healthfusion.healthFusionMainFunction.dietTracking.ui.DietScreen
+import com.example.healthfusion.healthFusionMainFunction.dietTracking.ui.DietViewModel
+import com.example.healthfusion.healthFusionMainFunction.sleepTracking.ui.SleepScreen
+import com.example.healthfusion.healthFusionMainFunction.sleepTracking.ui.SleepViewModel
 import com.example.healthfusion.ui.theme.HealthFusionTheme
-import com.example.healthfusion.workoutTracking.ui.WorkoutViewModel
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutScreen
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -22,6 +25,7 @@ class MainActivity : ComponentActivity() {
 
     private val workoutViewModel: WorkoutViewModel by viewModels()
     private val dietViewModel: DietViewModel by viewModels()
+    private val sleepViewModel: SleepViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,9 +37,12 @@ class MainActivity : ComponentActivity() {
                     Column(modifier = Modifier.padding(innerPadding)) {
 /*                        WorkoutScreen(
                             viewModel = workoutViewModel,
-                        )*/
+                        )
                         DietScreen(
                             viewModel = dietViewModel
+                        )*/
+                        SleepScreen(
+                            viewModel = sleepViewModel
                         )
                     }
                 }

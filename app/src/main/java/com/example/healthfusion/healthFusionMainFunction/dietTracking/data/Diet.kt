@@ -1,4 +1,4 @@
-package com.example.healthfusion.dietTracking.data
+package com.example.healthfusion.healthFusionMainFunction.dietTracking.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
