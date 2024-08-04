@@ -2,7 +2,7 @@ package com.example.healthfusion.workoutTracking.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.healthfusion.workoutTracking.data.AppDatabase
+import com.example.healthfusion.AppDatabase
 import com.example.healthfusion.workoutTracking.data.WorkoutDao
 import dagger.Module
 import dagger.Provides
@@ -27,6 +27,6 @@ object DatabaseModule {
 
     @Provides
     fun provideExerciseDao(database: AppDatabase): WorkoutDao {
-        return database.exerciseDao()
+        return database.workoutDao()
     }
 }

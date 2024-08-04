@@ -24,7 +24,7 @@ import com.example.healthfusion.workoutTracking.data.Workout
 import com.example.healthfusion.workoutTracking.data.WorkoutType
 
 @Composable
-fun WorkoutScreen(viewModel: WorkoutViewModel, modifier: Modifier) {
+fun WorkoutScreen(viewModel: WorkoutViewModel, modifier: Modifier = Modifier) {
     val workouts by viewModel.workouts.collectAsState()
 
     var name by remember { mutableStateOf("") }

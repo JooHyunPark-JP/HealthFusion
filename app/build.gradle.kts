@@ -79,6 +79,10 @@ dependencies {
     //viewModel (MVVM)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
 
+    //Jetpack compose navigation
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.hilt.navigation.compose)
+
     //Test
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
