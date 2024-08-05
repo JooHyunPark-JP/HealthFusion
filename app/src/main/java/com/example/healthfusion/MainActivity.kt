@@ -37,7 +37,6 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 Scaffold(modifier = Modifier.fillMaxSize(),
                     bottomBar = { BottomNavBar(navController = navController) }) { innerPadding ->
-
                     Column(modifier = Modifier.padding(innerPadding)) {
                         NavGraph(
                             navController = navController,
