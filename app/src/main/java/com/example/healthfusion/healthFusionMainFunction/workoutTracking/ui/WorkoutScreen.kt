@@ -2,7 +2,9 @@ package com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -22,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.Workout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun WorkoutScreen(viewModel: WorkoutViewModel, modifier: Modifier = Modifier) {
@@ -84,6 +87,15 @@ fun WorkoutScreen(viewModel: WorkoutViewModel, modifier: Modifier = Modifier) {
                     text = "Workout: ${workout.name}, Duration: ${workout.duration}, Calories Burned: ${workout.caloriesBurned}, Type: ${workout.type}"
                 )
             }
+        }
+
+        //temporary sign out function with button
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Button(onClick = {
+            FirebaseAuth.getInstance().signOut()
+        }) {
+            Text("Sign Out")
         }
     }
 }
