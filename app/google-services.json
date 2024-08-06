@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1079670821977",
+    "project_id": "healthfusion-2602e",
+    "storage_bucket": "healthfusion-2602e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1079670821977:android:92d97c4498c0e5f1554d48",
+        "android_client_info": {
+          "package_name": "com.example.healthfusion"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-ncOrnqPaJu-Gdvfuw4vYWSIekpQl5SE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

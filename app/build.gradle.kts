@@ -4,6 +4,8 @@ plugins {
 
     alias(libs.plugins.kotlinAndroidKsp)
     alias(libs.plugins.hiltAndroid)
+
+    alias(libs.plugins.googleService)
 }
 
 android {
@@ -82,6 +84,11 @@ dependencies {
     //Jetpack compose navigation
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.hilt.navigation.compose)
+
+    //Google firebase
+    implementation(platform(libs.google.firebase.bom))
+    implementation(libs.google.firebase.analytics)  // Add the dependencies for Firebase products you want to use
+    implementation(libs.google.firebase.auth.ktx)
 
     //Test
     testImplementation(libs.junit)

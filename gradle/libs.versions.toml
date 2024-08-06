@@ -15,6 +15,8 @@ coroutines = "1.8.1"
 lifecycleViewModel = "2.8.4"
 navigationCompose = "2.7.7"
 hiltNavigationCompose = "1.2.0"
+googleService = "4.4.2"
+googleFirebaseBom = "33.1.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -47,6 +49,9 @@ androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifec
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 
+google-firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "googleFirebaseBom" }
+google-firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics"}
+google-firebase-auth-ktx = {group = "com.google.firebase", name = "firebase-auth-ktx"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -54,4 +59,6 @@ jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = 
 
 hiltAndroid = { id = "com.google.dagger.hilt.android", version.ref ="hilt" }
 kotlinAndroidKsp = { id = "com.google.devtools.ksp", version.ref ="ksp" }
+
+googleService = {id = "com.google.gms.google-services", version.ref ="googleService"  }
 
