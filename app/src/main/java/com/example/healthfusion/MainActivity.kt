@@ -16,10 +16,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.example.healthfusion.healthFusionMainFunction.dietTracking.ui.DietViewModel
-import com.example.healthfusion.healthFusionMainFunction.login.ui.LoginScreen
 import com.example.healthfusion.healthFusionMainFunction.login.ui.LoginViewModel
 import com.example.healthfusion.healthFusionMainFunction.sleepTracking.ui.SleepViewModel
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutViewModel
+import com.example.healthfusion.healthFusionMainFunction.login.navigator.AuthNavGraph
 import com.example.healthfusion.healthFusionNav.BottomNavBar
 import com.example.healthfusion.healthFusionNav.NavGraph
 import com.example.healthfusion.ui.theme.HealthFusionTheme
@@ -72,6 +72,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }) { innerPadding ->
                     Column(modifier = Modifier.padding(innerPadding)) {
+                        //If user is already logged in
                         if (currentUser.value != null) {
                             NavGraph(
                                 navController = navController,
@@ -80,7 +81,10 @@ class MainActivity : ComponentActivity() {
                                 sleepViewModel = sleepViewModel
                             )
                         } else {
-                            LoginScreen(viewModel = loginViewModel)
+                            AuthNavGraph(
+                                navController = navController,
+                                loginViewModel = loginViewModel
+                            )
                         }
                     }
                 }

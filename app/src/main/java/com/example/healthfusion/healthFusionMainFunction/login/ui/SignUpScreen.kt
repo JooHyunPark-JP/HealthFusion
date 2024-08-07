@@ -23,17 +23,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 
 @Composable
-fun LoginScreen(
+fun SignUpScreen(
     navController: NavHostController,
-    viewModel: LoginViewModel,
+    viewModel: LoginViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var isLogin by remember { mutableStateOf(true) }
     val loginState by viewModel.loginState.collectAsState()
 
     Column(
@@ -43,7 +43,7 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = if (isLogin) "Login" else "Sign Up", fontSize = 24.sp)
+        Text(text = "Sign Up!", fontSize = 24.sp)
 
         TextField(
             value = email,
@@ -61,13 +61,11 @@ fun LoginScreen(
 
         Button(
             onClick = {
-                if (isLogin) {
-                    viewModel.login(email, password)
-                }
+                viewModel.signUp(email, password)
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Login")
+            Text("Sign Up!")
         }
 
         when (loginState) {
@@ -80,15 +78,15 @@ fun LoginScreen(
             }
 
             is LoginState.Success -> {
-                // Handle successful login if needed
+                // Handle successful sign up if needed
             }
 
             LoginState.Idle -> { /* Do nothing */
             }
         }
 
-        TextButton(onClick = { navController.navigate("signup") }) {
-            Text("Don't have an account? Sign Up")
+        TextButton(onClick = { navController.navigate("login") }) {
+            Text("Already have an account? Login")
         }
     }
 }
