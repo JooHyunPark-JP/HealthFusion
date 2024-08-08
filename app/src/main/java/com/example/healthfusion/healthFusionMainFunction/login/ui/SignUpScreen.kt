@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,17 +25,30 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 
 @Composable
 fun SignUpScreen(
     navController: NavHostController,
-    viewModel: LoginViewModel = hiltViewModel(),
+    viewModel: SignUpViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    val loginState by viewModel.loginState.collectAsState()
+    val signUpState by viewModel.signUpState.collectAsState()
+
+    //Remove error exception message when navigated from another page to signup page
+    DisposableEffect(Unit) {
+        val callback = NavController.OnDestinationChangedListener { _, _, _ ->
+            viewModel.resetState()
+
+        }
+        navController.addOnDestinationChangedListener(callback)
+        onDispose {
+            navController.removeOnDestinationChangedListener(callback)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -50,11 +64,11 @@ fun SignUpScreen(
             onValueChange = { email = it },
             label = { Text("Email") },
             modifier = Modifier.fillMaxWidth(),
-            isError = loginState is LoginState.Error && (loginState as LoginState.Error).emailError != null,
+            isError = signUpState is AuthState.Error && (signUpState as AuthState.Error).emailError != null,
             supportingText = {
-                if (loginState is LoginState.Error)
+                if (signUpState is AuthState.Error)
                     Text(
-                        (loginState as LoginState.Error).emailError ?: ""
+                        (signUpState as AuthState.Error).emailError ?: ""
                     )
             }
         )
@@ -64,10 +78,10 @@ fun SignUpScreen(
             label = { Text("Password") },
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation(),
-            isError = loginState is LoginState.Error && (loginState as LoginState.Error).passwordError != null,
+            isError = signUpState is AuthState.Error && (signUpState as AuthState.Error).passwordError != null,
             supportingText = {
-                if (loginState is LoginState.Error) Text(
-                    (loginState as LoginState.Error).passwordError ?: ""
+                if (signUpState is AuthState.Error) Text(
+                    (signUpState as AuthState.Error).passwordError ?: ""
                 )
             }
         )
@@ -81,26 +95,26 @@ fun SignUpScreen(
             Text("Sign Up!")
         }
 
-        when (loginState) {
-            is LoginState.AuthError -> {
+        when (signUpState) {
+            is AuthState.AuthError -> {
                 Spacer(modifier = Modifier.height(8.dp))
-                if ((loginState as LoginState.AuthError).authError != null) {
+                if ((signUpState as AuthState.AuthError).authError != null) {
                     Text(
-                        text = (loginState as LoginState.AuthError).authError
+                        text = (signUpState as AuthState.AuthError).authError
                             ?: "An unexpected error occurred",
                         color = MaterialTheme.colorScheme.error
                     )
                 }
             }
 
-            is LoginState.Success -> {
+            is AuthState.Success -> {
                 // Handle successful login if needed ex: Add login success message etc.
             }
 
-            is LoginState.Idle -> { /* Do nothing */
+            is AuthState.Idle -> { /* Do nothing */
             }
 
-            is LoginState.Error -> { /* Do nothing */
+            is AuthState.Error -> { /* Do nothing */
             }
         }
 

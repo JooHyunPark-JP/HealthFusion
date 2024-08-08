@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 
 @Composable
@@ -34,7 +36,18 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val isLogin by remember { mutableStateOf(true) }
-    val loginState by viewModel.loginState.collectAsState()
+    val loginState by viewModel.authState.collectAsState()
+
+    //Remove error exception message when navigated from another page to login screen
+    DisposableEffect(Unit) {
+        val callback = NavController.OnDestinationChangedListener { _, _, _ ->
+            viewModel.resetState()
+        }
+        navController.addOnDestinationChangedListener(callback)
+        onDispose {
+            navController.removeOnDestinationChangedListener(callback)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -50,11 +63,11 @@ fun LoginScreen(
             onValueChange = { email = it },
             label = { Text("Email") },
             modifier = Modifier.fillMaxWidth(),
-            isError = loginState is LoginState.Error && (loginState as LoginState.Error).emailError != null,
+            isError = loginState is AuthState.Error && (loginState as AuthState.Error).emailError != null,
             supportingText = {
-                if (loginState is LoginState.Error)
+                if (loginState is AuthState.Error)
                     Text(
-                        (loginState as LoginState.Error).emailError ?: ""
+                        (loginState as AuthState.Error).emailError ?: ""
                     )
             }
 
@@ -65,10 +78,10 @@ fun LoginScreen(
             label = { Text("Password") },
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation(),
-            isError = loginState is LoginState.Error && (loginState as LoginState.Error).passwordError != null,
+            isError = loginState is AuthState.Error && (loginState as AuthState.Error).passwordError != null,
             supportingText = {
-                if (loginState is LoginState.Error) Text(
-                    (loginState as LoginState.Error).passwordError ?: ""
+                if (loginState is AuthState.Error) Text(
+                    (loginState as AuthState.Error).passwordError ?: ""
                 )
             }
         )
@@ -85,25 +98,25 @@ fun LoginScreen(
         }
 
         when (loginState) {
-            is LoginState.AuthError -> {
+            is AuthState.AuthError -> {
                 Spacer(modifier = Modifier.height(8.dp))
-                if ((loginState as LoginState.AuthError).authError != null) {
+                if ((loginState as AuthState.AuthError).authError != null) {
                     Text(
-                        text = (loginState as LoginState.AuthError).authError
+                        text = (loginState as AuthState.AuthError).authError
                             ?: "An unexpected error occurred",
                         color = MaterialTheme.colorScheme.error
                     )
                 }
             }
 
-            is LoginState.Success -> {
+            is AuthState.Success -> {
                 // Handle successful login if needed ex: Add login success message etc.
             }
 
-            is LoginState.Idle -> { /* Do nothing */
+            is AuthState.Idle -> { /* Do nothing */
             }
 
-            is LoginState.Error -> { /* Do nothing */
+            is AuthState.Error -> { /* Do nothing */
             }
         }
 

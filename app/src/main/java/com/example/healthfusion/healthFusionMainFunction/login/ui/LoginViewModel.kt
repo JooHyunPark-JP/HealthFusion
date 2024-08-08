@@ -16,56 +16,35 @@ class LoginViewModel @Inject constructor(
     private val loginRepository: LoginRepository
 ) : ViewModel() {
 
-    private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
-    val loginState: StateFlow<LoginState> = _loginState
+    private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
+    val authState: StateFlow<AuthState> = _authState
 
     fun login(email: String, password: String) {
         viewModelScope.launch {
-            _loginState.value = LoginState.Idle
+            _authState.value = AuthState.Idle
             val emailError = validateEmail(email)
             val passwordError = validatePassword(password)
             if (emailError != null || passwordError != null) {
-                _loginState.value =
-                    LoginState.Error(emailError = emailError, passwordError = passwordError)
+                _authState.value =
+                    AuthState.Error(emailError = emailError, passwordError = passwordError)
                 return@launch
             }
             try {
                 loginRepository.login(email, password)
-                _loginState.value = LoginState.Success
+                _authState.value = AuthState.Success
             } catch (e: Exception) {
                 firebaseException(e)
             }
 
         }
     }
-
-
-    fun signUp(email: String, password: String) {
-        viewModelScope.launch {
-            _loginState.value = LoginState.Idle
-            val emailError = validateEmail(email)
-            val passwordError = validatePassword(password)
-            if (emailError != null || passwordError != null) {
-                _loginState.value =
-                    LoginState.Error(emailError = emailError, passwordError = passwordError)
-                return@launch
-            }
-            try {
-                loginRepository.signUp(email, password)
-                _loginState.value = LoginState.Success
-            } catch (e: Exception) {
-                firebaseException(e)
-            }
-        }
-    }
-
 
     private fun firebaseException(e: Exception) {
         //Add more firebase exception when needed
         when (e) {
-            is FirebaseAuthInvalidUserException -> LoginState.AuthError("Invalid email address.")
-            is FirebaseAuthInvalidCredentialsException -> LoginState.AuthError("Invalid password.")
-            else -> LoginState.AuthError(
+            is FirebaseAuthInvalidUserException -> AuthState.AuthError("Invalid email address.")
+            is FirebaseAuthInvalidCredentialsException -> AuthState.AuthError("Invalid password.")
+            else -> AuthState.AuthError(
                 e.localizedMessage ?: "An unexpected error occurred."
             )
         }
@@ -85,6 +64,6 @@ class LoginViewModel @Inject constructor(
 
 
     fun resetState() {
-        _loginState.value = LoginState.Idle
+        _authState.value = AuthState.Idle
     }
 }

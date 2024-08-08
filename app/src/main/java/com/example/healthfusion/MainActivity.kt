@@ -20,6 +20,7 @@ import com.example.healthfusion.healthFusionMainFunction.login.ui.LoginViewModel
 import com.example.healthfusion.healthFusionMainFunction.sleepTracking.ui.SleepViewModel
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutViewModel
 import com.example.healthfusion.healthFusionMainFunction.login.navigator.AuthNavGraph
+import com.example.healthfusion.healthFusionMainFunction.login.ui.SignUpViewModel
 import com.example.healthfusion.healthFusionNav.BottomNavBar
 import com.example.healthfusion.healthFusionNav.NavGraph
 import com.example.healthfusion.ui.theme.HealthFusionTheme
@@ -34,6 +35,7 @@ class MainActivity : ComponentActivity() {
     private val dietViewModel: DietViewModel by viewModels()
     private val sleepViewModel: SleepViewModel by viewModels()
     private val loginViewModel: LoginViewModel by viewModels()
+    private val signUpViewModel: SignUpViewModel by viewModels()
 
     @Inject
     lateinit var firebaseAuth: FirebaseAuth
@@ -83,7 +85,8 @@ class MainActivity : ComponentActivity() {
                         } else {
                             AuthNavGraph(
                                 navController = navController,
-                                loginViewModel = loginViewModel
+                                loginViewModel = loginViewModel,
+                                signUpViewModel = signUpViewModel
                             )
                         }
                     }
