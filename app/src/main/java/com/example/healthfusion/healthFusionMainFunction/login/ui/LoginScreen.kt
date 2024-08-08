@@ -33,7 +33,7 @@ fun LoginScreen(
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var isLogin by remember { mutableStateOf(true) }
+    val isLogin by remember { mutableStateOf(true) }
     val loginState by viewModel.loginState.collectAsState()
 
     Column(
@@ -43,20 +43,34 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = if (isLogin) "Login" else "Sign Up", fontSize = 24.sp)
+        Text(text = "Login", fontSize = 24.sp)
 
         TextField(
             value = email,
             onValueChange = { email = it },
             label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            isError = loginState is LoginState.Error && (loginState as LoginState.Error).emailError != null,
+            supportingText = {
+                if (loginState is LoginState.Error)
+                    Text(
+                        (loginState as LoginState.Error).emailError ?: ""
+                    )
+            }
+
         )
         TextField(
             value = password,
             onValueChange = { password = it },
             label = { Text("Password") },
             modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation()
+            visualTransformation = PasswordVisualTransformation(),
+            isError = loginState is LoginState.Error && (loginState as LoginState.Error).passwordError != null,
+            supportingText = {
+                if (loginState is LoginState.Error) Text(
+                    (loginState as LoginState.Error).passwordError ?: ""
+                )
+            }
         )
 
         Button(
@@ -71,21 +85,28 @@ fun LoginScreen(
         }
 
         when (loginState) {
-            is LoginState.Error -> {
+            is LoginState.AuthError -> {
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = (loginState as LoginState.Error).message,
-                    color = MaterialTheme.colorScheme.error
-                )
+                if ((loginState as LoginState.AuthError).authError != null) {
+                    Text(
+                        text = (loginState as LoginState.AuthError).authError
+                            ?: "An unexpected error occurred",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
             }
 
             is LoginState.Success -> {
-                // Handle successful login if needed
+                // Handle successful login if needed ex: Add login success message etc.
             }
 
-            LoginState.Idle -> { /* Do nothing */
+            is LoginState.Idle -> { /* Do nothing */
+            }
+
+            is LoginState.Error -> { /* Do nothing */
             }
         }
+
 
         TextButton(onClick = { navController.navigate("signup") }) {
             Text("Don't have an account? Sign Up")

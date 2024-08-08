@@ -21,30 +21,68 @@ class LoginViewModel @Inject constructor(
 
     fun login(email: String, password: String) {
         viewModelScope.launch {
+            _loginState.value = LoginState.Idle
+            val emailError = validateEmail(email)
+            val passwordError = validatePassword(password)
+            if (emailError != null || passwordError != null) {
+                _loginState.value =
+                    LoginState.Error(emailError = emailError, passwordError = passwordError)
+                return@launch
+            }
             try {
                 loginRepository.login(email, password)
                 _loginState.value = LoginState.Success
             } catch (e: Exception) {
-                _loginState.value = when (e) {
-                    is FirebaseAuthInvalidUserException -> LoginState.Error("Invalid email address.")
-                    is FirebaseAuthInvalidCredentialsException -> LoginState.Error("Invalid password.")
-                    else -> LoginState.Error(e.localizedMessage ?: "An unexpected error occurred.")
-                }
+                firebaseException(e)
             }
+
         }
     }
 
+
     fun signUp(email: String, password: String) {
         viewModelScope.launch {
+            _loginState.value = LoginState.Idle
+            val emailError = validateEmail(email)
+            val passwordError = validatePassword(password)
+            if (emailError != null || passwordError != null) {
+                _loginState.value =
+                    LoginState.Error(emailError = emailError, passwordError = passwordError)
+                return@launch
+            }
             try {
                 loginRepository.signUp(email, password)
                 _loginState.value = LoginState.Success
             } catch (e: Exception) {
-                _loginState.value =
-                    LoginState.Error(e.localizedMessage ?: "An unexpected error occurred.")
+                firebaseException(e)
             }
         }
     }
+
+
+    private fun firebaseException(e: Exception) {
+        //Add more firebase exception when needed
+        when (e) {
+            is FirebaseAuthInvalidUserException -> LoginState.AuthError("Invalid email address.")
+            is FirebaseAuthInvalidCredentialsException -> LoginState.AuthError("Invalid password.")
+            else -> LoginState.AuthError(
+                e.localizedMessage ?: "An unexpected error occurred."
+            )
+        }
+    }
+
+    private fun validateEmail(email: String): String? {
+        return if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            "Please enter a valid email address."
+        } else null
+    }
+
+    private fun validatePassword(password: String): String? {
+        return if (password.length < 6) {
+            "Password must be at least 6 characters."
+        } else null
+    }
+
 
     fun resetState() {
         _loginState.value = LoginState.Idle
