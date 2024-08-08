@@ -33,15 +33,15 @@ class LoginViewModel @Inject constructor(
                 loginRepository.login(email, password)
                 _authState.value = AuthState.Success
             } catch (e: Exception) {
-                firebaseException(e)
+                _authState.value = firebaseException(e)
             }
 
         }
     }
 
-    private fun firebaseException(e: Exception) {
+    private fun firebaseException(e: Exception): AuthState {
         //Add more firebase exception when needed
-        when (e) {
+        return when (e) {
             is FirebaseAuthInvalidUserException -> AuthState.AuthError("Invalid email address.")
             is FirebaseAuthInvalidCredentialsException -> AuthState.AuthError("Invalid password.")
             else -> AuthState.AuthError(

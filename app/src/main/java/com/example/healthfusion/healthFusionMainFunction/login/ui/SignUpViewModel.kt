@@ -3,6 +3,8 @@ package com.example.healthfusion.healthFusionMainFunction.login.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.healthfusion.healthFusionMainFunction.login.di.LoginRepository
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,9 +34,16 @@ class SignUpViewModel @Inject constructor(
                 loginRepository.signUp(email, password)
                 _signUpState.value = AuthState.Success
             } catch (e: Exception) {
-                _signUpState.value =
-                    AuthState.AuthError(e.localizedMessage ?: "An unexpected error occurred.")
+                _signUpState.value = firebaseException(e)
             }
+        }
+    }
+
+    private fun firebaseException(e: Exception): AuthState {
+        return when (e) {
+            is FirebaseAuthInvalidUserException -> AuthState.AuthError("Invalid email address.")
+            is FirebaseAuthInvalidCredentialsException -> AuthState.AuthError("Invalid password.")
+            else -> AuthState.AuthError(e.localizedMessage ?: "An unexpected error occurred.")
         }
     }
 
