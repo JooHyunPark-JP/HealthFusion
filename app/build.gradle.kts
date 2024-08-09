@@ -89,6 +89,7 @@ dependencies {
     implementation(platform(libs.google.firebase.bom))
     implementation(libs.google.firebase.analytics)  // Add the dependencies for Firebase products you want to use
     implementation(libs.google.firebase.auth.ktx)
+    implementation(libs.google.firestore.ktx)
 
     //Test
     testImplementation(libs.junit)
