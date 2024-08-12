@@ -20,7 +20,6 @@ class WorkoutViewModel @Inject constructor(
     val workouts: StateFlow<List<Workout>> = workoutDao.getAllExercises()
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-
     fun addWorkout(workout: Workout) {
         viewModelScope.launch {
             workoutDao.insert(workout)
