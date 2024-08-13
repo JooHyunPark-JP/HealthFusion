@@ -1,6 +1,7 @@
 package com.example.healthfusion.healthFusionMainFunction.login.di
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -13,5 +14,9 @@ class LoginRepository @Inject constructor(
 
     suspend fun signUp(email: String, password: String) {
         firebaseAuth.createUserWithEmailAndPassword(email, password).await()
+    }
+
+    fun getCurrentUser(): FirebaseUser? {
+        return firebaseAuth.currentUser
     }
 }

@@ -1,6 +1,7 @@
 package com.example.healthfusion
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -48,15 +49,16 @@ class MainActivity : ComponentActivity() {
             HealthFusionTheme {
                 val navController = rememberNavController()
 
-                //firebase login
+                // Current Firebase user
                 val currentUser =
                     remember { mutableStateOf(firebaseAuth.currentUser) }
 
+                // Auth state listener to update UI on auth state changes
                 firebaseAuth.addAuthStateListener { auth ->
                     currentUser.value = auth.currentUser
                 }
 
-                //Checks user is whether signed out or not
+                // Checking whether the user is signed in or not
                 val authState by produceState(initialValue = currentUser.value) {
                     val authListener = FirebaseAuth.AuthStateListener { auth ->
                         value = auth.currentUser
@@ -67,6 +69,8 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
+
+
                 Scaffold(modifier = Modifier.fillMaxSize(),
                     bottomBar = {
                         if (authState != null) {
@@ -76,6 +80,14 @@ class MainActivity : ComponentActivity() {
                     Column(modifier = Modifier.padding(innerPadding)) {
                         //If user is already logged in
                         if (currentUser.value != null) {
+/*
+                            // If user is signed in, get the UID
+                            val userUid = currentUser.value?.uid
+
+                            // checking user UID for debugging
+                            Log.d("MainActivity", "User UID: $userUid")
+*/
+
                             NavGraph(
                                 navController = navController,
                                 workoutViewModel = workoutViewModel,
