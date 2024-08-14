@@ -2,10 +2,11 @@ package com.example.healthfusion.healthFusionMainFunction.login.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.healthfusion.healthFusionData.fireStore.FirestoreRepository
+import com.example.healthfusion.healthFusionMainFunction.login.data.User
 import com.example.healthfusion.healthFusionMainFunction.login.di.LoginRepository
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +17,8 @@ import javax.inject.Inject
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
     private val loginRepository: LoginRepository,
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val firestoreRepository: FirestoreRepository
 ) : ViewModel() {
 
     private val _signUpState = MutableStateFlow<AuthState>(AuthState.Idle)
@@ -37,19 +39,15 @@ class SignUpViewModel @Inject constructor(
                 loginRepository.signUp(email, password)
                 val uid = loginRepository.getCurrentUser()?.uid ?: throw Exception("UID not found")
 
+                val user = User(email = email)
+                val result = firestoreRepository.saveUser(uid, user)
 
-                val user = hashMapOf(
-                    "email" to email,
-                    "createdAt" to FieldValue.serverTimestamp()
-                )
-
-                firestore.collection("users").document(uid).set(user)
-                    .addOnSuccessListener {
-                        _signUpState.value = AuthState.Success
-                    }
-                    .addOnFailureListener { e ->
-                        _signUpState.value = AuthState.AuthError(e.localizedMessage)
-                    }
+                if (result.isSuccess) {
+                    _signUpState.value = AuthState.Success
+                } else {
+                    _signUpState.value =
+                        AuthState.AuthError(result.exceptionOrNull()?.localizedMessage)
+                }
             } catch (e: Exception) {
                 _signUpState.value = firebaseException(e)
             }

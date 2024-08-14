@@ -95,6 +95,7 @@ fun SignUpScreen(
             Text("Sign Up!")
         }
 
+
         when (signUpState) {
             is AuthState.AuthError -> {
                 Spacer(modifier = Modifier.height(8.dp))
