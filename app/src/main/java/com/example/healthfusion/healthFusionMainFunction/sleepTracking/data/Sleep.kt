@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 data class Sleep(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
+    val userId: String,
     val date: String, // YYYY-MM-DD
     val startTime: String, // HH:MM
     val endTime: String, // HH:MM

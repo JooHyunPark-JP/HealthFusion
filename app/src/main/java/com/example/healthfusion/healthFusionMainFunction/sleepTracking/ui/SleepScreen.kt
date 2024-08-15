@@ -19,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.healthfusion.healthFusionMainFunction.sleepTracking.data.Sleep
 
 @Composable
 fun SleepScreen(viewModel: SleepViewModel, modifier: Modifier = Modifier) {
@@ -56,13 +55,12 @@ fun SleepScreen(viewModel: SleepViewModel, modifier: Modifier = Modifier) {
             label = { Text("Quality (1-5)") })
 
         Button(onClick = {
-            val sleep = Sleep(
+            viewModel.addSleepRecord(
                 date = date,
                 startTime = startTime,
                 endTime = endTime,
                 quality = quality
             )
-            viewModel.addSleepRecord(sleep)
         }) {
             Text("Add Sleep Record")
         }

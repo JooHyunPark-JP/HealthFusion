@@ -1,5 +1,6 @@
 package com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,7 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.Workout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
 import com.google.firebase.auth.FirebaseAuth
 
@@ -70,13 +70,12 @@ fun WorkoutScreen(viewModel: WorkoutViewModel, modifier: Modifier = Modifier) {
         }
 
         Button(onClick = {
-            val workout = Workout(
+            viewModel.addWorkout(
                 name = name,
                 duration = duration.toIntOrNull() ?: 0,
                 caloriesBurned = caloriesBurned.toIntOrNull() ?: 0,
                 type = type
             )
-            viewModel.addWorkout(workout)
         }) {
             Text("Add Workout")
         }
@@ -94,6 +93,8 @@ fun WorkoutScreen(viewModel: WorkoutViewModel, modifier: Modifier = Modifier) {
 
         Button(onClick = {
             FirebaseAuth.getInstance().signOut()
+            val user = FirebaseAuth.getInstance().currentUser
+            Log.d("heybro", "After sign out, currentUser: $user")
         }) {
             Text("Sign Out")
         }

@@ -18,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.healthfusion.healthFusionMainFunction.dietTracking.data.Diet
 
 
 @Composable
@@ -46,11 +45,8 @@ fun DietScreen(viewModel: DietViewModel, modifier: Modifier = Modifier) {
             label = { Text("Calories") })
 
         Button(onClick = {
-            val diet = Diet(
-                name = name,
-                calories = calories.toIntOrNull() ?: 0
-            )
-            viewModel.addDiet(diet)
+
+            viewModel.addDiet(name = name, calories = calories.toInt())
         }) {
             Text("Add Food")
         }

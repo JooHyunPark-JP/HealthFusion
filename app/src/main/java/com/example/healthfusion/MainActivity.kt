@@ -10,18 +10,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.example.healthfusion.healthFusionMainFunction.dietTracking.ui.DietViewModel
+import com.example.healthfusion.healthFusionMainFunction.login.navigator.AuthNavGraph
 import com.example.healthfusion.healthFusionMainFunction.login.ui.LoginViewModel
+import com.example.healthfusion.healthFusionMainFunction.login.ui.SignUpViewModel
 import com.example.healthfusion.healthFusionMainFunction.sleepTracking.ui.SleepViewModel
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutViewModel
-import com.example.healthfusion.healthFusionMainFunction.login.navigator.AuthNavGraph
-import com.example.healthfusion.healthFusionMainFunction.login.ui.SignUpViewModel
 import com.example.healthfusion.healthFusionNav.BottomNavBar
 import com.example.healthfusion.healthFusionNav.NavGraph
 import com.example.healthfusion.ui.theme.HealthFusionTheme
@@ -49,22 +48,33 @@ class MainActivity : ComponentActivity() {
             HealthFusionTheme {
                 val navController = rememberNavController()
 
-                // Current Firebase user
+                // Current Firebase user as state
                 val currentUser =
                     remember { mutableStateOf(firebaseAuth.currentUser) }
 
-                // Auth state listener to update UI on auth state changes
-                firebaseAuth.addAuthStateListener { auth ->
-                    currentUser.value = auth.currentUser
-                }
+                /*                // Auth state listener to update UI on auth state changes
+                                firebaseAuth.addAuthStateListener { auth ->
+                                    currentUser.value = auth.currentUser
+                                }
 
-                // Checking whether the user is signed in or not
-                val authState by produceState(initialValue = currentUser.value) {
+                                // Checking whether the user is signed in or not
+                                val authState by produceState(initialValue = currentUser.value) {
+                                    val authListener = FirebaseAuth.AuthStateListener { auth ->
+                                        value = auth.currentUser
+                                    }
+                                    firebaseAuth.addAuthStateListener(authListener)
+                                    awaitDispose {
+                                        firebaseAuth.removeAuthStateListener(authListener)
+                                    }
+                                }*/
+
+                // Auth state listener to update currentUser state
+                DisposableEffect(Unit) {
                     val authListener = FirebaseAuth.AuthStateListener { auth ->
-                        value = auth.currentUser
+                        currentUser.value = auth.currentUser
                     }
                     firebaseAuth.addAuthStateListener(authListener)
-                    awaitDispose {
+                    onDispose {
                         firebaseAuth.removeAuthStateListener(authListener)
                     }
                 }
@@ -73,20 +83,18 @@ class MainActivity : ComponentActivity() {
 
                 Scaffold(modifier = Modifier.fillMaxSize(),
                     bottomBar = {
-                        if (authState != null) {
+                        if (currentUser.value != null) {
                             BottomNavBar(navController = navController)
                         }
                     }) { innerPadding ->
                     Column(modifier = Modifier.padding(innerPadding)) {
                         //If user is already logged in
                         if (currentUser.value != null) {
-/*
                             // If user is signed in, get the UID
                             val userUid = currentUser.value?.uid
 
                             // checking user UID for debugging
-                            Log.d("MainActivity", "User UID: $userUid")
-*/
+                            Log.d("heybro1", "User UID: $userUid")
 
                             NavGraph(
                                 navController = navController,
