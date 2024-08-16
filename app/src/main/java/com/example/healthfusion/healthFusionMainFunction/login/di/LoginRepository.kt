@@ -19,4 +19,5 @@ class LoginRepository @Inject constructor(
     fun getCurrentUser(): FirebaseUser? {
         return firebaseAuth.currentUser
     }
+
 }

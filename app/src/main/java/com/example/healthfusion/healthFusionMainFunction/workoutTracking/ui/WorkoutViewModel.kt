@@ -2,14 +2,16 @@ package com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.healthfusion.healthFusionMainFunction.login.di.LoginRepository
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.Workout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutDao
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -17,22 +19,23 @@ import javax.inject.Inject
 @HiltViewModel
 class WorkoutViewModel @Inject constructor(
     private val workoutDao: WorkoutDao,
-    private val loginRepository: LoginRepository
 ) : ViewModel() {
 
-    // get the user UID
-    private val currentUserUid: String? = loginRepository.getCurrentUser()?.uid
+    private val _userId = MutableStateFlow<String?>(null)
+
 
     // get the workout data of current user and convert flow to stateFlow by using stainIn
-    val workouts: StateFlow<List<Workout>> = currentUserUid?.let { uid ->
-        workoutDao.getWorkoutsForUser(uid)
-            .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
-    } ?: MutableStateFlow(emptyList())
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val workouts: StateFlow<List<Workout>> = _userId.flatMapLatest { uid ->
+        uid?.let {
+            workoutDao.getWorkoutsForUser(it)
+        } ?: flowOf(emptyList())
+    }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
 
     fun addWorkout(name: String, duration: Int, caloriesBurned: Int, type: WorkoutType) {
         viewModelScope.launch {
-            currentUserUid?.let { uid ->
+            _userId.value?.let { uid ->
                 val workout = Workout(
                     name = name,
                     duration = duration,
@@ -40,10 +43,13 @@ class WorkoutViewModel @Inject constructor(
                     type = type,
                     userId = uid
                 )
-                workoutDao.insert(workout.copy(userId = uid))
+                workoutDao.insert(workout)
             }
         }
     }
 
+    fun setUserId(uid: String?) {
+        _userId.value = uid
+    }
 
 }

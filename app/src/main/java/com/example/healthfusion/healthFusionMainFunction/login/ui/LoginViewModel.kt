@@ -8,6 +8,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -16,8 +17,18 @@ class LoginViewModel @Inject constructor(
     private val loginRepository: LoginRepository
 ) : ViewModel() {
 
+    private val _currentUserUid = MutableStateFlow<String?>(null)
+    val currentUserUid: StateFlow<String?> = _currentUserUid.asStateFlow()
+
     private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
     val authState: StateFlow<AuthState> = _authState
+
+    init {
+        // when app starts, firebaseauth checks if app is logged in and get UID
+        val currentUser = loginRepository.getCurrentUser()
+        _currentUserUid.value = currentUser?.uid
+        _authState.value = if (currentUser != null) AuthState.Success else AuthState.Idle
+    }
 
     fun login(email: String, password: String) {
         viewModelScope.launch {
@@ -31,6 +42,7 @@ class LoginViewModel @Inject constructor(
             }
             try {
                 loginRepository.login(email, password)
+                _currentUserUid.value = loginRepository.getCurrentUser()?.uid
                 _authState.value = AuthState.Success
             } catch (e: Exception) {
                 _authState.value = firebaseException(e)
@@ -61,7 +73,6 @@ class LoginViewModel @Inject constructor(
             "Password must be at least 6 characters."
         } else null
     }
-
 
     fun resetState() {
         _authState.value = AuthState.Idle

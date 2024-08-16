@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -47,26 +48,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             HealthFusionTheme {
                 val navController = rememberNavController()
+                val currentUserUid = loginViewModel.currentUserUid.collectAsState().value
 
                 // Current Firebase user as state
                 val currentUser =
                     remember { mutableStateOf(firebaseAuth.currentUser) }
-
-                /*                // Auth state listener to update UI on auth state changes
-                                firebaseAuth.addAuthStateListener { auth ->
-                                    currentUser.value = auth.currentUser
-                                }
-
-                                // Checking whether the user is signed in or not
-                                val authState by produceState(initialValue = currentUser.value) {
-                                    val authListener = FirebaseAuth.AuthStateListener { auth ->
-                                        value = auth.currentUser
-                                    }
-                                    firebaseAuth.addAuthStateListener(authListener)
-                                    awaitDispose {
-                                        firebaseAuth.removeAuthStateListener(authListener)
-                                    }
-                                }*/
 
                 // Auth state listener to update currentUser state
                 DisposableEffect(Unit) {
@@ -78,8 +64,6 @@ class MainActivity : ComponentActivity() {
                         firebaseAuth.removeAuthStateListener(authListener)
                     }
                 }
-
-
 
                 Scaffold(modifier = Modifier.fillMaxSize(),
                     bottomBar = {
@@ -98,9 +82,9 @@ class MainActivity : ComponentActivity() {
 
                             NavGraph(
                                 navController = navController,
-                                workoutViewModel = workoutViewModel,
-                                dietViewModel = dietViewModel,
-                                sleepViewModel = sleepViewModel
+                                workoutViewModel = workoutViewModel.apply { setUserId(currentUserUid) },
+                                dietViewModel = dietViewModel.apply { setUserId(currentUserUid) },
+                                sleepViewModel = sleepViewModel.apply { setUserId(currentUserUid) }
                             )
                         } else {
                             AuthNavGraph(
