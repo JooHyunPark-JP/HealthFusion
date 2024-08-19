@@ -76,6 +76,7 @@ fun WorkoutScreen(viewModel: WorkoutViewModel, modifier: Modifier = Modifier) {
                 caloriesBurned = caloriesBurned.toIntOrNull() ?: 0,
                 type = type
             )
+
         }) {
             Text("Add Workout")
         }
@@ -93,8 +94,6 @@ fun WorkoutScreen(viewModel: WorkoutViewModel, modifier: Modifier = Modifier) {
 
         Button(onClick = {
             FirebaseAuth.getInstance().signOut()
-            val user = FirebaseAuth.getInstance().currentUser
-            Log.d("heybro", "After sign out, currentUser: $user")
         }) {
             Text("Sign Out")
         }

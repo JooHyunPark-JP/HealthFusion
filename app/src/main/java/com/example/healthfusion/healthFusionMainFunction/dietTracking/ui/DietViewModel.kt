@@ -2,9 +2,9 @@ package com.example.healthfusion.healthFusionMainFunction.dietTracking.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.healthfusion.healthFusionData.fireStore.FirestoreRepository
 import com.example.healthfusion.healthFusionMainFunction.dietTracking.data.Diet
 import com.example.healthfusion.healthFusionMainFunction.dietTracking.data.DietDao
-import com.example.healthfusion.healthFusionMainFunction.login.di.LoginRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,8 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class DietViewModel @Inject constructor(
     private val dietDao: DietDao,
-    private val loginRepository: LoginRepository
-
+    private val firestoreRepository: FirestoreRepository
 ) : ViewModel() {
 
     private val _userId = MutableStateFlow<String?>(null)
@@ -32,10 +31,6 @@ class DietViewModel @Inject constructor(
         } ?: flowOf(emptyList())
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-    // get the user UID
-    private val currentUserUid: String? = loginRepository.getCurrentUser()?.uid
-
-
     fun addDiet(name: String, calories: Int) {
         viewModelScope.launch {
             _userId.value?.let { uid ->
@@ -43,6 +38,8 @@ class DietViewModel @Inject constructor(
                     name = name, calories = calories, userId = uid
                 )
                 dietDao.insert(diet)
+
+                firestoreRepository.saveDiet(uid, diet)
             }
         }
     }

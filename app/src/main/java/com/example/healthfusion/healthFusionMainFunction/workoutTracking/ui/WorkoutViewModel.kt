@@ -2,6 +2,7 @@ package com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.healthfusion.healthFusionData.fireStore.FirestoreRepository
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.Workout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutDao
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
@@ -19,10 +20,10 @@ import javax.inject.Inject
 @HiltViewModel
 class WorkoutViewModel @Inject constructor(
     private val workoutDao: WorkoutDao,
+    private val firestoreRepository: FirestoreRepository
 ) : ViewModel() {
 
     private val _userId = MutableStateFlow<String?>(null)
-
 
     // get the workout data of current user and convert flow to stateFlow by using stainIn
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -44,6 +45,9 @@ class WorkoutViewModel @Inject constructor(
                     userId = uid
                 )
                 workoutDao.insert(workout)
+
+                // Save workout data into firestore
+                firestoreRepository.saveWorkout(uid, workout)
             }
         }
     }
