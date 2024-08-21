@@ -40,7 +40,7 @@ class WorkoutViewModel @Inject constructor(
     fun addWorkout(name: String, duration: Int, caloriesBurned: Int, type: WorkoutType) {
         viewModelScope.launch {
             _userId.value?.let { uid ->
-                val workout = Workout(
+                var workout = Workout(
                     name = name,
                     duration = duration,
                     caloriesBurned = caloriesBurned,
@@ -49,13 +49,21 @@ class WorkoutViewModel @Inject constructor(
                     isSynced = false
                 )
                 //save data into room database regardless of network connection
-                workoutDao.insert(workout)
+                val insertedId = workoutDao.insert(workout)
+                workout = workout.copy(id = insertedId.toInt()) // need to update ID
 
                 if (networkHelper.isNetworkConnected()) {
                     try {
                         // Save workout data into firestore
-                        firestoreRepository.saveWorkout(uid, workout)
+                        firestoreRepository.saveWorkout(uid, workout.copy(isSynced = true))
                         workoutDao.update(workout.copy(isSynced = true))
+
+                        /*                        // Testing purpose: after update, view the database data
+                                                val workouts = workoutDao.getWorkoutsForUser(uid)
+                                                    .firstOrNull()
+
+                                                // all workout data review
+                                                Log.d("Testing workoutData2", "Workouts for user $workouts")*/
                     } catch (e: Exception) {
                         Log.e(
                             "SyncError",
