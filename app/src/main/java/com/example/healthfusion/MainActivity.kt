@@ -1,7 +1,10 @@
 package com.example.healthfusion
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -22,6 +25,7 @@ import com.example.healthfusion.healthFusionMainFunction.login.ui.LoginViewModel
 import com.example.healthfusion.healthFusionMainFunction.login.ui.SignUpViewModel
 import com.example.healthfusion.healthFusionMainFunction.sleepTracking.ui.SleepViewModel
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutViewModel
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.util.NetworkCallback
 import com.example.healthfusion.healthFusionNav.BottomNavBar
 import com.example.healthfusion.healthFusionNav.NavGraph
 import com.example.healthfusion.ui.theme.HealthFusionTheme
@@ -37,6 +41,8 @@ class MainActivity : ComponentActivity() {
     private val sleepViewModel: SleepViewModel by viewModels()
     private val loginViewModel: LoginViewModel by viewModels()
     private val signUpViewModel: SignUpViewModel by viewModels()
+    private lateinit var networkCallback: NetworkCallback
+    private lateinit var connectivityManager: ConnectivityManager
 
     @Inject
     lateinit var firebaseAuth: FirebaseAuth
@@ -46,6 +52,26 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+
+            workoutViewModel.syncUnsyncedWorkouts()
+
+            connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+            networkCallback = NetworkCallback(
+                onNetworkAvailable = {
+                    workoutViewModel.syncUnsyncedWorkouts()
+                },
+                onNetworkLost = {
+                    // if network is disconnected, add extra work here.
+                }
+            )
+
+            val request = NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                .build()
+
+            connectivityManager.registerNetworkCallback(request, networkCallback)
+
             HealthFusionTheme {
                 val navController = rememberNavController()
                 val currentUserUid = loginViewModel.currentUserUid.collectAsState().value
@@ -74,11 +100,11 @@ class MainActivity : ComponentActivity() {
                     Column(modifier = Modifier.padding(innerPadding)) {
                         //If user is already logged in
                         if (currentUser.value != null) {
-                            // If user is signed in, get the UID
-                            val userUid = currentUser.value?.uid
 
-                            // checking user UID for debugging
-                            Log.d("heybro1", "User UID: $userUid")
+                            /*                            val userUid = currentUser.value?.uid
+
+                                                        // checking user UID for debugging
+                                                        Log.d("heybro1", "User UID: $userUid")*/
 
                             NavGraph(
                                 navController = navController,
@@ -98,7 +124,14 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // remove receiver
+        connectivityManager.unregisterNetworkCallback(networkCallback)
+    }
 }
+
 
 /*
 

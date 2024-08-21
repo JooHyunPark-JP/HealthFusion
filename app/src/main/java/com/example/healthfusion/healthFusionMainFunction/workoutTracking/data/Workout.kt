@@ -12,5 +12,6 @@ data class Workout(
     val duration: Int, // in minutes
     val caloriesBurned: Int,
     val type: WorkoutType,
+    val isSynced: Boolean = false
 )
 
