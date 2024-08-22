@@ -11,5 +11,6 @@ data class Sleep(
     val date: String, // YYYY-MM-DD
     val startTime: String, // HH:MM
     val endTime: String, // HH:MM
-    val quality: Int // 1-5 or good/bad/excellent... Haven't decided it yet.
+    val quality: Int, // 1-5 or good/bad/excellent... Haven't decided it yet.
+    val isSynced: Boolean = false
 )

@@ -53,13 +53,15 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
 
-            workoutViewModel.syncUnsyncedWorkouts()
+            syncUnsyncedData()
 
-            connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            connectivityManager =
+                getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
+            //Check the current device internet connection. When network is back online, try unsyncedData.
             networkCallback = NetworkCallback(
                 onNetworkAvailable = {
-                    workoutViewModel.syncUnsyncedWorkouts()
+                    syncUnsyncedData()
                 },
                 onNetworkLost = {
                     // if network is disconnected, add extra work here.
@@ -123,6 +125,12 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun syncUnsyncedData() {
+        workoutViewModel.syncUnsyncedWorkouts()
+        sleepViewModel.syncUnsyncedSleepRecords()
+        dietViewModel.syncUnsyncedDiets()
     }
 
     override fun onDestroy() {

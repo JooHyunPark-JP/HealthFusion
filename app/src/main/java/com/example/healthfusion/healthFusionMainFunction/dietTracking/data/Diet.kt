@@ -9,5 +9,6 @@ data class Diet(
     val id: Int = 0,
     val userId: String,
     val name: String,
-    val calories: Int
+    val calories: Int,
+    val isSynced: Boolean = false
 )

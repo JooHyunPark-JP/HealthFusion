@@ -1,10 +1,12 @@
 package com.example.healthfusion.healthFusionMainFunction.sleepTracking.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.healthfusion.healthFusionData.fireStore.FirestoreRepository
 import com.example.healthfusion.healthFusionMainFunction.sleepTracking.data.Sleep
 import com.example.healthfusion.healthFusionMainFunction.sleepTracking.data.SleepDao
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.util.NetworkHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,12 +21,13 @@ import javax.inject.Inject
 @HiltViewModel
 class SleepViewModel @Inject constructor(
     private val sleepDao: SleepDao,
-    private val firestoreRepository: FirestoreRepository
+    private val firestoreRepository: FirestoreRepository,
+    private val networkHelper: NetworkHelper
 ) : ViewModel() {
 
     private val _userId = MutableStateFlow<String?>(null)
 
-
+    // get the sleep data of current user and convert flow to stateFlow by using stateIn
     @OptIn(ExperimentalCoroutinesApi::class)
     val sleepRecords: StateFlow<List<Sleep>> = _userId.flatMapLatest { uid ->
         uid?.let {
@@ -36,16 +39,47 @@ class SleepViewModel @Inject constructor(
     fun addSleepRecord(date: String, startTime: String, endTime: String, quality: Int) {
         viewModelScope.launch {
             _userId.value?.let { uid ->
-                val sleep = Sleep(
+                var sleep = Sleep(
                     date = date,
                     startTime = startTime,
                     endTime = endTime,
                     quality = quality,
-                    userId = uid
+                    userId = uid,
+                    isSynced = false
                 )
-                sleepDao.insert(sleep)
+                // Save data into Room database regardless of network connection
+                val insertedId = sleepDao.insert(sleep)
+                sleep = sleep.copy(id = insertedId.toInt()) // update ID after insertion
 
-                firestoreRepository.saveSleep(uid, sleep)
+                if (networkHelper.isNetworkConnected()) {
+                    try {
+                        // Save sleep data into Firestore
+                        firestoreRepository.saveSleep(uid, sleep.copy(isSynced = true))
+                        sleepDao.update(sleep.copy(isSynced = true))
+                    } catch (e: Exception) {
+                        Log.e(
+                            "SyncError",
+                            "Failed to sync sleep to Firestore: ${e.localizedMessage}"
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+
+    fun syncUnsyncedSleepRecords() {
+        viewModelScope.launch {
+            _userId.value?.let { uid ->
+                val unsyncedSleeps = sleepDao.getUnsyncedSleeps(uid)
+                unsyncedSleeps.forEach { sleep ->
+                    try {
+                        firestoreRepository.saveSleep(uid, sleep)
+                        sleepDao.update(sleep.copy(isSynced = true))
+                    } catch (e: Exception) {
+                        Log.e("SyncError", "Failed to sync sleep record: ${e.localizedMessage}")
+                    }
+                }
             }
         }
     }
