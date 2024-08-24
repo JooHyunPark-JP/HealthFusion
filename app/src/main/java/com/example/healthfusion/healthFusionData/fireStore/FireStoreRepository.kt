@@ -1,5 +1,6 @@
 package com.example.healthfusion.healthFusionData.fireStore
 
+import android.util.Log
 import com.example.healthfusion.healthFusionMainFunction.dietTracking.data.Diet
 import com.example.healthfusion.healthFusionMainFunction.login.data.User
 import com.example.healthfusion.healthFusionMainFunction.sleepTracking.data.Sleep
@@ -58,6 +59,40 @@ class FirestoreRepository @Inject constructor(
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+
+    suspend fun getWorkoutsFromFirestore(userId: String): List<Workout> {
+        return try {
+            val snapshot = firestore.collection("users").document(userId)
+                .collection("workouts").get().await()
+            snapshot.toObjects(Workout::class.java)
+        } catch (e: Exception) {
+            Log.e("FirestoreError", "Failed to fetch workouts: ${e.localizedMessage}")
+            emptyList()
+        }
+    }
+
+    suspend fun getSleepsFromFirestore(userId: String): List<Sleep> {
+        return try {
+            val snapshot = firestore.collection("users").document(userId)
+                .collection("sleeps").get().await()
+            snapshot.toObjects(Sleep::class.java)
+        } catch (e: Exception) {
+            Log.e("FirestoreError", "Failed to fetch sleeps: ${e.localizedMessage}")
+            emptyList()
+        }
+    }
+
+    suspend fun getDietsFromFirestore(userId: String): List<Diet> {
+        return try {
+            val snapshot = firestore.collection("users").document(userId)
+                .collection("diets").get().await()
+            snapshot.toObjects(Diet::class.java)
+        } catch (e: Exception) {
+            Log.e("FirestoreError", "Failed to fetch diets: ${e.localizedMessage}")
+            emptyList()
         }
     }
 }

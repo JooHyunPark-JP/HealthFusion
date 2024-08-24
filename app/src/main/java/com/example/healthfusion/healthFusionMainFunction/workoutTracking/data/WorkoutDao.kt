@@ -30,4 +30,7 @@ interface WorkoutDao {
 
     @Query("SELECT * FROM workout_table WHERE isSynced = 0 AND userId = :userId")
     suspend fun getUnsyncedWorkouts(userId: String): List<Workout>
+
+    @Query("SELECT * FROM workout_table WHERE id = :id")
+    suspend fun getWorkoutById(id: Int): Workout?
 }

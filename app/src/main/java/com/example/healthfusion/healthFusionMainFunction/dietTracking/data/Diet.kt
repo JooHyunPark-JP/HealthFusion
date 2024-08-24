@@ -7,8 +7,16 @@ import androidx.room.PrimaryKey
 data class Diet(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val userId: String,
-    val name: String,
-    val calories: Int,
+    val userId: String = "",
+    val name: String = "",
+    val calories: Int = 0,
     val isSynced: Boolean = false
-)
+) {
+    constructor() : this(
+        id = 0,
+        userId = "",
+        name = "",
+        calories = 0,
+        isSynced = false
+    )
+}

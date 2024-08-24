@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.Workout
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -30,5 +31,8 @@ interface DietDao {
 
     @Query("SELECT * FROM diet_table WHERE isSynced = 0 AND userId = :userId")
     suspend fun getUnsyncedDiets(userId: String): List<Diet>
+
+    @Query("SELECT * FROM diet_table WHERE id = :id")
+    suspend fun getDietById(id: Int): Diet?
 
 }

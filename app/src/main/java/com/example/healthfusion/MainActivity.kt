@@ -53,7 +53,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
 
-            syncUnsyncedData()
+            //Synchronized between firestore and room database
+            syncRoomDatabaseAndFirestoreData()
 
             connectivityManager =
                 getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -61,7 +62,7 @@ class MainActivity : ComponentActivity() {
             //Check the current device internet connection. When network is back online, try unsyncedData.
             networkCallback = NetworkCallback(
                 onNetworkAvailable = {
-                    syncUnsyncedData()
+                    syncRoomDatabaseAndFirestoreData()
                 },
                 onNetworkLost = {
                     // if network is disconnected, add extra work here.
@@ -127,10 +128,13 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun syncUnsyncedData() {
+    private fun syncRoomDatabaseAndFirestoreData() {
         workoutViewModel.syncUnsyncedWorkouts()
+        workoutViewModel.syncWorkoutsFromFirestore()
         sleepViewModel.syncUnsyncedSleepRecords()
+        sleepViewModel.syncWorkoutsFromFirestore()
         dietViewModel.syncUnsyncedDiets()
+        dietViewModel.syncDietFromFirestore()
     }
 
     override fun onDestroy() {

@@ -7,11 +7,21 @@ import androidx.room.PrimaryKey
 data class Workout(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val userId: String,
-    val name: String,
-    val duration: Int, // in minutes
-    val caloriesBurned: Int,
-    val type: WorkoutType,
+    val name: String = "",
+    val duration: Int = 0,
+    val caloriesBurned: Int = 0,
+    val type: WorkoutType = WorkoutType.AEROBIC,
+    val userId: String = "",
     val isSynced: Boolean = false
-)
+){
+    constructor() : this(
+        id = 0,
+        name = "",
+        duration = 0,
+        caloriesBurned = 0,
+        type = WorkoutType.AEROBIC,
+        userId = "",
+        isSynced = false
+    )
+}
 

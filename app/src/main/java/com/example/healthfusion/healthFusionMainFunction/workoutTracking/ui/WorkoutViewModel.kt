@@ -13,6 +13,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
@@ -58,7 +59,7 @@ class WorkoutViewModel @Inject constructor(
                         firestoreRepository.saveWorkout(uid, workout.copy(isSynced = true))
                         workoutDao.update(workout.copy(isSynced = true))
 
-                        /*                        // Testing purpose: after update, view the database data
+/*                                                // Testing purpose: after update, view the database data
                                                 val workouts = workoutDao.getWorkoutsForUser(uid)
                                                     .firstOrNull()
 
@@ -85,6 +86,26 @@ class WorkoutViewModel @Inject constructor(
                         workoutDao.update(workout.copy(isSynced = true))
                     } catch (e: Exception) {
                         Log.e("SyncError", "Failed to sync workout: ${e.localizedMessage}")
+                    }
+                }
+            }
+        }
+    }
+
+    fun syncWorkoutsFromFirestore() {
+        viewModelScope.launch {
+            _userId.value?.let { uid ->
+                if (networkHelper.isNetworkConnected()) {
+                    try {
+                        val firestoreWorkouts = firestoreRepository.getWorkoutsFromFirestore(uid)
+                        firestoreWorkouts.forEach { workout ->
+                            val existingWorkout = workoutDao.getWorkoutById(workout.id)
+                            if (existingWorkout == null) {
+                                workoutDao.insert(workout.copy(isSynced = true))
+                            }
+                        }
+                    } catch (e: Exception) {
+                        Log.e("SyncError", "Failed to sync workouts from Firestore: ${e.localizedMessage}")
                     }
                 }
             }

@@ -76,6 +76,26 @@ class DietViewModel @Inject constructor(
         }
     }
 
+    fun syncDietFromFirestore() {
+        viewModelScope.launch {
+            _userId.value?.let { uid ->
+                if (networkHelper.isNetworkConnected()) {
+                    try {
+                        val firestoreDiets = firestoreRepository.getDietsFromFirestore(uid)
+                        firestoreDiets.forEach { diet ->
+                            val existingDiet = dietDao.getDietById(diet.id)
+                            if (existingDiet == null) {
+                                dietDao.insert(diet.copy(isSynced = true))
+                            }
+                        }
+                    } catch (e: Exception) {
+                        Log.e("SyncError", "Failed to sync workouts from Firestore: ${e.localizedMessage}")
+                    }
+                }
+            }
+        }
+    }
+
     fun setUserId(uid: String?) {
         _userId.value = uid
     }

@@ -32,4 +32,7 @@ interface SleepDao {
 
     @Query("SELECT * FROM sleep_table WHERE isSynced = 0 AND userId = :userId")
     suspend fun getUnsyncedSleeps(userId: String): List<Sleep>
+
+    @Query("SELECT * FROM sleep_table WHERE id = :id")
+    suspend fun getSleepById(id: Int): Sleep?
 }

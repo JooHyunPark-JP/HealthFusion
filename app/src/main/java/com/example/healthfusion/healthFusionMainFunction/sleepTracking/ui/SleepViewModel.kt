@@ -84,6 +84,26 @@ class SleepViewModel @Inject constructor(
         }
     }
 
+    fun syncWorkoutsFromFirestore() {
+        viewModelScope.launch {
+            _userId.value?.let { uid ->
+                if (networkHelper.isNetworkConnected()) {
+                    try {
+                        val firestoreSleeps = firestoreRepository.getSleepsFromFirestore(uid)
+                        firestoreSleeps.forEach { sleep ->
+                            val existingSleep = sleepDao.getSleepById(sleep.id)
+                            if (existingSleep == null) {
+                                sleepDao.insert(sleep.copy(isSynced = true))
+                            }
+                        }
+                    } catch (e: Exception) {
+                        Log.e("SyncError", "Failed to sync workouts from Firestore: ${e.localizedMessage}")
+                    }
+                }
+            }
+        }
+    }
+
     fun setUserId(uid: String?) {
         _userId.value = uid
     }
