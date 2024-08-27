@@ -12,7 +12,8 @@ data class Sleep(
     val startTime: String = "", // HH:MM
     val endTime: String = "", // HH:MM
     val quality: Int = 0, // 1-5 or good/bad/excellent... Haven't decided it yet.
-    val isSynced: Boolean = false
+    val isSynced: Boolean = false,
+    val lastModified: Long = System.currentTimeMillis()
 ) {
     constructor() : this(
         id = 0,

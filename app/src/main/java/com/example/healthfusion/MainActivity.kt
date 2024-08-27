@@ -25,10 +25,10 @@ import com.example.healthfusion.healthFusionMainFunction.login.ui.LoginViewModel
 import com.example.healthfusion.healthFusionMainFunction.login.ui.SignUpViewModel
 import com.example.healthfusion.healthFusionMainFunction.sleepTracking.ui.SleepViewModel
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutViewModel
-import com.example.healthfusion.healthFusionMainFunction.workoutTracking.util.NetworkCallback
 import com.example.healthfusion.healthFusionNav.BottomNavBar
 import com.example.healthfusion.healthFusionNav.NavGraph
 import com.example.healthfusion.ui.theme.HealthFusionTheme
+import com.example.healthfusion.util.NetworkCallback
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

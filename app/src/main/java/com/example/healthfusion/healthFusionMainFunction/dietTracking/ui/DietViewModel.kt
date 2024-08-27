@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.healthfusion.healthFusionData.fireStore.FirestoreRepository
 import com.example.healthfusion.healthFusionMainFunction.dietTracking.data.Diet
 import com.example.healthfusion.healthFusionMainFunction.dietTracking.data.DietDao
-import com.example.healthfusion.healthFusionMainFunction.workoutTracking.util.NetworkHelper
+import com.example.healthfusion.util.NetworkHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,7 +38,11 @@ class DietViewModel @Inject constructor(
         viewModelScope.launch {
             _userId.value?.let { uid ->
                 var diet = Diet(
-                    name = name, calories = calories, userId = uid, isSynced = false
+                    name = name,
+                    calories = calories,
+                    userId = uid,
+                    isSynced = false,
+                    lastModified = System.currentTimeMillis()
                 )
                 // Save data into Room database regardless of network connection
                 val insertedId = dietDao.insert(diet)
@@ -82,14 +86,19 @@ class DietViewModel @Inject constructor(
                 if (networkHelper.isNetworkConnected()) {
                     try {
                         val firestoreDiets = firestoreRepository.getDietsFromFirestore(uid)
-                        firestoreDiets.forEach { diet ->
-                            val existingDiet = dietDao.getDietById(diet.id)
+                        firestoreDiets.forEach { firestoreDiet ->
+                            val existingDiet = dietDao.getDietById(firestoreDiet.id)
                             if (existingDiet == null) {
-                                dietDao.insert(diet.copy(isSynced = true))
+                                dietDao.insert(firestoreDiet.copy(isSynced = true))
+                            } else if (firestoreDiet.lastModified > existingDiet.lastModified) {
+                                dietDao.update(firestoreDiet)
                             }
                         }
                     } catch (e: Exception) {
-                        Log.e("SyncError", "Failed to sync workouts from Firestore: ${e.localizedMessage}")
+                        Log.e(
+                            "SyncError",
+                            "Failed to sync workouts from Firestore: ${e.localizedMessage}"
+                        )
                     }
                 }
             }

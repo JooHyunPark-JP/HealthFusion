@@ -7,13 +7,13 @@ import com.example.healthfusion.healthFusionData.fireStore.FirestoreRepository
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.Workout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutDao
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
-import com.example.healthfusion.healthFusionMainFunction.workoutTracking.util.NetworkHelper
+import com.example.healthfusion.util.DateFormatter
+import com.example.healthfusion.util.NetworkHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
@@ -24,7 +24,8 @@ import javax.inject.Inject
 class WorkoutViewModel @Inject constructor(
     private val workoutDao: WorkoutDao,
     private val firestoreRepository: FirestoreRepository,
-    private val networkHelper: NetworkHelper
+    private val networkHelper: NetworkHelper,
+    private val dateFormatter: DateFormatter
 ) : ViewModel() {
 
     private val _userId = MutableStateFlow<String?>(null)
@@ -47,7 +48,8 @@ class WorkoutViewModel @Inject constructor(
                     caloriesBurned = caloriesBurned,
                     type = type,
                     userId = uid,
-                    isSynced = false
+                    isSynced = false,
+                    lastModified = System.currentTimeMillis()
                 )
                 //save data into room database regardless of network connection
                 val insertedId = workoutDao.insert(workout)
@@ -59,12 +61,12 @@ class WorkoutViewModel @Inject constructor(
                         firestoreRepository.saveWorkout(uid, workout.copy(isSynced = true))
                         workoutDao.update(workout.copy(isSynced = true))
 
-/*                                                // Testing purpose: after update, view the database data
-                                                val workouts = workoutDao.getWorkoutsForUser(uid)
-                                                    .firstOrNull()
+                        /*                                                // Testing purpose: after update, view the database data
+                                                                        val workouts = workoutDao.getWorkoutsForUser(uid)
+                                                                            .firstOrNull()
 
-                                                // all workout data review
-                                                Log.d("Testing workoutData2", "Workouts for user $workouts")*/
+                                                                        // all workout data review
+                                                                        Log.d("Testing workoutData2", "Workouts for user $workouts")*/
                     } catch (e: Exception) {
                         Log.e(
                             "SyncError",
@@ -98,14 +100,22 @@ class WorkoutViewModel @Inject constructor(
                 if (networkHelper.isNetworkConnected()) {
                     try {
                         val firestoreWorkouts = firestoreRepository.getWorkoutsFromFirestore(uid)
-                        firestoreWorkouts.forEach { workout ->
-                            val existingWorkout = workoutDao.getWorkoutById(workout.id)
+                        firestoreWorkouts.forEach { firestoreWorkout ->
+                            val existingWorkout = workoutDao.getWorkoutById(firestoreWorkout.id)
                             if (existingWorkout == null) {
-                                workoutDao.insert(workout.copy(isSynced = true))
+                                workoutDao.insert(firestoreWorkout.copy(isSynced = true))
                             }
+                            //if firestore data is recent then update room database data
+                            else if (firestoreWorkout.lastModified > existingWorkout.lastModified) {
+                                workoutDao.update(firestoreWorkout)
+                            }
+                            //else (firestore data is older one than room database, do nothing (for now)
                         }
                     } catch (e: Exception) {
-                        Log.e("SyncError", "Failed to sync workouts from Firestore: ${e.localizedMessage}")
+                        Log.e(
+                            "SyncError",
+                            "Failed to sync workouts from Firestore: ${e.localizedMessage}"
+                        )
                     }
                 }
             }

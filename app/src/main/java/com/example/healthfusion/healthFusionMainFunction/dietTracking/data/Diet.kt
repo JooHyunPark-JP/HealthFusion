@@ -10,7 +10,8 @@ data class Diet(
     val userId: String = "",
     val name: String = "",
     val calories: Int = 0,
-    val isSynced: Boolean = false
+    val isSynced: Boolean = false,
+    val lastModified: Long = System.currentTimeMillis()
 ) {
     constructor() : this(
         id = 0,

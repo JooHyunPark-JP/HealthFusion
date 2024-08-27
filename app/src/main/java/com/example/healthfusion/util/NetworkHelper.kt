@@ -1,4 +1,4 @@
-package com.example.healthfusion.healthFusionMainFunction.workoutTracking.util
+package com.example.healthfusion.util
 
 import android.content.Context
 import android.net.ConnectivityManager

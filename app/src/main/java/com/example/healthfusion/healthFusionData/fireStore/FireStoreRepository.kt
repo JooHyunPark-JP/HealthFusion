@@ -27,7 +27,6 @@ class FirestoreRepository @Inject constructor(
         }
     }
 
-
     suspend fun saveDiet(userId: String, diet: Diet): Result<Unit> {
         return try {
             val docRef = firestore.collection("users").document(userId)

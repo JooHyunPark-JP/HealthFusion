@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.healthfusion.healthFusionData.fireStore.FirestoreRepository
 import com.example.healthfusion.healthFusionMainFunction.sleepTracking.data.Sleep
 import com.example.healthfusion.healthFusionMainFunction.sleepTracking.data.SleepDao
-import com.example.healthfusion.healthFusionMainFunction.workoutTracking.util.NetworkHelper
+import com.example.healthfusion.util.NetworkHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,7 +45,8 @@ class SleepViewModel @Inject constructor(
                     endTime = endTime,
                     quality = quality,
                     userId = uid,
-                    isSynced = false
+                    isSynced = false,
+                    lastModified = System.currentTimeMillis()
                 )
                 // Save data into Room database regardless of network connection
                 val insertedId = sleepDao.insert(sleep)
@@ -90,10 +91,14 @@ class SleepViewModel @Inject constructor(
                 if (networkHelper.isNetworkConnected()) {
                     try {
                         val firestoreSleeps = firestoreRepository.getSleepsFromFirestore(uid)
-                        firestoreSleeps.forEach { sleep ->
-                            val existingSleep = sleepDao.getSleepById(sleep.id)
+                        firestoreSleeps.forEach { fireStoreSleep ->
+                            val existingSleep = sleepDao.getSleepById(fireStoreSleep.id)
                             if (existingSleep == null) {
-                                sleepDao.insert(sleep.copy(isSynced = true))
+                                sleepDao.insert(fireStoreSleep.copy(isSynced = true))
+                            }
+                            else if(fireStoreSleep.lastModified > existingSleep.lastModified)
+                            {
+                                sleepDao.update(fireStoreSleep)
                             }
                         }
                     } catch (e: Exception) {
