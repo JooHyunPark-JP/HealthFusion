@@ -7,6 +7,8 @@ import com.example.healthfusion.healthFusionData.fireStore.FirestoreRepository
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.Workout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutDao
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.toDTO
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.toEntity
 import com.example.healthfusion.util.DateFormatter
 import com.example.healthfusion.util.NetworkHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -57,8 +59,9 @@ class WorkoutViewModel @Inject constructor(
 
                 if (networkHelper.isNetworkConnected()) {
                     try {
+                        val workoutDTO = workout.toDTO(dateFormatter)
                         // Save workout data into firestore
-                        firestoreRepository.saveWorkout(uid, workout.copy(isSynced = true))
+                        firestoreRepository.saveWorkout(uid, workoutDTO)
                         workoutDao.update(workout.copy(isSynced = true))
 
                         /*                                                // Testing purpose: after update, view the database data
@@ -78,13 +81,15 @@ class WorkoutViewModel @Inject constructor(
         }
     }
 
+    //If room database has data that firestore hasn't, sync the data
     fun syncUnsyncedWorkouts() {
         viewModelScope.launch {
             _userId.value?.let { uid ->
                 val unsyncedWorkouts = workoutDao.getUnsyncedWorkouts(uid)
                 unsyncedWorkouts.forEach { workout ->
                     try {
-                        firestoreRepository.saveWorkout(uid, workout)
+                        val workoutDTO = workout.toDTO(dateFormatter)
+                        firestoreRepository.saveWorkout(uid, workoutDTO)
                         workoutDao.update(workout.copy(isSynced = true))
                     } catch (e: Exception) {
                         Log.e("SyncError", "Failed to sync workout: ${e.localizedMessage}")
@@ -94,6 +99,7 @@ class WorkoutViewModel @Inject constructor(
         }
     }
 
+    //when firestore has data but room database hasn't, get data from firestore and update room database
     fun syncWorkoutsFromFirestore() {
         viewModelScope.launch {
             _userId.value?.let { uid ->
@@ -102,12 +108,21 @@ class WorkoutViewModel @Inject constructor(
                         val firestoreWorkouts = firestoreRepository.getWorkoutsFromFirestore(uid)
                         firestoreWorkouts.forEach { firestoreWorkout ->
                             val existingWorkout = workoutDao.getWorkoutById(firestoreWorkout.id)
+                            val firestoreLastModified =
+                                dateFormatter.parseDateTimeToMillis(firestoreWorkout.lastModified)
                             if (existingWorkout == null) {
-                                workoutDao.insert(firestoreWorkout.copy(isSynced = true))
+                                workoutDao.insert(
+                                    firestoreWorkout.toEntity(dateFormatter).copy(isSynced = true)
+                                )
                             }
                             //if firestore data is recent then update room database data
-                            else if (firestoreWorkout.lastModified > existingWorkout.lastModified) {
-                                workoutDao.update(firestoreWorkout)
+                            else if (firestoreLastModified != null) {
+                                if (firestoreLastModified > existingWorkout.lastModified) {
+                                    workoutDao.update(
+                                        firestoreWorkout.toEntity(dateFormatter)
+                                            .copy(isSynced = true)
+                                    )
+                                }
                             }
                             //else (firestore data is older one than room database, do nothing (for now)
                         }

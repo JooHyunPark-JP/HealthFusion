@@ -21,4 +21,9 @@ class DateFormatter {
             null
         }
     }
+
+    fun formatMillisToDateTime(millis: Long): String {
+        val date = Date(millis)
+        return dateFormat.format(date)
+    }
 }

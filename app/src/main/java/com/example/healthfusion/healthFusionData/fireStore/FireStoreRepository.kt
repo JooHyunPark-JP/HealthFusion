@@ -1,10 +1,10 @@
 package com.example.healthfusion.healthFusionData.fireStore
 
 import android.util.Log
-import com.example.healthfusion.healthFusionMainFunction.dietTracking.data.Diet
+import com.example.healthfusion.healthFusionMainFunction.dietTracking.data.DietDTO
 import com.example.healthfusion.healthFusionMainFunction.login.data.User
-import com.example.healthfusion.healthFusionMainFunction.sleepTracking.data.Sleep
-import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.Workout
+import com.example.healthfusion.healthFusionMainFunction.sleepTracking.data.SleepDTO
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutDTO
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
@@ -16,33 +16,33 @@ class FirestoreRepository @Inject constructor(
     private val firestore: FirebaseFirestore
 ) {
     // save workout data into firestore
-    suspend fun saveWorkout(userId: String, workout: Workout): Result<Unit> {
+    suspend fun saveWorkout(userId: String, workoutDTO: WorkoutDTO): Result<Unit> {
         return try {
             val docRef = firestore.collection("users").document(userId)
                 .collection("workouts").document()
-            docRef.set(workout).await()
+            docRef.set(workoutDTO).await()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-    suspend fun saveDiet(userId: String, diet: Diet): Result<Unit> {
+    suspend fun saveDiet(userId: String, dietDTO: DietDTO): Result<Unit> {
         return try {
             val docRef = firestore.collection("users").document(userId)
                 .collection("diets").document()
-            docRef.set(diet).await()
+            docRef.set(dietDTO).await()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-    suspend fun saveSleep(userId: String, sleep: Sleep): Result<Unit> {
+    suspend fun saveSleep(userId: String, sleepDTO: SleepDTO): Result<Unit> {
         return try {
             val docRef = firestore.collection("users").document(userId)
                 .collection("sleeps").document()
-            docRef.set(sleep).await()
+            docRef.set(sleepDTO).await()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
@@ -62,33 +62,33 @@ class FirestoreRepository @Inject constructor(
     }
 
 
-    suspend fun getWorkoutsFromFirestore(userId: String): List<Workout> {
+    suspend fun getWorkoutsFromFirestore(userId: String): List<WorkoutDTO> {
         return try {
             val snapshot = firestore.collection("users").document(userId)
                 .collection("workouts").get().await()
-            snapshot.toObjects(Workout::class.java)
+            snapshot.toObjects(WorkoutDTO::class.java)
         } catch (e: Exception) {
             Log.e("FirestoreError", "Failed to fetch workouts: ${e.localizedMessage}")
             emptyList()
         }
     }
 
-    suspend fun getSleepsFromFirestore(userId: String): List<Sleep> {
+    suspend fun getSleepsFromFirestore(userId: String): List<SleepDTO> {
         return try {
             val snapshot = firestore.collection("users").document(userId)
                 .collection("sleeps").get().await()
-            snapshot.toObjects(Sleep::class.java)
+            snapshot.toObjects(SleepDTO::class.java)
         } catch (e: Exception) {
             Log.e("FirestoreError", "Failed to fetch sleeps: ${e.localizedMessage}")
             emptyList()
         }
     }
 
-    suspend fun getDietsFromFirestore(userId: String): List<Diet> {
+    suspend fun getDietsFromFirestore(userId: String): List<DietDTO> {
         return try {
             val snapshot = firestore.collection("users").document(userId)
                 .collection("diets").get().await()
-            snapshot.toObjects(Diet::class.java)
+            snapshot.toObjects(DietDTO::class.java)
         } catch (e: Exception) {
             Log.e("FirestoreError", "Failed to fetch diets: ${e.localizedMessage}")
             emptyList()

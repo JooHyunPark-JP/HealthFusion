@@ -6,6 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.healthfusion.healthFusionData.fireStore.FirestoreRepository
 import com.example.healthfusion.healthFusionMainFunction.dietTracking.data.Diet
 import com.example.healthfusion.healthFusionMainFunction.dietTracking.data.DietDao
+import com.example.healthfusion.healthFusionMainFunction.dietTracking.data.toDTO
+import com.example.healthfusion.healthFusionMainFunction.dietTracking.data.toEntity
+import com.example.healthfusion.util.DateFormatter
 import com.example.healthfusion.util.NetworkHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -22,7 +25,8 @@ import javax.inject.Inject
 class DietViewModel @Inject constructor(
     private val dietDao: DietDao,
     private val firestoreRepository: FirestoreRepository,
-    private val networkHelper: NetworkHelper
+    private val networkHelper: NetworkHelper,
+    private val dateFormatter: DateFormatter
 ) : ViewModel() {
 
     private val _userId = MutableStateFlow<String?>(null)
@@ -50,8 +54,9 @@ class DietViewModel @Inject constructor(
 
                 if (networkHelper.isNetworkConnected()) {
                     try {
+                        val dietDTO = diet.toDTO(dateFormatter)
                         // Save diet data into Firestore
-                        firestoreRepository.saveDiet(uid, diet.copy(isSynced = true))
+                        firestoreRepository.saveDiet(uid, dietDTO)
                         dietDao.update(diet.copy(isSynced = true))
                     } catch (e: Exception) {
                         Log.e(
@@ -70,7 +75,8 @@ class DietViewModel @Inject constructor(
                 val unsyncedDiets = dietDao.getUnsyncedDiets(uid)
                 unsyncedDiets.forEach { diet ->
                     try {
-                        firestoreRepository.saveDiet(uid, diet)
+                        val dietDTO = diet.toDTO(dateFormatter)
+                        firestoreRepository.saveDiet(uid, dietDTO)
                         dietDao.update(diet.copy(isSynced = true))
                     } catch (e: Exception) {
                         Log.e("SyncError", "Failed to sync diet: ${e.localizedMessage}")
@@ -88,10 +94,16 @@ class DietViewModel @Inject constructor(
                         val firestoreDiets = firestoreRepository.getDietsFromFirestore(uid)
                         firestoreDiets.forEach { firestoreDiet ->
                             val existingDiet = dietDao.getDietById(firestoreDiet.id)
+                            val firestoreLastModified =
+                                dateFormatter.parseDateTimeToMillis(firestoreDiet.lastModified)
                             if (existingDiet == null) {
-                                dietDao.insert(firestoreDiet.copy(isSynced = true))
-                            } else if (firestoreDiet.lastModified > existingDiet.lastModified) {
-                                dietDao.update(firestoreDiet)
+                                dietDao.insert(firestoreDiet.toEntity(dateFormatter))
+                            } else if (firestoreLastModified != null) {
+                                if (firestoreLastModified > existingDiet.lastModified) {
+                                    dietDao.update(
+                                        firestoreDiet.toEntity(dateFormatter).copy(isSynced = true)
+                                    )
+                                }
                             }
                         }
                     } catch (e: Exception) {

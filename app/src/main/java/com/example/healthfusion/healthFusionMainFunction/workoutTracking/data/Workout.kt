@@ -2,6 +2,11 @@ package com.example.healthfusion.healthFusionMainFunction.workoutTracking.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.healthfusion.util.DateFormatter
+
+
+//Workout data class for room database
+//WorkoutDTO data for firestore
 
 @Entity(tableName = "workout_table")
 data class Workout(
@@ -14,7 +19,7 @@ data class Workout(
     val userId: String = "",
     val isSynced: Boolean = false,
     val lastModified: Long = System.currentTimeMillis()
-){
+) {
     constructor() : this(
         id = 0,
         name = "",
@@ -27,14 +32,15 @@ data class Workout(
     )
 }
 
-/*data class WorkoutDTO(
+data class WorkoutDTO(
     val id: Int,
     val name: String,
     val duration: Int,
     val caloriesBurned: Int,
     val type: WorkoutType,
-    val userId: String
-){
+    val userId: String,
+    val lastModified: String
+) {
     constructor() : this(
         id = 0,
         name = "",
@@ -42,21 +48,25 @@ data class Workout(
         caloriesBurned = 0,
         type = WorkoutType.AEROBIC,
         userId = "",
+        lastModified = ""
     )
 }
 
-fun Workout.toDTO(): WorkoutDTO {
+fun Workout.toDTO(dateFormatter: DateFormatter): WorkoutDTO {
     return WorkoutDTO(
         id = this.id,
         name = this.name,
         duration = this.duration,
         caloriesBurned = this.caloriesBurned,
         type = this.type,
-        userId = this.userId
+        userId = this.userId,
+        lastModified = dateFormatter.formatMillisToDateTime(this.lastModified)
     )
-}*/
+}
 
-/*fun WorkoutDTO.toEntity(): Workout {
+fun WorkoutDTO.toEntity(dateFormatter: DateFormatter): Workout {
+    val lastModifiedMillis =
+        dateFormatter.parseDateTimeToMillis(this.lastModified) ?: System.currentTimeMillis()
     return Workout(
         id = this.id,
         name = this.name,
@@ -64,9 +74,9 @@ fun Workout.toDTO(): WorkoutDTO {
         caloriesBurned = this.caloriesBurned,
         type = this.type,
         userId = this.userId,
-        isSynced = true, // 또는 필요한 상태로 설정
-        lastModified = System.currentTimeMillis()
+        isSynced = true,
+        lastModified = lastModifiedMillis
     )
-}*/
+}
 
 

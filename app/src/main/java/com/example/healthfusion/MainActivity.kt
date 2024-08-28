@@ -132,7 +132,7 @@ class MainActivity : ComponentActivity() {
         workoutViewModel.syncUnsyncedWorkouts()
         workoutViewModel.syncWorkoutsFromFirestore()
         sleepViewModel.syncUnsyncedSleepRecords()
-        sleepViewModel.syncWorkoutsFromFirestore()
+        sleepViewModel.syncSleepsFromFirestore()
         dietViewModel.syncUnsyncedDiets()
         dietViewModel.syncDietFromFirestore()
     }

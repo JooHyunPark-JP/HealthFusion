@@ -6,6 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.healthfusion.healthFusionData.fireStore.FirestoreRepository
 import com.example.healthfusion.healthFusionMainFunction.sleepTracking.data.Sleep
 import com.example.healthfusion.healthFusionMainFunction.sleepTracking.data.SleepDao
+import com.example.healthfusion.healthFusionMainFunction.sleepTracking.data.toDTO
+import com.example.healthfusion.healthFusionMainFunction.sleepTracking.data.toEntity
+import com.example.healthfusion.util.DateFormatter
 import com.example.healthfusion.util.NetworkHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -22,7 +25,8 @@ import javax.inject.Inject
 class SleepViewModel @Inject constructor(
     private val sleepDao: SleepDao,
     private val firestoreRepository: FirestoreRepository,
-    private val networkHelper: NetworkHelper
+    private val networkHelper: NetworkHelper,
+    private val dateFormatter: DateFormatter
 ) : ViewModel() {
 
     private val _userId = MutableStateFlow<String?>(null)
@@ -54,8 +58,9 @@ class SleepViewModel @Inject constructor(
 
                 if (networkHelper.isNetworkConnected()) {
                     try {
+                        val sleepDTO = sleep.toDTO(dateFormatter)
                         // Save sleep data into Firestore
-                        firestoreRepository.saveSleep(uid, sleep.copy(isSynced = true))
+                        firestoreRepository.saveSleep(uid, sleepDTO)
                         sleepDao.update(sleep.copy(isSynced = true))
                     } catch (e: Exception) {
                         Log.e(
@@ -75,7 +80,8 @@ class SleepViewModel @Inject constructor(
                 val unsyncedSleeps = sleepDao.getUnsyncedSleeps(uid)
                 unsyncedSleeps.forEach { sleep ->
                     try {
-                        firestoreRepository.saveSleep(uid, sleep)
+                        val sleepDTO = sleep.toDTO(dateFormatter)
+                        firestoreRepository.saveSleep(uid, sleepDTO)
                         sleepDao.update(sleep.copy(isSynced = true))
                     } catch (e: Exception) {
                         Log.e("SyncError", "Failed to sync sleep record: ${e.localizedMessage}")
@@ -83,9 +89,10 @@ class SleepViewModel @Inject constructor(
                 }
             }
         }
+
     }
 
-    fun syncWorkoutsFromFirestore() {
+    fun syncSleepsFromFirestore() {
         viewModelScope.launch {
             _userId.value?.let { uid ->
                 if (networkHelper.isNetworkConnected()) {
@@ -93,16 +100,25 @@ class SleepViewModel @Inject constructor(
                         val firestoreSleeps = firestoreRepository.getSleepsFromFirestore(uid)
                         firestoreSleeps.forEach { fireStoreSleep ->
                             val existingSleep = sleepDao.getSleepById(fireStoreSleep.id)
+                            val firestoreLastModified =
+                                dateFormatter.parseDateTimeToMillis(fireStoreSleep.lastModified)
                             if (existingSleep == null) {
-                                sleepDao.insert(fireStoreSleep.copy(isSynced = true))
-                            }
-                            else if(fireStoreSleep.lastModified > existingSleep.lastModified)
-                            {
-                                sleepDao.update(fireStoreSleep)
+                                sleepDao.insert(
+                                    fireStoreSleep.toEntity(dateFormatter).copy(isSynced = true)
+                                )
+                            } else if (firestoreLastModified != null) {
+                                if (firestoreLastModified > existingSleep.lastModified) {
+                                    sleepDao.update(
+                                        fireStoreSleep.toEntity(dateFormatter).copy(isSynced = true)
+                                    )
+                                }
                             }
                         }
                     } catch (e: Exception) {
-                        Log.e("SyncError", "Failed to sync workouts from Firestore: ${e.localizedMessage}")
+                        Log.e(
+                            "SyncError",
+                            "Failed to sync workouts from Firestore: ${e.localizedMessage}"
+                        )
                     }
                 }
             }
