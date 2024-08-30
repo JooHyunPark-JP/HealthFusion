@@ -28,11 +28,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
+import com.example.healthfusion.healthFusionNav.Screen
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun WorkoutScreen(viewModel: WorkoutViewModel, modifier: Modifier = Modifier) {
+fun WorkoutScreen(navController: NavController, viewModel: WorkoutViewModel, modifier: Modifier = Modifier) {
     val workouts by viewModel.workouts.collectAsState()
 
     var name by remember { mutableStateOf("") }
@@ -56,6 +58,7 @@ fun WorkoutScreen(viewModel: WorkoutViewModel, modifier: Modifier = Modifier) {
                 .border(1.dp, Color.Gray)
                 .clickable {
                     // Move to workout goal page logic here
+                    navController.navigate(Screen.WorkoutGoal.route)
                 }
                 .padding(16.dp)
         ) {
@@ -65,7 +68,7 @@ fun WorkoutScreen(viewModel: WorkoutViewModel, modifier: Modifier = Modifier) {
             Text(text = "You can set your daily workout goals here.")
             Spacer(modifier = Modifier.height(8.dp))
             Button(onClick = {
-                //Move to workout goal page logic here
+                navController.navigate(Screen.WorkoutGoal.route)
             }) {
                 Text("Set Workout Goal")
             }

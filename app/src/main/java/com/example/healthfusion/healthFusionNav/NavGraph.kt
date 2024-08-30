@@ -8,6 +8,7 @@ import com.example.healthfusion.healthFusionMainFunction.dietTracking.ui.DietScr
 import com.example.healthfusion.healthFusionMainFunction.dietTracking.ui.DietViewModel
 import com.example.healthfusion.healthFusionMainFunction.sleepTracking.ui.SleepScreen
 import com.example.healthfusion.healthFusionMainFunction.sleepTracking.ui.SleepViewModel
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutGoalScreen
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutScreen
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutViewModel
 
@@ -20,13 +21,16 @@ fun NavGraph(
 ) {
     NavHost(navController = navController, startDestination = Screen.Workout.route) {
         composable(Screen.Workout.route) {
-            WorkoutScreen(viewModel = workoutViewModel)
+            WorkoutScreen(navController, viewModel = workoutViewModel)
         }
         composable(Screen.Diet.route) {
             DietScreen(viewModel = dietViewModel)
         }
         composable(Screen.Sleep.route) {
             SleepScreen(viewModel = sleepViewModel)
+        }
+        composable(Screen.WorkoutGoal.route) {
+            WorkoutGoalScreen()
         }
     }
 }
