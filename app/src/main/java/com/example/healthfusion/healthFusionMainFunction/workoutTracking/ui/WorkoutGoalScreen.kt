@@ -29,6 +29,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,6 +45,10 @@ import com.example.healthfusion.ui.theme.HealthFusionTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutGoalScreen() {
+
+    var dailyGoals by remember { mutableStateOf(listOf<String>()) }
+    var weeklyGoals by remember { mutableStateOf(listOf<String>()) }
+
     HealthFusionTheme {
         Scaffold(
             modifier = Modifier.windowInsetsPadding(WindowInsets.safeDrawing),
@@ -51,7 +59,7 @@ fun WorkoutGoalScreen() {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "ArrowBack")
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.inversePrimary // 배경색 설정
+                        containerColor = MaterialTheme.colorScheme.inversePrimary
                     )
                 )
             }
@@ -61,51 +69,14 @@ fun WorkoutGoalScreen() {
                     .fillMaxSize()
                     .padding(innerPadding)
             ) {
-                // 왼쪽 세션: Daily Workout Goal
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(16.dp)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(bottom = 56.dp), // FAB 공간 확보를 위해 패딩 추가
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        Text(text = "Daily Goal", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-
-                        // ProgressBar for Daily Workout Goal
-                        val dailyProgress = 0.5f // Progress value between 0.0f and 1.0f
-                        LinearProgressIndicator(
-                            progress = { dailyProgress },
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-
-                        Text(text = "${(dailyProgress * 100).toInt()}% completed")
-
-                        // LazyColumn for daily goals
-                        LazyColumn(
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            items(5) { index -> // 5개의 목표를 예제로 추가
-                                Text(text = "Daily Goal Item $index")
-                                Spacer(modifier = Modifier.height(8.dp))
-                            }
-                        }
-                    }
-
-                    // FloatingActionButton for Daily Goals
-                    FloatingActionButton(
-                        onClick = { /* Add daily goal logic here */ },
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(16.dp)
-                    ) {
-                        Icon(Icons.Default.Add, contentDescription = "Add Daily Goal")
-                    }
-                }
+                WorkoutGoalSection(
+                    title = "Daily Goal",
+                    progress = 0.5f,
+                    goals = dailyGoals,
+                    onAddGoalClick = { newGoal ->
+                        dailyGoals = dailyGoals + newGoal },
+                    modifier = Modifier.weight(1f)
+                )
 
                 // Vertical Divider
                 VerticalDivider(
@@ -115,52 +86,74 @@ fun WorkoutGoalScreen() {
                         .width(1.dp)
                 )
 
-                // 오른쪽 세션: Weekly Workout Goal
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(16.dp)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(bottom = 56.dp), // FAB 공간 확보를 위해 패딩 추가
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        Text(text = "Weekly Goal", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                WorkoutGoalSection(
+                    title = "Weekly Goal",
+                    progress = 0.8f,
+                    goals = weeklyGoals,
+                    onAddGoalClick = { newGoal ->
+                        weeklyGoals = weeklyGoals + newGoal },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+    }
+}
 
-                        // ProgressBar for Weekly Workout Goal
-                        val weeklyProgress = 0.8f // Progress value between 0.0f and 1.0f
-                        LinearProgressIndicator(
-                            progress = { weeklyProgress },
-                            modifier = Modifier.fillMaxWidth(),
-                        )
+@Composable
+fun WorkoutGoalSection(
+    title: String,
+    progress: Float,
+    goals: List<String>,
+    onAddGoalClick: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
 
-                        Text(text = "${(weeklyProgress * 100).toInt()}% completed")
+    var showDialog by remember { mutableStateOf(false) }
 
-                        // LazyColumn for weekly goals
-                        LazyColumn(
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            items(5) { index -> // 5개의 목표를 예제로 추가
-                                Text(text = "Weekly Goal Item $index")
-                                Spacer(modifier = Modifier.height(8.dp))
-                            }
-                        }
-                    }
+    Box(
+        modifier = modifier.padding(16.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 56.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(text = title, fontSize = 20.sp, fontWeight = FontWeight.Bold)
 
-                    // FloatingActionButton for Weekly Goals
-                    FloatingActionButton(
-                        onClick = { /* Add weekly goal logic here */ },
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(16.dp)
-                    ) {
-                        Icon(Icons.Default.Add, contentDescription = "Add Weekly Goal")
-                    }
+            LinearProgressIndicator(
+                progress = { progress },
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            Text(text = "${(progress * 100).toInt()}% completed")
+
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                items(goals.size) { index ->
+                    Text(text = goals[index])
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
+        }
+
+        FloatingActionButton(
+            onClick = { showDialog = true },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+        ) {
+            Icon(Icons.Default.Add, contentDescription = "Add Goal")
+        }
+
+        if (showDialog) {
+            AddGoalDialog(
+                onDismiss = { showDialog = false },
+                onConfirm = { newGoal ->
+                    onAddGoalClick(newGoal)
+                })
         }
     }
 }
