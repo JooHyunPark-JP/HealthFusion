@@ -1,5 +1,7 @@
 package com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +20,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -40,14 +43,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoal
 import com.example.healthfusion.ui.theme.HealthFusionTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutGoalScreen() {
 
-    var dailyGoals by remember { mutableStateOf(listOf<String>()) }
-    var weeklyGoals by remember { mutableStateOf(listOf<String>()) }
+    var dailyGoals by remember { mutableStateOf(listOf<WorkoutGoal>()) }
+    var weeklyGoals by remember { mutableStateOf(listOf<WorkoutGoal>()) }
 
     HealthFusionTheme {
         Scaffold(
@@ -73,8 +77,14 @@ fun WorkoutGoalScreen() {
                     title = "Daily Goal",
                     progress = 0.5f,
                     goals = dailyGoals,
-                    onAddGoalClick = { newGoal ->
-                        dailyGoals = dailyGoals + newGoal },
+                    onAddGoalClick = { newDailyGoalText ->
+                        dailyGoals = dailyGoals + WorkoutGoal(text = newDailyGoalText)
+                    },
+                    onGoalClick = { workoutGoal ->
+                        dailyGoals = dailyGoals.map { goal ->
+                            if (goal == workoutGoal) goal.copy(isCompleted = !goal.isCompleted) else goal
+                        }
+                    },
                     modifier = Modifier.weight(1f)
                 )
 
@@ -90,8 +100,14 @@ fun WorkoutGoalScreen() {
                     title = "Weekly Goal",
                     progress = 0.8f,
                     goals = weeklyGoals,
-                    onAddGoalClick = { newGoal ->
-                        weeklyGoals = weeklyGoals + newGoal },
+                    onAddGoalClick = { newWeeklyGoal ->
+                        weeklyGoals = weeklyGoals + WorkoutGoal(text = newWeeklyGoal)
+                    },
+                    onGoalClick = { workoutGoal ->
+                        weeklyGoals = weeklyGoals.map { goal ->
+                            if (goal == workoutGoal) goal.copy(isCompleted = !goal.isCompleted) else goal
+                        }
+                    },
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -103,12 +119,15 @@ fun WorkoutGoalScreen() {
 fun WorkoutGoalSection(
     title: String,
     progress: Float,
-    goals: List<String>,
+    goals: List<WorkoutGoal>,
     onAddGoalClick: (String) -> Unit,
+    onGoalClick: (WorkoutGoal) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
     var showDialog by remember { mutableStateOf(false) }
+
+    val calculatedProgress = if (goals.isEmpty()) 0f else goals.size / 5f
 
     Box(
         modifier = modifier.padding(16.dp)
@@ -127,13 +146,28 @@ fun WorkoutGoalSection(
                 modifier = Modifier.fillMaxWidth(),
             )
 
-            Text(text = "${(progress * 100).toInt()}% completed")
+            Text(text = "${(calculatedProgress * 100).toInt()}% completed")
 
             LazyColumn(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 items(goals.size) { index ->
-                    Text(text = goals[index])
+                    val goal = goals[index]
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                            .background(if (goal.isCompleted) Color.Gray else Color.Transparent)
+                            .clickable { onGoalClick(goal) } // 클릭 시 goal 상태 업데이트
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(text = goal.text)
+                        if (goal.isCompleted) {
+                            Icon(Icons.Default.Check, contentDescription = "Completed")
+                        }
+                    }
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }
