@@ -6,6 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.healthfusion.healthFusionData.fireStore.FirestoreRepository
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.Workout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutDao
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoal
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoalDao
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoalType
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.toDTO
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.toEntity
@@ -25,6 +28,7 @@ import javax.inject.Inject
 @HiltViewModel
 class WorkoutViewModel @Inject constructor(
     private val workoutDao: WorkoutDao,
+    private val workoutGoalDao: WorkoutGoalDao,
     private val firestoreRepository: FirestoreRepository,
     private val networkHelper: NetworkHelper,
     private val dateFormatter: DateFormatter
@@ -37,6 +41,26 @@ class WorkoutViewModel @Inject constructor(
     val workouts: StateFlow<List<Workout>> = _userId.flatMapLatest { uid ->
         uid?.let {
             workoutDao.getWorkoutsForUser(it)
+        } ?: flowOf(emptyList())
+    }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val dailyGoals: StateFlow<List<WorkoutGoal>> = _userId.flatMapLatest { uid ->
+        uid?.let {
+            workoutGoalDao.getGoalsForUserAndType(it, WorkoutGoalType.DAILY)
+        } ?: flowOf(emptyList())
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.Lazily,
+        emptyList()
+    )
+
+    // Weekly goals
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val weeklyGoals: StateFlow<List<WorkoutGoal>> = _userId.flatMapLatest { uid ->
+        uid?.let {
+            workoutGoalDao.getGoalsForUserAndType(it, WorkoutGoalType.WEEKLY)
         } ?: flowOf(emptyList())
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
@@ -64,12 +88,12 @@ class WorkoutViewModel @Inject constructor(
                         firestoreRepository.saveWorkout(uid, workoutDTO)
                         workoutDao.update(workout.copy(isSynced = true))
 
-                        /*                                                // Testing purpose: after update, view the database data
-                                                                        val workouts = workoutDao.getWorkoutsForUser(uid)
-                                                                            .firstOrNull()
+                        /* // Testing purpose: after update, view the database data
+                       val workouts = workoutDao.getWorkoutsForUser(uid)
+                       .firstOrNull()
 
-                                                                        // all workout data review
-                                                                        Log.d("Testing workoutData2", "Workouts for user $workouts")*/
+                     // all workout data review
+                       Log.d("Testing workoutData2", "Workouts for user $workouts")*/
                     } catch (e: Exception) {
                         Log.e(
                             "SyncError",
@@ -78,6 +102,41 @@ class WorkoutViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    fun addWorkoutGoal(text: String) {
+        viewModelScope.launch {
+            _userId.value?.let { uid ->
+                val newGoal = WorkoutGoal(
+                    text = text,
+                    isCompleted = false,
+                    userId = uid,
+                    type = WorkoutGoalType.DAILY
+                )
+                workoutGoalDao.insert(newGoal)
+            }
+        }
+    }
+
+    // Weekly goals 추가
+    fun addWeeklyGoal(text: String) {
+        viewModelScope.launch {
+            _userId.value?.let { uid ->
+                val newGoal = WorkoutGoal(
+                    text = text,
+                    isCompleted = false,
+                    userId = uid,
+                    type = WorkoutGoalType.WEEKLY
+                )
+                workoutGoalDao.insert(newGoal)
+            }
+        }
+    }
+
+    fun updateWorkoutGoal(workoutGoal: WorkoutGoal) {
+        viewModelScope.launch {
+            workoutGoalDao.update(workoutGoal)
         }
     }
 

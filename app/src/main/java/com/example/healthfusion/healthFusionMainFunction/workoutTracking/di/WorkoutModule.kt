@@ -2,6 +2,7 @@ package com.example.healthfusion.healthFusionMainFunction.workoutTracking.di
 
 import com.example.healthfusion.healthFusionData.AppDatabase
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutDao
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoalDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,5 +15,10 @@ object WorkoutModule {
     @Provides
     fun provideWorkoutDao(database: AppDatabase): WorkoutDao {
         return database.workoutDao()
+    }
+
+    @Provides
+    fun provideWorkoutGoalDao(database: AppDatabase): WorkoutGoalDao {
+        return database.workoutGoalDao()
     }
 }

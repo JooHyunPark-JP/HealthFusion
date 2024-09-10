@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -32,26 +33,28 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoal
 import com.example.healthfusion.ui.theme.HealthFusionTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WorkoutGoalScreen() {
+fun WorkoutGoalScreen(navController: NavHostController, viewModel: WorkoutViewModel) {
 
-    var dailyGoals by remember { mutableStateOf(listOf<WorkoutGoal>()) }
-    var weeklyGoals by remember { mutableStateOf(listOf<WorkoutGoal>()) }
+    val dailyGoals by viewModel.dailyGoals.collectAsState()
+    val weeklyGoals by viewModel.weeklyGoals.collectAsState()
 
     HealthFusionTheme {
         Scaffold(
@@ -60,7 +63,9 @@ fun WorkoutGoalScreen() {
                 TopAppBar(
                     title = { Text("Workout Goals") },
                     navigationIcon = {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "ArrowBack")
+                        IconButton(onClick = { navController.navigateUp() }) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.inversePrimary
@@ -77,17 +82,15 @@ fun WorkoutGoalScreen() {
                     title = "Daily Goal",
                     goals = dailyGoals,
                     onAddGoalClick = { newDailyGoalText ->
-                        dailyGoals = dailyGoals + WorkoutGoal(text = newDailyGoalText)
+                        viewModel.addWorkoutGoal(newDailyGoalText)
                     },
                     onGoalClick = { workoutGoal ->
-                        dailyGoals = dailyGoals.map { goal ->
-                            if (goal == workoutGoal) goal.copy(isCompleted = !goal.isCompleted) else goal
-                        }
+                        val updatedGoal = workoutGoal.copy(isCompleted = !workoutGoal.isCompleted)
+                        viewModel.updateWorkoutGoal(updatedGoal)
                     },
                     modifier = Modifier.weight(1f)
                 )
 
-                // Vertical Divider
                 VerticalDivider(
                     color = Color.Gray,
                     modifier = Modifier
@@ -98,13 +101,12 @@ fun WorkoutGoalScreen() {
                 WorkoutGoalSection(
                     title = "Weekly Goal",
                     goals = weeklyGoals,
-                    onAddGoalClick = { newWeeklyGoal ->
-                        weeklyGoals = weeklyGoals + WorkoutGoal(text = newWeeklyGoal)
+                    onAddGoalClick = { newWeeklyGoalText ->
+                        viewModel.addWeeklyGoal(newWeeklyGoalText)
                     },
                     onGoalClick = { workoutGoal ->
-                        weeklyGoals = weeklyGoals.map { goal ->
-                            if (goal == workoutGoal) goal.copy(isCompleted = !goal.isCompleted) else goal
-                        }
+                        val updatedGoal = workoutGoal.copy(isCompleted = !workoutGoal.isCompleted)
+                        viewModel.updateWorkoutGoal(updatedGoal)
                     },
                     modifier = Modifier.weight(1f)
                 )
@@ -122,7 +124,7 @@ fun WorkoutGoalSection(
     modifier: Modifier = Modifier
 ) {
 
-    var showDialog by remember { mutableStateOf(false) }
+    var showDialog by rememberSaveable { mutableStateOf(false) }
 
     val completedGoals = goals.count { it.isCompleted }
     val totalGoals = goals.size
@@ -140,7 +142,8 @@ fun WorkoutGoalSection(
         ) {
             Text(text = title, fontSize = 20.sp, fontWeight = FontWeight.Bold)
 
-            val calculatedProgress = if (totalGoals == 0) 0f else completedGoals / totalGoals.toFloat()
+            val calculatedProgress =
+                if (totalGoals == 0) 0f else completedGoals / totalGoals.toFloat()
 
             LinearProgressIndicator(
                 progress = { calculatedProgress },
@@ -154,22 +157,7 @@ fun WorkoutGoalSection(
             ) {
                 items(goals.size) { index ->
                     val goal = goals[index]
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)
-                            .background(if (goal.isCompleted) Color.Gray else Color.Transparent)
-                            .clickable { onGoalClick(goal) }
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(text = goal.text)
-                        if (goal.isCompleted) {
-                            Icon(Icons.Default.Check, contentDescription = "Completed")
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
+                    GoalItem(goal = goal, onGoalClick = onGoalClick)
                 }
             }
         }
@@ -193,10 +181,41 @@ fun WorkoutGoalSection(
     }
 }
 
+@Composable
+fun GoalItem(
+    goal: WorkoutGoal,
+    onGoalClick: (WorkoutGoal) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(if (goal.isCompleted) Color.Gray else Color.Transparent)
+            .clickable { onGoalClick(goal) }
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = goal.text,
+            modifier = Modifier.weight(1f),
+        )
+        if (goal.isCompleted) {
+            Icon(
+                Icons.Default.Check,
+                contentDescription = "Completed",
+                modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+    }
+}
+
+/*
 @Preview(showBackground = true)
 @Composable
 fun WorkoutGoalScreenPreview() {
     HealthFusionTheme {
-        WorkoutGoalScreen()
+        val fakeNavController = rememberNavController()
+        WorkoutGoalScreen(navController = fakeNavController)
     }
-}
+}*/
