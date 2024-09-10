@@ -75,7 +75,6 @@ fun WorkoutGoalScreen() {
             ) {
                 WorkoutGoalSection(
                     title = "Daily Goal",
-                    progress = 0.5f,
                     goals = dailyGoals,
                     onAddGoalClick = { newDailyGoalText ->
                         dailyGoals = dailyGoals + WorkoutGoal(text = newDailyGoalText)
@@ -98,7 +97,6 @@ fun WorkoutGoalScreen() {
 
                 WorkoutGoalSection(
                     title = "Weekly Goal",
-                    progress = 0.8f,
                     goals = weeklyGoals,
                     onAddGoalClick = { newWeeklyGoal ->
                         weeklyGoals = weeklyGoals + WorkoutGoal(text = newWeeklyGoal)
@@ -118,7 +116,6 @@ fun WorkoutGoalScreen() {
 @Composable
 fun WorkoutGoalSection(
     title: String,
-    progress: Float,
     goals: List<WorkoutGoal>,
     onAddGoalClick: (String) -> Unit,
     onGoalClick: (WorkoutGoal) -> Unit,
@@ -127,7 +124,9 @@ fun WorkoutGoalSection(
 
     var showDialog by remember { mutableStateOf(false) }
 
-    val calculatedProgress = if (goals.isEmpty()) 0f else goals.size / 5f
+    val completedGoals = goals.count { it.isCompleted }
+    val totalGoals = goals.size
+
 
     Box(
         modifier = modifier.padding(16.dp)
@@ -141,12 +140,14 @@ fun WorkoutGoalSection(
         ) {
             Text(text = title, fontSize = 20.sp, fontWeight = FontWeight.Bold)
 
+            val calculatedProgress = if (totalGoals == 0) 0f else completedGoals / totalGoals.toFloat()
+
             LinearProgressIndicator(
-                progress = { progress },
+                progress = { calculatedProgress },
                 modifier = Modifier.fillMaxWidth(),
             )
 
-            Text(text = "${(calculatedProgress * 100).toInt()}% completed")
+            Text(text = "$completedGoals of $totalGoals $title completed")
 
             LazyColumn(
                 modifier = Modifier.fillMaxWidth()
@@ -158,7 +159,7 @@ fun WorkoutGoalSection(
                             .fillMaxWidth()
                             .padding(8.dp)
                             .background(if (goal.isCompleted) Color.Gray else Color.Transparent)
-                            .clickable { onGoalClick(goal) } // 클릭 시 goal 상태 업데이트
+                            .clickable { onGoalClick(goal) }
                             .padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
