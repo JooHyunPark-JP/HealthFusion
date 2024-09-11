@@ -45,6 +45,7 @@ class WorkoutViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
 
+    //daily goals
     @OptIn(ExperimentalCoroutinesApi::class)
     val dailyGoals: StateFlow<List<WorkoutGoal>> = _userId.flatMapLatest { uid ->
         uid?.let {

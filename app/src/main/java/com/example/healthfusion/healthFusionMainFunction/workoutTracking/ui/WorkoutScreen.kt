@@ -2,6 +2,7 @@ package com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -29,12 +31,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoal
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoalType
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
 import com.example.healthfusion.healthFusionNav.Screen
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun WorkoutScreen(navController: NavController, viewModel: WorkoutViewModel, modifier: Modifier = Modifier) {
+fun WorkoutScreen(
+    navController: NavController,
+    viewModel: WorkoutViewModel,
+    modifier: Modifier = Modifier
+) {
     val workouts by viewModel.workouts.collectAsState()
 
     var name by remember { mutableStateOf("") }
@@ -42,8 +50,11 @@ fun WorkoutScreen(navController: NavController, viewModel: WorkoutViewModel, mod
     var caloriesBurned by remember { mutableStateOf("") }
     var type by remember { mutableStateOf(WorkoutType.AEROBIC) }
 
+    val dailyGoals by viewModel.dailyGoals.collectAsState()
+    val weeklyGoals by viewModel.weeklyGoals.collectAsState()
+
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(top = 50.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -51,9 +62,9 @@ fun WorkoutScreen(navController: NavController, viewModel: WorkoutViewModel, mod
         Text(text = "Workout Page", fontSize = 24.sp)
 
         Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp)
                 .padding(16.dp)
                 .border(1.dp, Color.Gray)
                 .clickable {
@@ -62,11 +73,12 @@ fun WorkoutScreen(navController: NavController, viewModel: WorkoutViewModel, mod
                 }
                 .padding(16.dp)
         ) {
-            Text(text = "Today's Workout Goals", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = "Workout Goals", fontSize = 20.sp, fontWeight = FontWeight.Bold)
             //will change to progress bar for this text
-            Text(text = "You can set your daily workout goals here.")
-            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = "Your workout goal progress:")
+            WorkoutGoalProgressBar(dailyGoals, WorkoutGoalType.DAILY)
+            WorkoutGoalProgressBar(weeklyGoals, WorkoutGoalType.WEEKLY)
+
             Button(onClick = {
                 navController.navigate(Screen.WorkoutGoal.route)
             }) {
@@ -74,7 +86,6 @@ fun WorkoutScreen(navController: NavController, viewModel: WorkoutViewModel, mod
             }
         }
 
-        // 구분선 추가
         HorizontalDivider(
             color = Color.Gray,
             thickness = 1.dp,
@@ -137,4 +148,25 @@ fun WorkoutScreen(navController: NavController, viewModel: WorkoutViewModel, mod
             Text("Sign Out")
         }
     }
+}
+
+@Composable
+private fun WorkoutGoalProgressBar(
+    workoutGoal: List<WorkoutGoal>,
+    goalType: WorkoutGoalType
+) {
+    val completedGoals = workoutGoal.count { it.isCompleted }
+    val totalGoals = workoutGoal.size
+
+    val calculatedProgress =
+        if (totalGoals == 0) 0f else completedGoals / totalGoals.toFloat()
+
+    val goalTypeText = goalType.toString().lowercase()
+
+    LinearProgressIndicator(
+        progress = { calculatedProgress },
+        modifier = Modifier.fillMaxWidth(),
+    )
+    Text(text = "$completedGoals of $totalGoals $goalTypeText workout goal completed")
+
 }

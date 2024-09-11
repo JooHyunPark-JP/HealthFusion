@@ -189,11 +189,12 @@ fun GoalItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(top = 4.dp)
             .background(if (goal.isCompleted) Color.Gray else Color.Transparent)
             .clickable { onGoalClick(goal) }
-            .padding(12.dp),
+            .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
             text = goal.text,
