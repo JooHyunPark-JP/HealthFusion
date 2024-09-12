@@ -27,6 +27,7 @@ import com.example.healthfusion.healthFusionMainFunction.sleepTracking.ui.SleepV
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutViewModel
 import com.example.healthfusion.healthFusionNav.BottomNavBar
 import com.example.healthfusion.healthFusionNav.NavGraph
+import com.example.healthfusion.healthFusionNav.TopBar
 import com.example.healthfusion.ui.theme.HealthFusionTheme
 import com.example.healthfusion.util.NetworkCallback
 import com.google.firebase.auth.FirebaseAuth
@@ -95,6 +96,9 @@ class MainActivity : ComponentActivity() {
                 }
 
                 Scaffold(modifier = Modifier.fillMaxSize(),
+                    topBar = {
+                        TopBar(navController)
+                    },
                     bottomBar = {
                         if (currentUser.value != null) {
                             BottomNavBar(navController = navController)

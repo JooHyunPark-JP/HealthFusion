@@ -56,10 +56,9 @@ fun WorkoutScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(top = 50.dp),
+            .padding(top = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Workout Page", fontSize = 24.sp)
 
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),

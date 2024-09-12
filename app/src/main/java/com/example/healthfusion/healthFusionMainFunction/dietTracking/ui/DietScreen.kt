@@ -17,7 +17,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 
 @Composable
@@ -30,11 +29,9 @@ fun DietScreen(viewModel: DietViewModel, modifier: Modifier = Modifier) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 50.dp),
+            .padding(top = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Diet Page", fontSize = 24.sp)
-
         TextField(
             value = name,
             onValueChange = { name = it },
