@@ -31,7 +31,7 @@ fun NavGraph(
             SleepScreen(viewModel = sleepViewModel)
         }
         composable(Screen.WorkoutGoal.route) {
-            WorkoutGoalScreen(navController = navController, viewModel = workoutViewModel)
+            WorkoutGoalScreen(viewModel = workoutViewModel)
         }
     }
 }

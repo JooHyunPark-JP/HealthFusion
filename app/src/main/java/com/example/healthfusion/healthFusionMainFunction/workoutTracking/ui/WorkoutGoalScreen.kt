@@ -63,7 +63,7 @@ fun WorkoutGoalScreen(viewModel: WorkoutViewModel) {
                     viewModel.updateWorkoutGoal(updatedGoal)
                 },
                 onGoalDelete = { workoutGoal ->
-
+                    viewModel.deleteWorkoutGoal(workoutGoal)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -88,6 +88,7 @@ fun WorkoutGoalScreen(viewModel: WorkoutViewModel) {
                     viewModel.updateWorkoutGoal(updatedGoal)
                 },
                 onGoalDelete = { workoutGoal ->
+                    viewModel.deleteWorkoutGoal(workoutGoal)
                 },
                 modifier = Modifier
                     .fillMaxWidth()

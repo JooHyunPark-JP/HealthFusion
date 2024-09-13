@@ -20,34 +20,31 @@ fun TopBar(navController: NavHostController) {
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStackEntry?.destination?.route
 
+    val topBarColors = TopAppBarDefaults.topAppBarColors(
+        containerColor = MaterialTheme.colorScheme.inversePrimary
+    )
+
     when (currentDestination) {
         Screen.Workout.route -> {
             CenterAlignedTopAppBar(
                 title = { Text("Workout") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.inversePrimary
+                colors = topBarColors
                 )
-            )
         }
 
         Screen.Diet.route -> {
             CenterAlignedTopAppBar(
                 title = { Text("Diet") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.inversePrimary
-                )
+                colors = topBarColors
             )
         }
 
         Screen.Sleep.route -> {
             CenterAlignedTopAppBar(
                 title = { Text("Sleep") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.inversePrimary
-                )
+                colors = topBarColors
             )
         }
-
 
         Screen.WorkoutGoal.route -> {
             CenterAlignedTopAppBar(
@@ -57,18 +54,14 @@ fun TopBar(navController: NavHostController) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.inversePrimary
-                )
+                colors = topBarColors
             )
         }
 
         else -> {
             CenterAlignedTopAppBar(
                 title = { Text("HealthFusion") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.inversePrimary
-                )
+                colors = topBarColors
             )
         }
     }

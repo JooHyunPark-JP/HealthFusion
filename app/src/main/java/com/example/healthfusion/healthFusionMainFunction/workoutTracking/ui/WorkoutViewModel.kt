@@ -141,6 +141,12 @@ class WorkoutViewModel @Inject constructor(
         }
     }
 
+    fun deleteWorkoutGoal(workoutGoal: WorkoutGoal) {
+        viewModelScope.launch {
+            workoutGoalDao.delete(workoutGoal)
+        }
+    }
+
     //If room database has data that firestore hasn't, sync the data
     fun syncUnsyncedWorkouts() {
         viewModelScope.launch {
