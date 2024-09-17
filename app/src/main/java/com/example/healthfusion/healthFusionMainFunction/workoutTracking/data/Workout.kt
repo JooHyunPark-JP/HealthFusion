@@ -32,6 +32,12 @@ data class Workout(
     )
 }
 
+//workout for image control for gridviews and such
+data class WorkOutName(
+    val name: String,
+    val imageResource: Int
+)
+
 data class WorkoutDTO(
     val id: Int,
     val name: String,
