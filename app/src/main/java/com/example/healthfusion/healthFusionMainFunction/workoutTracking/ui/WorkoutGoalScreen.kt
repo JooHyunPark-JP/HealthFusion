@@ -18,15 +18,18 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -35,7 +38,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoal
 import com.example.healthfusion.ui.theme.HealthFusionTheme
 
@@ -46,54 +48,69 @@ fun WorkoutGoalScreen(viewModel: WorkoutViewModel) {
     val dailyGoals by viewModel.dailyGoals.collectAsState()
     val weeklyGoals by viewModel.weeklyGoals.collectAsState()
 
+
+    val tabWorkoutPageTitles = listOf("Daily Goal", "Weekly Goal")
+
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
+
     HealthFusionTheme {
         Column(
             modifier = Modifier
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            WorkoutGoalSection(
-                title = "Daily Goal",
-                goals = dailyGoals,
-                onAddGoalClick = { newDailyGoalText ->
-                    viewModel.addWorkoutGoal(newDailyGoalText)
-                },
-                onGoalClick = { workoutGoal ->
-                    val updatedGoal = workoutGoal.copy(isCompleted = !workoutGoal.isCompleted)
-                    viewModel.updateWorkoutGoal(updatedGoal)
-                },
-                onGoalDelete = { workoutGoal ->
-                    viewModel.deleteWorkoutGoal(workoutGoal)
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            )
 
-            HorizontalDivider(
-                color = Color.Gray,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(1.dp)
-            )
 
-            WorkoutGoalSection(
-                title = "Weekly Goal",
-                goals = weeklyGoals,
-                onAddGoalClick = { newWeeklyGoalText ->
-                    viewModel.addWeeklyGoal(newWeeklyGoalText)
-                },
-                onGoalClick = { workoutGoal ->
-                    val updatedGoal = workoutGoal.copy(isCompleted = !workoutGoal.isCompleted)
-                    viewModel.updateWorkoutGoal(updatedGoal)
-                },
-                onGoalDelete = { workoutGoal ->
-                    viewModel.deleteWorkoutGoal(workoutGoal)
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            )
+            TabRow(selectedTabIndex = selectedTabIndex) {
+                tabWorkoutPageTitles.forEachIndexed { index, title ->
+                    Tab(
+                        selected = selectedTabIndex == index,
+                        onClick = { selectedTabIndex = index },
+                        text = { Text(title) }
+                    )
+                }
+            }
+
+            if (selectedTabIndex == 0) {
+                WorkoutGoalSection(
+                    title = "Daily Goal",
+                    goals = dailyGoals,
+                    onAddGoalClick = { newDailyGoalText ->
+                        viewModel.addWorkoutGoal(newDailyGoalText)
+                    },
+                    onGoalClick = { workoutGoal ->
+                        val updatedGoal = workoutGoal.copy(isCompleted = !workoutGoal.isCompleted)
+                        viewModel.updateWorkoutGoal(updatedGoal)
+                    },
+                    onGoalDelete = { workoutGoal ->
+                        viewModel.deleteWorkoutGoal(workoutGoal)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                )
+            }
+
+            if (selectedTabIndex == 1) {
+                WorkoutGoalSection(
+                    title = "Weekly Goal",
+                    goals = weeklyGoals,
+                    onAddGoalClick = { newWeeklyGoalText ->
+                        viewModel.addWeeklyGoal(newWeeklyGoalText)
+                    },
+                    onGoalClick = { workoutGoal ->
+                        val updatedGoal = workoutGoal.copy(isCompleted = !workoutGoal.isCompleted)
+                        viewModel.updateWorkoutGoal(updatedGoal)
+                    },
+                    onGoalDelete = { workoutGoal ->
+                        viewModel.deleteWorkoutGoal(workoutGoal)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                )
+            }
+
         }
     }
 }

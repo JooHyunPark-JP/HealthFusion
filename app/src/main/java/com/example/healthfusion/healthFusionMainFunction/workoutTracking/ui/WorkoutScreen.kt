@@ -102,28 +102,11 @@ fun WorkoutScreen(
         }
 
         if (selectedWorkoutTabIndex == 0) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .border(1.dp, Color.Gray)
-                    .clickable {
-                        navController.navigate(Screen.WorkoutGoal.route)
-                    }
-                    .padding(16.dp)
-            ) {
-                Text(text = "Workout Goals", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                Text(text = "Your workout goal progress:")
-                WorkoutGoalProgressBar(dailyGoals, WorkoutGoalType.DAILY)
-                WorkoutGoalProgressBar(weeklyGoals, WorkoutGoalType.WEEKLY)
-
-                Button(onClick = {
-                    navController.navigate(Screen.WorkoutGoal.route)
-                }) {
-                    Text("Set Workout Goal")
-                }
-            }
+            WorkoutGoalBox(
+                navController = navController,
+                dailyGoals = dailyGoals,
+                weeklyGoals = weeklyGoals
+            )
         }
 
         if (selectedWorkoutTabIndex == 1) {
@@ -139,7 +122,6 @@ fun WorkoutScreen(
             }
 
             val selectedWorkouts = if (selectedTabIndex == 0) aerobicWorkouts else anaerobicWorkouts
-
 
             LazyVerticalGrid(
                 columns = GridCells.Fixed(3),
@@ -218,6 +200,36 @@ fun WorkoutScreen(
             FirebaseAuth.getInstance().signOut()
         }) {
             Text("Sign Out")
+        }
+    }
+}
+
+@Composable
+fun WorkoutGoalBox(
+    navController: NavController,
+    dailyGoals: List<WorkoutGoal>,
+    weeklyGoals: List<WorkoutGoal>
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .border(1.dp, Color.Gray)
+            .clickable {
+                navController.navigate(Screen.WorkoutGoal.route)
+            }
+            .padding(16.dp)
+    ) {
+        Text(text = "Workout Goals", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text(text = "Your workout goal progress:")
+        WorkoutGoalProgressBar(dailyGoals, WorkoutGoalType.DAILY)
+        WorkoutGoalProgressBar(weeklyGoals, WorkoutGoalType.WEEKLY)
+
+        Button(onClick = {
+            navController.navigate(Screen.WorkoutGoal.route)
+        }) {
+            Text("Set Workout Goal")
         }
     }
 }
