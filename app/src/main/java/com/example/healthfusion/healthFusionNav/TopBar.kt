@@ -24,31 +24,43 @@ fun TopBar(navController: NavHostController) {
         containerColor = MaterialTheme.colorScheme.inversePrimary
     )
 
-    when (currentDestination) {
-        Screen.Workout.route -> {
+    when {
+        currentDestination == Screen.Workout.route -> {
             CenterAlignedTopAppBar(
                 title = { Text("Workout") },
                 colors = topBarColors
-                )
+            )
         }
 
-        Screen.Diet.route -> {
+        currentDestination == Screen.Diet.route -> {
             CenterAlignedTopAppBar(
                 title = { Text("Diet") },
                 colors = topBarColors
             )
         }
 
-        Screen.Sleep.route -> {
+        currentDestination == Screen.Sleep.route -> {
             CenterAlignedTopAppBar(
                 title = { Text("Sleep") },
                 colors = topBarColors
             )
         }
 
-        Screen.WorkoutGoal.route -> {
+        currentDestination == Screen.WorkoutGoal.route -> {
             CenterAlignedTopAppBar(
                 title = { Text("Workout Goals") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                colors = topBarColors
+            )
+        }
+
+        currentDestination?.startsWith(Screen.WorkoutEdit.route) == true -> {
+            CenterAlignedTopAppBar(
+                title = { Text("Workout!") },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")

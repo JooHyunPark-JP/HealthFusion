@@ -1,14 +1,16 @@
 package com.example.healthfusion.healthFusionNav
 
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.healthfusion.healthFusionMainFunction.dietTracking.ui.DietScreen
 import com.example.healthfusion.healthFusionMainFunction.dietTracking.ui.DietViewModel
 import com.example.healthfusion.healthFusionMainFunction.sleepTracking.ui.SleepScreen
 import com.example.healthfusion.healthFusionMainFunction.sleepTracking.ui.SleepViewModel
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutEdit
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutGoalScreen
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutScreen
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutViewModel
@@ -32,6 +34,13 @@ fun NavGraph(
         }
         composable(Screen.WorkoutGoal.route) {
             WorkoutGoalScreen(viewModel = workoutViewModel)
+        }
+        composable(
+            route = "${Screen.WorkoutEdit.route}/{workoutName}",
+            arguments = listOf(navArgument("workoutName") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val workoutName = backStackEntry.arguments?.getString("workoutName")
+            WorkoutEdit(viewModel = workoutViewModel, workoutName = workoutName.toString())
         }
     }
 }
