@@ -99,7 +99,7 @@ fun WorkoutScreen(
         }
 
         if (selectedWorkoutTabIndex == 1) {
-
+            Spacer(modifier = Modifier.height(8.dp))
             TabRow(selectedTabIndex = selectedTabIndex) {
                 tabTitles.forEachIndexed { index, title ->
                     Tab(
@@ -127,7 +127,13 @@ fun WorkoutScreen(
         }
 
         if (selectedWorkoutTabIndex == 2) {
-            Text(text = "Workout History will be implemented here.")
+
+            Text(text = "Keep up the good work!")
+            WorkoutHistoryScreen(
+                viewModel = viewModel,
+                aerobicWorkouts = aerobicWorkouts,
+                anaerobicWorkouts = anaerobicWorkouts
+            )
         }
 
         //Below here, these codes for later use.
