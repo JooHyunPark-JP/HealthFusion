@@ -17,6 +17,7 @@ data class Workout(
     val caloriesBurned: Int = 0,
     val type: WorkoutType = WorkoutType.AEROBIC,
     val userId: String = "",
+    val workoutDate: Long = System.currentTimeMillis(),
     val isSynced: Boolean = false,
     val lastModified: Long = System.currentTimeMillis()
 ) {
@@ -27,6 +28,7 @@ data class Workout(
         caloriesBurned = 0,
         type = WorkoutType.AEROBIC,
         userId = "",
+        workoutDate = System.currentTimeMillis(),
         isSynced = false,
         lastModified = System.currentTimeMillis()
     )
@@ -45,6 +47,7 @@ data class WorkoutDTO(
     val caloriesBurned: Int,
     val type: WorkoutType,
     val userId: String,
+    val workoutDate: String,
     val lastModified: String
 ) {
     constructor() : this(
@@ -54,6 +57,7 @@ data class WorkoutDTO(
         caloriesBurned = 0,
         type = WorkoutType.AEROBIC,
         userId = "",
+        workoutDate = "",
         lastModified = ""
     )
 }
@@ -66,6 +70,7 @@ fun Workout.toDTO(dateFormatter: DateFormatter): WorkoutDTO {
         caloriesBurned = this.caloriesBurned,
         type = this.type,
         userId = this.userId,
+        workoutDate = dateFormatter.formatMillisToDateTime(this.workoutDate),
         lastModified = dateFormatter.formatMillisToDateTime(this.lastModified)
     )
 }
@@ -80,6 +85,8 @@ fun WorkoutDTO.toEntity(dateFormatter: DateFormatter): Workout {
         caloriesBurned = this.caloriesBurned,
         type = this.type,
         userId = this.userId,
+        workoutDate = dateFormatter.parseDateTimeToMillis(this.workoutDate)
+            ?: System.currentTimeMillis(),
         isSynced = true,
         lastModified = lastModifiedMillis
     )

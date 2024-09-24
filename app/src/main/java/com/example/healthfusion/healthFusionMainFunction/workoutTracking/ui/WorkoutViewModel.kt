@@ -75,6 +75,7 @@ class WorkoutViewModel @Inject constructor(
                     caloriesBurned = caloriesBurned,
                     type = type,
                     userId = uid,
+                    workoutDate = System.currentTimeMillis(),
                     isSynced = false,
                     lastModified = System.currentTimeMillis()
                 )

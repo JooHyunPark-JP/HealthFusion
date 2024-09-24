@@ -24,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkOutName
+import com.example.healthfusion.util.DateFormatter
 
 @Composable
 fun WorkoutHistoryScreen(
@@ -32,6 +33,8 @@ fun WorkoutHistoryScreen(
     anaerobicWorkouts: List<WorkOutName>
 ) {
     val workouts by viewModel.workouts.collectAsState()
+
+    val dateFormatter = DateFormatter()
 
     var filterName by remember { mutableStateOf("") }
     var selectedAerobicWorkout by remember { mutableStateOf<WorkOutName?>(null) }
@@ -143,10 +146,12 @@ fun WorkoutHistoryScreen(
                     (selectedAnaerobicWorkout == null || workout.name == selectedAnaerobicWorkout?.name)
         }
 
+
         LazyColumn {
             items(filteredWorkouts) { workout ->
+                val formattedDate = dateFormatter.formatMillisToDateTime(workout.workoutDate)
                 Text(
-                    text = "Workout: ${workout.name},\nDuration: ${workout.duration}, Calories Burned: ${workout.caloriesBurned}"
+                    text = "Workout: ${workout.name},\nDuration: ${workout.duration}, Calories Burned: ${workout.caloriesBurned}\nDate: $formattedDate"
                 )
                 Spacer(modifier = Modifier.height(8.dp))
             }
