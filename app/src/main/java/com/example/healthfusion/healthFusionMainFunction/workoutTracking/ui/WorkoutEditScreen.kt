@@ -1,8 +1,11 @@
 package com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -19,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
 import com.example.healthfusion.ui.theme.HealthFusionTheme
@@ -106,21 +110,35 @@ fun AerobicInputFields(
     onDistanceChange: (String) -> Unit,
     onCaloriesChange: (String) -> Unit
 ) {
-    TextField(
-        value = duration,
-        onValueChange = onDurationChange,
-        label = { Text("Duration (minutes)") }
-    )
-    TextField(
-        value = distance,
-        onValueChange = onDistanceChange,
-        label = { Text("Distance (km)") }
-    )
-    TextField(
-        value = caloriesBurned,
-        onValueChange = onCaloriesChange,
-        label = { Text("Calories Burned") }
-    )
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        TextField(
+            value = duration,
+            onValueChange = onDurationChange,
+            label = { Text("Duration (minutes)") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Transparent)
+                .padding(horizontal = 4.dp)
+        )
+        TextField(
+            value = distance,
+            onValueChange = onDistanceChange,
+            label = { Text("Distance (km)") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Transparent)
+                .padding(horizontal = 4.dp)
+        )
+        TextField(
+            value = caloriesBurned,
+            onValueChange = onCaloriesChange,
+            label = { Text("Calories Burned") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Transparent)
+                .padding(horizontal = 4.dp)
+        )
+    }
 }
 
 @Composable
@@ -132,21 +150,35 @@ fun AnaerobicInputFields(
     onRepsChange: (Int) -> Unit,
     onWeightsChange: (Int) -> Unit
 ) {
-    TextField(
-        value = sets.toString(),
-        onValueChange = { onSetsChange(it.toIntOrNull() ?: 0) },
-        label = { Text("Sets") }
-    )
-    TextField(
-        value = repetitions.toString(),
-        onValueChange = { onRepsChange(it.toIntOrNull() ?: 0) },
-        label = { Text("Repetitions") }
-    )
-    TextField(
-        value = weights.toString(),
-        onValueChange = { onWeightsChange(it.toIntOrNull() ?: 0) },
-        label = { Text("Weights") }
-    )
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {  // TextField 간격을 8dp로 설정
+        TextField(
+            value = sets.toString(),
+            onValueChange = { onSetsChange(it.toIntOrNull() ?: 0) },
+            label = { Text("Sets") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Transparent)
+                .padding(horizontal = 4.dp)
+        )
+        TextField(
+            value = repetitions.toString(),
+            onValueChange = { onRepsChange(it.toIntOrNull() ?: 0) },
+            label = { Text("Repetitions") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Transparent)
+                .padding(horizontal = 4.dp)
+        )
+        TextField(
+            value = weights.toString(),
+            onValueChange = { onWeightsChange(it.toIntOrNull() ?: 0) },
+            label = { Text("Weights") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Transparent)
+                .padding(horizontal = 4.dp)
+        )
+    }
 }
 
 @Composable

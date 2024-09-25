@@ -57,17 +57,17 @@ fun WorkoutScreen(
     var selectedWorkoutTabIndex by remember { mutableIntStateOf(0) }
     var selectedTabIndex by remember { mutableIntStateOf(0) }
 
-    //Later, workout list will be connected and syncroinized to healthconnect.
+    //Later, workout list will be connected and syncroinized to healthconnect API.
     //For now, just using static list of workouts list.
     val aerobicWorkouts = listOf(
-        WorkOutName("Running", R.drawable.ic_placeholder_icon),
-        WorkOutName("Cycling", R.drawable.ic_placeholder_icon),
-        WorkOutName("Walking", R.drawable.ic_placeholder_icon)
+        WorkOutName("Running", R.drawable.running_pose2),
+        WorkOutName("Cycling", R.drawable.cycling_pose),
+        WorkOutName("Walking", R.drawable.walking_pose)
     )
 
     val anaerobicWorkouts = listOf(
-        WorkOutName("PushUps", R.drawable.ic_placeholder_icon),
-        WorkOutName("Squats", R.drawable.ic_placeholder_icon)
+        WorkOutName("PushUps", R.drawable.pushup_pose),
+        WorkOutName("Squats", R.drawable.squat_pose)
     )
 
     val tabWorkoutPageTitles = listOf("Goals", "Workout List", "History")
@@ -113,8 +113,8 @@ fun WorkoutScreen(
             val selectedWorkouts = if (selectedTabIndex == 0) aerobicWorkouts else anaerobicWorkouts
 
             LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                contentPadding = PaddingValues(16.dp),
+                columns = GridCells.Fixed(2),
+                contentPadding = PaddingValues(8.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
                 itemsIndexed(selectedWorkouts) { index, workout ->
@@ -196,7 +196,7 @@ fun WorkoutGridItem(workout: WorkOutName, navController: NavController) {
             painter = painterResource(id = workout.imageResource),
             contentDescription = workout.name,
             modifier = Modifier
-                .size(100.dp)
+                .size(200.dp)
                 .padding(8.dp)
         )
         Text(text = workout.name, fontSize = 16.sp)
