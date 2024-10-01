@@ -16,6 +16,7 @@ import com.example.healthfusion.util.DateFormatter
 import com.example.healthfusion.util.NetworkHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -105,6 +106,18 @@ class WorkoutViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun getFilteredWorkoutsByName(workoutName: String?): Flow<List<Workout>> {
+        return _userId.flatMapLatest { uid ->
+            if (uid == null || workoutName.isNullOrEmpty()) {
+                flowOf(emptyList())
+            } else {
+                workoutDao.getWorkoutsByName(uid, workoutName)
+            }
+        }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
     }
 
     fun addWorkoutGoal(text: String) {

@@ -70,7 +70,7 @@ fun WorkoutScreen(
         WorkOutName("Squats", R.drawable.squat_pose)
     )
 
-    val tabWorkoutPageTitles = listOf("Goals", "Workout List", "History")
+    val tabWorkoutPageTitles = listOf("Goals", "Workout List", "History", "Calendar")
     val tabTitles = listOf(WorkoutType.AEROBIC, WorkoutType.ANAEROBIC)
 
     Column(
@@ -90,50 +90,64 @@ fun WorkoutScreen(
             }
         }
 
-        if (selectedWorkoutTabIndex == 0) {
-            WorkoutGoalBox(
-                navController = navController,
-                dailyGoals = dailyGoals,
-                weeklyGoals = weeklyGoals
-            )
-        }
+        when (selectedWorkoutTabIndex) {
+            0 -> {
+                WorkoutGoalBox(
+                    navController = navController,
+                    dailyGoals = dailyGoals,
+                    weeklyGoals = weeklyGoals
+                )
+            }
 
-        if (selectedWorkoutTabIndex == 1) {
-            Spacer(modifier = Modifier.height(8.dp))
-            TabRow(selectedTabIndex = selectedTabIndex) {
-                tabTitles.forEachIndexed { index, title ->
-                    Tab(
-                        selected = selectedTabIndex == index,
-                        onClick = { selectedTabIndex = index },
-                        text = { Text(title.toString()) }
-                    )
+            1 -> {
+                Spacer(modifier = Modifier.height(8.dp))
+                TabRow(selectedTabIndex = selectedTabIndex) {
+                    tabTitles.forEachIndexed { index, title ->
+                        Tab(
+                            selected = selectedTabIndex == index,
+                            onClick = { selectedTabIndex = index },
+                            text = { Text(title.toString()) }
+                        )
+                    }
+                }
+
+                val selectedWorkouts =
+                    if (selectedTabIndex == 0) aerobicWorkouts else anaerobicWorkouts
+
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    contentPadding = PaddingValues(8.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    itemsIndexed(selectedWorkouts) { index, workout ->
+                        WorkoutGridItem(
+                            workout = workout,
+                            navController = navController,
+                        )
+                    }
                 }
             }
 
-            val selectedWorkouts = if (selectedTabIndex == 0) aerobicWorkouts else anaerobicWorkouts
-
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                contentPadding = PaddingValues(8.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                itemsIndexed(selectedWorkouts) { index, workout ->
-                    WorkoutGridItem(
-                        workout = workout,
-                        navController = navController,
-                    )
-                }
+            2 -> {
+                Text(text = "Keep up the good work!")
+                WorkoutHistoryScreen(
+                    viewModel = viewModel,
+                    aerobicWorkouts = aerobicWorkouts,
+                    anaerobicWorkouts = anaerobicWorkouts
+                )
             }
-        }
 
-        if (selectedWorkoutTabIndex == 2) {
+            3 -> {
+                WorkoutCalendarScreen(
+                    viewModel = viewModel,
+                    aerobicWorkouts = aerobicWorkouts,
+                    anaerobicWorkouts = anaerobicWorkouts
+                )
+            }
 
-            Text(text = "Keep up the good work!")
-            WorkoutHistoryScreen(
-                viewModel = viewModel,
-                aerobicWorkouts = aerobicWorkouts,
-                anaerobicWorkouts = anaerobicWorkouts
-            )
+            else -> {
+                Text(text = "Invalid Tab")
+            }
         }
 
         //Below here, these codes for later use.
@@ -153,6 +167,7 @@ fun WorkoutScreen(
         }
     }
 }
+
 
 @Composable
 fun WorkoutGoalBox(
@@ -222,5 +237,4 @@ private fun WorkoutGoalProgressBar(
         modifier = Modifier.fillMaxWidth(),
     )
     Text(text = "$completedGoals of $totalGoals $goalTypeText workout goal completed")
-
 }

@@ -25,6 +25,9 @@ interface WorkoutDao {
     @Query("SELECT * FROM workout_table WHERE type = :type")
     fun getExercisesByType(type: WorkoutType): Flow<List<Workout>>
 
+    @Query("SELECT * FROM workout_table WHERE userId = :userId AND name = :workoutName")
+    fun getWorkoutsByName(userId: String, workoutName: String): Flow<List<Workout>>
+
     @Query("SELECT * FROM workout_table WHERE userId = :userId")
     fun getWorkoutsForUser(userId: String): Flow<List<Workout>>
 

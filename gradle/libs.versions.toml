@@ -17,6 +17,7 @@ navigationCompose = "2.7.7"
 hiltNavigationCompose = "1.2.0"
 googleService = "4.4.2"
 googleFirebaseBom = "33.1.2"
+composeCalendar = "1.3.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -53,6 +54,8 @@ google-firebase-bom = { group = "com.google.firebase", name = "firebase-bom", ve
 google-firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics"}
 google-firebase-auth-ktx = {group = "com.google.firebase", name = "firebase-auth-ktx"}
 google-firestore-ktx = {group = "com.google.firebase", name = "firebase-firestore"}
+
+compose-calendar = { group = "io.github.boguszpawlowski.composecalendar", name = "composecalendar", version.ref = "composeCalendar" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

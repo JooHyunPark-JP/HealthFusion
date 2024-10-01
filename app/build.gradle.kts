@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.healthfusion"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -90,6 +90,9 @@ dependencies {
     implementation(libs.google.firebase.analytics)  // Add the dependencies for Firebase products you want to use
     implementation(libs.google.firebase.auth.ktx)
     implementation(libs.google.firestore.ktx)
+
+    //Compose Calendar
+    implementation(libs.compose.calendar)
 
     //Test
     testImplementation(libs.junit)
