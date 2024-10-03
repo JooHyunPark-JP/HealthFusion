@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.OutlinedButton
@@ -28,8 +29,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
+import com.example.healthfusion.R
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkOutName
 import io.github.boguszpawlowski.composecalendar.Calendar
 import io.github.boguszpawlowski.composecalendar.rememberCalendarState
@@ -53,7 +57,6 @@ fun WorkoutCalendarScreen(
     var expandedAnaerobic by remember { mutableStateOf(false) }
 
 
-    // 달력 상태 기억
     val calendarState = rememberCalendarState(
         minMonth = YearMonth.now().minusMonths(12),
         maxMonth = YearMonth.now().plusMonths(12),
@@ -64,7 +67,32 @@ fun WorkoutCalendarScreen(
 
     Column(modifier = Modifier.padding(16.dp)) {
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // show the filter data
+        val filteredWorkouts = workouts.filter { workout ->
+            (selectedAerobicWorkout == null || workout.name == selectedAerobicWorkout?.name) &&
+                    (selectedAnaerobicWorkout == null || workout.name == selectedAnaerobicWorkout?.name)
+        }
+
+        val workoutDates = filteredWorkouts.map { workout ->
+            Instant.ofEpochMilli(workout.workoutDate).atZone(ZoneId.systemDefault()).toLocalDate()
+        }
+
+        Box(modifier = Modifier.padding(16.dp)) {
+            //Compose Calendar: External library
+            Calendar(
+                calendarState = calendarState,
+                dayContent = { day ->
+                    if (day.date.month == currentMonth.month) {
+                        val isWorkoutDay = workoutDates.contains(day.date)
+                        DayContent(day = day.date, isWorkoutDay = isWorkoutDay)
+                    } else {
+                        Box(modifier = Modifier.size(48.dp))
+                    }
+                }
+            )
+        }
 
         Row(modifier = Modifier.fillMaxWidth()) {
             Box(
@@ -78,7 +106,7 @@ fun WorkoutCalendarScreen(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = selectedAerobicWorkout?.name ?: "Select Aerobic Workout")
+                    Text(text = selectedAerobicWorkout?.name ?: "Aerobic Workout")
                 }
 
                 DropdownMenu(
@@ -119,7 +147,7 @@ fun WorkoutCalendarScreen(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = selectedAnaerobicWorkout?.name ?: "Select Anaerobic Workout")
+                    Text(text = selectedAnaerobicWorkout?.name ?: "Anaerobic Workout")
                 }
 
                 DropdownMenu(
@@ -150,33 +178,6 @@ fun WorkoutCalendarScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // show the filter data
-        val filteredWorkouts = workouts.filter { workout ->
-            (selectedAerobicWorkout == null || workout.name == selectedAerobicWorkout?.name) &&
-                    (selectedAnaerobicWorkout == null || workout.name == selectedAnaerobicWorkout?.name)
-        }
-
-        val workoutDates = filteredWorkouts.map { workout ->
-            Instant.ofEpochMilli(workout.workoutDate).atZone(ZoneId.systemDefault()).toLocalDate()
-        }
-
-
-        Box(modifier = Modifier.padding(16.dp)) {
-            //Compose Calendar: External library
-            Calendar(
-                calendarState = calendarState,
-                dayContent = { day ->
-                    if (day.date.month == currentMonth.month) {
-                        val isWorkoutDay = workoutDates.contains(day.date)
-                        DayContent(day = day.date, isWorkoutDay = isWorkoutDay)
-                    } else {
-                        // 이전/다음 달 날짜는 빈 셀 처리
-                        Box(modifier = Modifier.size(48.dp))
-                    }
-                }
-            )
-        }
-
 
         /*        LazyColumn {
                     items(filteredWorkouts) { workout ->
@@ -196,18 +197,18 @@ fun DayContent(day: LocalDate, isWorkoutDay: Boolean) {
     var isBlinking by remember { mutableStateOf(false) }
 
     val backgroundColor by animateColorAsState(
-        targetValue = if (isWorkoutDay && isBlinking) Color.Green else Color.Transparent,
+        targetValue = if (isWorkoutDay && isBlinking) colorResource(R.color.light_skyblue) else Color.Transparent,
         animationSpec = repeatable(
             iterations = 2,
-            animation = tween(durationMillis = 300),
-            repeatMode = RepeatMode.Reverse
+            animation = tween(durationMillis = 1000),
+            repeatMode = RepeatMode.Restart
         ), label = ""
     )
 
     LaunchedEffect(isWorkoutDay) {
         if (isWorkoutDay) {
             isBlinking = true
-            delay(600)
+            delay(2000)
             isBlinking = false
         }
     }
@@ -215,7 +216,8 @@ fun DayContent(day: LocalDate, isWorkoutDay: Boolean) {
     Box(
         modifier = Modifier
             .size(48.dp)
-            .background(if (isWorkoutDay && !isBlinking) Color.Green else backgroundColor),
+            .clip(CircleShape)
+            .background(if (isWorkoutDay && !isBlinking) colorResource(R.color.light_skyblue) else backgroundColor),
         contentAlignment = Alignment.Center
     ) {
         Text(text = day.dayOfMonth.toString())

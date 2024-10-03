@@ -16,7 +16,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.Button
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -70,7 +69,7 @@ fun WorkoutScreen(
         WorkOutName("Squats", R.drawable.squat_pose)
     )
 
-    val tabWorkoutPageTitles = listOf("Goals", "Workout List", "History", "Calendar")
+    val tabWorkoutPageTitles = listOf("Goals", "Workout", "History", "Calendar")
     val tabTitles = listOf(WorkoutType.AEROBIC, WorkoutType.ANAEROBIC)
 
     Column(
@@ -97,6 +96,15 @@ fun WorkoutScreen(
                     dailyGoals = dailyGoals,
                     weeklyGoals = weeklyGoals
                 )
+
+                //temporary sign out function with button
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Button(onClick = {
+                    FirebaseAuth.getInstance().signOut()
+                }) {
+                    Text("Sign Out")
+                }
             }
 
             1 -> {
@@ -148,22 +156,6 @@ fun WorkoutScreen(
             else -> {
                 Text(text = "Invalid Tab")
             }
-        }
-
-        //Below here, these codes for later use.
-        HorizontalDivider(
-            color = Color.Gray,
-            thickness = 1.dp,
-            modifier = Modifier.padding(vertical = 16.dp)
-        )
-
-        //temporary sign out function with button
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Button(onClick = {
-            FirebaseAuth.getInstance().signOut()
-        }) {
-            Text("Sign Out")
         }
     }
 }
