@@ -65,7 +65,7 @@ fun WorkoutHistoryScreen(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = selectedAerobicWorkout?.name ?: "Select Aerobic Workout")
+                    Text(text = selectedAerobicWorkout?.name ?: "Select Aerobic")
                 }
 
                 DropdownMenu(
@@ -107,7 +107,7 @@ fun WorkoutHistoryScreen(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = selectedAnaerobicWorkout?.name ?: "Select Anaerobic Workout")
+                    Text(text = selectedAnaerobicWorkout?.name ?: "Select Anaerobic")
                 }
 
                 DropdownMenu(
@@ -145,7 +145,6 @@ fun WorkoutHistoryScreen(
                     (selectedAerobicWorkout == null || workout.name == selectedAerobicWorkout?.name) &&
                     (selectedAnaerobicWorkout == null || workout.name == selectedAnaerobicWorkout?.name)
         }
-
 
         LazyColumn {
             items(filteredWorkouts) { workout ->

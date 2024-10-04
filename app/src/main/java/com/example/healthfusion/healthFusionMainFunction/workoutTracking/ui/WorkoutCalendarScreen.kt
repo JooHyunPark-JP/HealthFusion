@@ -67,8 +67,6 @@ fun WorkoutCalendarScreen(
 
     Column(modifier = Modifier.padding(16.dp)) {
 
-        Spacer(modifier = Modifier.height(8.dp))
-
         // show the filter data
         val filteredWorkouts = workouts.filter { workout ->
             (selectedAerobicWorkout == null || workout.name == selectedAerobicWorkout?.name) &&
@@ -106,7 +104,7 @@ fun WorkoutCalendarScreen(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = selectedAerobicWorkout?.name ?: "Aerobic Workout")
+                    Text(text = selectedAerobicWorkout?.name ?: "Select Aerobic")
                 }
 
                 DropdownMenu(
@@ -147,7 +145,7 @@ fun WorkoutCalendarScreen(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = selectedAnaerobicWorkout?.name ?: "Anaerobic Workout")
+                    Text(text = selectedAnaerobicWorkout?.name ?: "Select Anaerobic")
                 }
 
                 DropdownMenu(
