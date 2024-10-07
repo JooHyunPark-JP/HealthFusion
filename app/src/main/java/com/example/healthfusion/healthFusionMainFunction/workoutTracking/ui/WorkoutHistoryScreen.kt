@@ -1,5 +1,6 @@
 package com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,9 +23,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkOutName
 import com.example.healthfusion.util.DateFormatter
+import ir.ehsannarmani.compose_charts.LineChart
+import ir.ehsannarmani.compose_charts.models.DotProperties
+import ir.ehsannarmani.compose_charts.models.Line
+import ir.ehsannarmani.compose_charts.models.PopupProperties
+
 
 @Composable
 fun WorkoutHistoryScreen(
@@ -145,6 +156,57 @@ fun WorkoutHistoryScreen(
                     (selectedAerobicWorkout == null || workout.name == selectedAerobicWorkout?.name) &&
                     (selectedAnaerobicWorkout == null || workout.name == selectedAnaerobicWorkout?.name)
         }
+
+        val lineData = filteredWorkouts.mapIndexed { index, workout ->
+            workout.caloriesBurned.toDouble() // This will be Y-axis data
+        }
+
+        LineChart(
+            data = listOf(
+                Line(
+                    label = "Calories Burned",
+                    values = lineData, // Pass the y-axis values (calories burned)
+                    color = SolidColor(Color(0xFF23af92)), // Line color
+                    curvedEdges = true, // Curved lines
+                    dotProperties = DotProperties(
+                        enabled = true, // Enable dots on the line
+                        color = SolidColor(Color.White),
+                        strokeWidth = 3.dp,
+                        radius = 3.dp,
+                        strokeColor = SolidColor(Color(0xFF23af92))
+                    ),
+                    popupProperties = PopupProperties(
+                        enabled = true,
+                        containerColor = Color(0xFF23af92), // Background color of the popup
+                        textStyle = TextStyle.Default.copy(fontSize = 12.sp),
+                        cornerRadius = 6.dp, // Rounded corners
+                        contentBuilder = { value ->
+                            // Display workout information based on the y-axis value (calories burned)
+                            val workout =
+                                filteredWorkouts.find { it.caloriesBurned.toDouble() == value }
+                            workout?.let {
+                                "Workout: ${it.name}\nCalories: ${it.caloriesBurned}\nDuration: ${it.duration} mins"
+                            } ?: "No data"
+                        })
+                )
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(300.dp),
+        )
+
+        // Manually add X-axis labels below the chart
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            listOf("0", "10", "20", "30").forEach { label ->
+                Text(text = label, modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
+            }
+        }
+
 
         LazyColumn {
             items(filteredWorkouts) { workout ->

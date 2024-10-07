@@ -94,6 +94,9 @@ dependencies {
     //Compose Calendar
     implementation(libs.compose.calendar)
 
+    //Compose charts (line, bar, pie etc)
+    implementation(libs.compose.chartEhsannarmani)
+
     //Test
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

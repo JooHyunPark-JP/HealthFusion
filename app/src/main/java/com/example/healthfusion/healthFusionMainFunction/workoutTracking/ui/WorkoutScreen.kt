@@ -137,7 +137,6 @@ fun WorkoutScreen(
             }
 
             2 -> {
-                Text(text = "Keep up the good work!")
                 WorkoutHistoryScreen(
                     viewModel = viewModel,
                     aerobicWorkouts = aerobicWorkouts,
