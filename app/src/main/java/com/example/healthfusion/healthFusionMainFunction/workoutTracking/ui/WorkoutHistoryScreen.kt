@@ -1,6 +1,5 @@
 package com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,8 +32,11 @@ import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.Wo
 import com.example.healthfusion.util.DateFormatter
 import ir.ehsannarmani.compose_charts.LineChart
 import ir.ehsannarmani.compose_charts.models.DotProperties
+import ir.ehsannarmani.compose_charts.models.LabelProperties
 import ir.ehsannarmani.compose_charts.models.Line
 import ir.ehsannarmani.compose_charts.models.PopupProperties
+import java.time.Instant
+import java.time.ZoneId
 
 
 @Composable
@@ -157,6 +159,16 @@ fun WorkoutHistoryScreen(
                     (selectedAnaerobicWorkout == null || workout.name == selectedAnaerobicWorkout?.name)
         }
 
+
+        // Get a list of x-axis labels as dates
+        val dateLabels = filteredWorkouts.map { workout ->
+            // Convert workout date to day-of-month for the x-axis
+            val localDate = Instant.ofEpochMilli(workout.workoutDate)
+                .atZone(ZoneId.systemDefault()).toLocalDate()
+            localDate.dayOfMonth.toString()
+        }
+
+
         val lineData = filteredWorkouts.mapIndexed { index, workout ->
             workout.caloriesBurned.toDouble() // This will be Y-axis data
         }
@@ -172,7 +184,7 @@ fun WorkoutHistoryScreen(
                         enabled = true, // Enable dots on the line
                         color = SolidColor(Color.White),
                         strokeWidth = 3.dp,
-                        radius = 3.dp,
+                        radius = 5.dp,
                         strokeColor = SolidColor(Color(0xFF23af92))
                     ),
                     popupProperties = PopupProperties(
@@ -182,31 +194,35 @@ fun WorkoutHistoryScreen(
                         cornerRadius = 6.dp, // Rounded corners
                         contentBuilder = { value ->
                             // Display workout information based on the y-axis value (calories burned)
-                            val workout =
-                                filteredWorkouts.find { it.caloriesBurned.toDouble() == value }
+                            // Tolerance for floating-point comparison
+                            val tolerance = 0.01
+
+                            // Display workout information based on the y-axis value (calories burned)
+                            val workout = filteredWorkouts.find {
+                                kotlin.math.abs(it.caloriesBurned.toDouble() - value) < tolerance
+                            }
+
                             workout?.let {
                                 "Workout: ${it.name}\nCalories: ${it.caloriesBurned}\nDuration: ${it.duration} mins"
-                            } ?: "No data"
+                            }.toString()
                         })
                 )
             ),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(300.dp),
+            labelProperties = LabelProperties(
+                enabled = true,
+                textStyle = TextStyle.Default.copy(
+                    fontSize = 12.sp,
+                    textAlign = TextAlign.Center
+                ), // Customize the text style
+                padding = 12.dp, // Add padding around the labels
+                labels = dateLabels, // X-axis labels
+                rotationDegreeOnSizeConflict = -45f, // Rotate labels if space conflicts
+                forceRotation = false // If true, always rotate the labels
+            )
         )
-
-        // Manually add X-axis labels below the chart
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            listOf("0", "10", "20", "30").forEach { label ->
-                Text(text = label, modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
-            }
-        }
-
 
         LazyColumn {
             items(filteredWorkouts) { workout ->
