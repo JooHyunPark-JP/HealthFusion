@@ -4,12 +4,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.OutlinedButton
@@ -29,14 +28,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkOutName
-import com.example.healthfusion.util.DateFormatter
 import ir.ehsannarmani.compose_charts.LineChart
 import ir.ehsannarmani.compose_charts.models.DotProperties
 import ir.ehsannarmani.compose_charts.models.LabelProperties
 import ir.ehsannarmani.compose_charts.models.Line
 import ir.ehsannarmani.compose_charts.models.PopupProperties
-import java.time.Instant
-import java.time.ZoneId
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 @Composable
@@ -47,8 +46,6 @@ fun WorkoutHistoryScreen(
 ) {
     val workouts by viewModel.workouts.collectAsState()
 
-    val dateFormatter = DateFormatter()
-
     var filterName by remember { mutableStateOf("") }
     var selectedAerobicWorkout by remember { mutableStateOf<WorkOutName?>(null) }
     var selectedAnaerobicWorkout by remember { mutableStateOf<WorkOutName?>(null) }
@@ -57,6 +54,107 @@ fun WorkoutHistoryScreen(
 
 
     Column(modifier = Modifier.padding(16.dp)) {
+
+        // show the filter data
+        val filteredWorkouts = workouts.filter { workout ->
+            (filterName.isEmpty() || workout.name.contains(filterName, ignoreCase = true)) &&
+                    (selectedAerobicWorkout == null || workout.name == selectedAerobicWorkout?.name) &&
+                    (selectedAnaerobicWorkout == null || workout.name == selectedAnaerobicWorkout?.name)
+        }
+
+
+        // Get the first and last workout dates for the x-axis labels
+        val firstWorkoutDate = filteredWorkouts.minOfOrNull { it.workoutDate }
+        val lastWorkoutDate = filteredWorkouts.maxOfOrNull { it.workoutDate }
+
+        // Format the first and last dates for display
+        val dateLabels = listOfNotNull(
+            firstWorkoutDate?.let {
+                SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(
+                    Date(
+                        it
+                    )
+                )
+            },
+            lastWorkoutDate?.let {
+                SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(
+                    Date(
+                        it
+                    )
+                )
+            }
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        if (filteredWorkouts.isNotEmpty()) {
+            val lineData = filteredWorkouts.mapIndexed { _, workout ->
+                workout.caloriesBurned.toDouble()
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.5f) // Fill 50% of the parent height
+            ) {
+
+                LineChart(
+                    data = listOf(
+                        Line(
+                            label = "Calories Burned",
+                            values = lineData,
+                            color = SolidColor(Color(0xFF23af92)),
+                            curvedEdges = true,
+                            dotProperties = DotProperties(
+                                enabled = true,
+                                color = SolidColor(Color.White),
+                                strokeWidth = 3.dp,
+                                radius = 5.dp,
+                                strokeColor = SolidColor(Color(0xFF23af92))
+                            ),
+                            popupProperties = PopupProperties(
+                                enabled = true,
+                                containerColor = Color(0xFF23af92),
+                                textStyle = TextStyle.Default.copy(fontSize = 12.sp),
+                                cornerRadius = 6.dp,
+                                contentBuilder = { value ->
+                                    val tolerance = 0.01
+                                    val workout = filteredWorkouts.find {
+                                        kotlin.math.abs(it.caloriesBurned.toDouble() - value) < tolerance
+                                    }
+                                    workout?.let {
+                                        "Workout: ${it.name}\nCalories: ${it.caloriesBurned}\nDuration: ${it.duration} mins"
+                                    } ?: "No data"
+                                }
+                            )
+                        )
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    labelProperties = LabelProperties(
+                        enabled = true,
+                        textStyle = TextStyle.Default.copy(
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.Center
+                        ),
+                        padding = 12.dp,
+                        labels = dateLabels,
+                        rotationDegreeOnSizeConflict = -45f,
+                        forceRotation = false
+                    )
+                )
+            }
+        } else {
+            Text(
+                text = "No data available!",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp),
+                textAlign = TextAlign.Center
+            )
+        }
+
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         TextField(
             value = filterName,
             onValueChange = { filterName = it },
@@ -147,90 +245,6 @@ fun WorkoutHistoryScreen(
                             expandedAnaerobic = false
                         })
                 }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // show the filter data
-        val filteredWorkouts = workouts.filter { workout ->
-            (filterName.isEmpty() || workout.name.contains(filterName, ignoreCase = true)) &&
-                    (selectedAerobicWorkout == null || workout.name == selectedAerobicWorkout?.name) &&
-                    (selectedAnaerobicWorkout == null || workout.name == selectedAnaerobicWorkout?.name)
-        }
-
-
-        // Get a list of x-axis labels as dates
-        val dateLabels = filteredWorkouts.map { workout ->
-            // Convert workout date to day-of-month for the x-axis
-            val localDate = Instant.ofEpochMilli(workout.workoutDate)
-                .atZone(ZoneId.systemDefault()).toLocalDate()
-            localDate.dayOfMonth.toString()
-        }
-
-
-        val lineData = filteredWorkouts.mapIndexed { index, workout ->
-            workout.caloriesBurned.toDouble() // This will be Y-axis data
-        }
-
-        LineChart(
-            data = listOf(
-                Line(
-                    label = "Calories Burned",
-                    values = lineData, // Pass the y-axis values (calories burned)
-                    color = SolidColor(Color(0xFF23af92)), // Line color
-                    curvedEdges = true, // Curved lines
-                    dotProperties = DotProperties(
-                        enabled = true, // Enable dots on the line
-                        color = SolidColor(Color.White),
-                        strokeWidth = 3.dp,
-                        radius = 5.dp,
-                        strokeColor = SolidColor(Color(0xFF23af92))
-                    ),
-                    popupProperties = PopupProperties(
-                        enabled = true,
-                        containerColor = Color(0xFF23af92), // Background color of the popup
-                        textStyle = TextStyle.Default.copy(fontSize = 12.sp),
-                        cornerRadius = 6.dp, // Rounded corners
-                        contentBuilder = { value ->
-                            // Display workout information based on the y-axis value (calories burned)
-                            // Tolerance for floating-point comparison
-                            val tolerance = 0.01
-
-                            // Display workout information based on the y-axis value (calories burned)
-                            val workout = filteredWorkouts.find {
-                                kotlin.math.abs(it.caloriesBurned.toDouble() - value) < tolerance
-                            }
-
-                            workout?.let {
-                                "Workout: ${it.name}\nCalories: ${it.caloriesBurned}\nDuration: ${it.duration} mins"
-                            }.toString()
-                        })
-                )
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(300.dp),
-            labelProperties = LabelProperties(
-                enabled = true,
-                textStyle = TextStyle.Default.copy(
-                    fontSize = 12.sp,
-                    textAlign = TextAlign.Center
-                ), // Customize the text style
-                padding = 12.dp, // Add padding around the labels
-                labels = dateLabels, // X-axis labels
-                rotationDegreeOnSizeConflict = -45f, // Rotate labels if space conflicts
-                forceRotation = false // If true, always rotate the labels
-            )
-        )
-
-        LazyColumn {
-            items(filteredWorkouts) { workout ->
-                val formattedDate = dateFormatter.formatMillisToDateTime(workout.workoutDate)
-                Text(
-                    text = "Workout: ${workout.name},\nDuration: ${workout.duration}, Calories Burned: ${workout.caloriesBurned}\nDate: $formattedDate"
-                )
-                Spacer(modifier = Modifier.height(8.dp))
             }
         }
     }
