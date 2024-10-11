@@ -139,8 +139,6 @@ fun WorkoutScreen(
             2 -> {
                 WorkoutHistoryScreen(
                     viewModel = viewModel,
-                    aerobicWorkouts = aerobicWorkouts,
-                    anaerobicWorkouts = anaerobicWorkouts
                 )
             }
 

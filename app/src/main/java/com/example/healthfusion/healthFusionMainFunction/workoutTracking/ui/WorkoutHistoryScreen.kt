@@ -27,7 +27,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkOutName
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.Workout
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
 import ir.ehsannarmani.compose_charts.LineChart
 import ir.ehsannarmani.compose_charts.models.DotProperties
 import ir.ehsannarmani.compose_charts.models.LabelProperties
@@ -41,16 +42,20 @@ import java.util.Locale
 @Composable
 fun WorkoutHistoryScreen(
     viewModel: WorkoutViewModel,
-    aerobicWorkouts: List<WorkOutName>,
-    anaerobicWorkouts: List<WorkOutName>
+    modifier: Modifier = Modifier
 ) {
     val workouts by viewModel.workouts.collectAsState()
 
     var filterName by remember { mutableStateOf("") }
-    var selectedAerobicWorkout by remember { mutableStateOf<WorkOutName?>(null) }
-    var selectedAnaerobicWorkout by remember { mutableStateOf<WorkOutName?>(null) }
+
+
+    var selectedAerobicWorkout by remember { mutableStateOf<Workout?>(null) }
+    var selectedAnaerobicWorkout by remember { mutableStateOf<Workout?>(null) }
     var expandedAerobic by remember { mutableStateOf(false) }
     var expandedAnaerobic by remember { mutableStateOf(false) }
+    var showExtraOptions by remember { mutableStateOf(false) }
+    var selectedDetailOption by remember { mutableStateOf<String?>(null) }
+    var expandedDetailOptions by remember { mutableStateOf(false) }
 
 
     Column(modifier = Modifier.padding(16.dp)) {
@@ -165,6 +170,8 @@ fun WorkoutHistoryScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(modifier = Modifier.fillMaxWidth()) {
+            val aerobicWorkout =
+                workouts.filter { it.type == WorkoutType.AEROBIC }.distinctBy { it.name }
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -184,24 +191,24 @@ fun WorkoutHistoryScreen(
                     onDismissRequest = { expandedAerobic = false },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    aerobicWorkouts.forEach { workout ->
+                    if (aerobicWorkout.isNotEmpty())
+                        aerobicWorkout.forEach { workout ->
+                            DropdownMenuItem(
+                                text = { Text(workout.name) },
+                                onClick = {
+                                    selectedAerobicWorkout = workout
+                                    selectedAnaerobicWorkout = null
+                                    expandedAerobic = false
+                                    filterName = ""
+                                    showExtraOptions = true
+                                }
+                            )
+                        }
+                    else {
                         DropdownMenuItem(
-                            text = { Text(workout.name) },
-                            onClick = {
-                                selectedAerobicWorkout = workout
-                                selectedAnaerobicWorkout = null
-                                expandedAerobic = false
-                                filterName = ""
-                            }
-                        )
+                            text = { Text("No Aerobic data in this account") },
+                            onClick = { })
                     }
-
-                    DropdownMenuItem(
-                        text = { Text("Clear Selection") },
-                        onClick = {
-                            selectedAerobicWorkout = null
-                            expandedAerobic = false
-                        })
                 }
             }
 
@@ -211,6 +218,10 @@ fun WorkoutHistoryScreen(
                 modifier = Modifier
                     .weight(1f)
             ) {
+                val anaerobicWorkout =
+                    workouts
+                        .filter { it.type == WorkoutType.ANAEROBIC }
+                        .distinctBy { it.name }
                 OutlinedButton(
                     onClick = {
                         expandedAnaerobic = true
@@ -226,26 +237,90 @@ fun WorkoutHistoryScreen(
                     onDismissRequest = { expandedAnaerobic = false },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    anaerobicWorkouts.forEach { workout ->
+                    if (anaerobicWorkout.isNotEmpty())
+                        anaerobicWorkout.forEach { workout ->
+                            DropdownMenuItem(
+                                text = { Text(workout.name) },
+                                onClick = {
+                                    selectedAnaerobicWorkout = workout
+                                    selectedAerobicWorkout = null
+                                    expandedAnaerobic = false
+                                    filterName = ""
+                                    showExtraOptions = true
+                                }
+                            )
+                        }
+                    else {
                         DropdownMenuItem(
-                            text = { Text(workout.name) },
-                            onClick = {
-                                selectedAnaerobicWorkout = workout
-                                selectedAerobicWorkout = null
-                                expandedAnaerobic = false
-                                filterName = ""
-                            }
-                        )
+                            text = { Text("No anaerobicWorkout data in this account") },
+                            onClick = { })
                     }
-
-                    DropdownMenuItem(
-                        text = { Text("Clear Selection") },
-                        onClick = {
-                            selectedAnaerobicWorkout = null
-                            expandedAnaerobic = false
-                        })
                 }
             }
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+
+        if (showExtraOptions) {
+            Box {
+                OutlinedButton(
+                    onClick = {
+                        expandedDetailOptions = true
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("View More Options")
+                }
+
+                DropdownMenu(
+                    expanded = expandedDetailOptions,
+                    onDismissRequest = { expandedDetailOptions = false },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Calories Burned") },
+                        onClick = {
+                            selectedDetailOption = "Calories Burned"
+                            expandedDetailOptions = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Distance") },
+                        onClick = {
+                            selectedDetailOption = "Distance"
+                            expandedDetailOptions = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Duration") },
+                        onClick = {
+                            selectedDetailOption = "Duration"
+                            expandedDetailOptions = false
+                        }
+                    )
+                }
+            }
+
+            selectedDetailOption?.let {
+                Text(
+                    text = "Selected: $it",
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        OutlinedButton(
+            onClick = {
+                selectedAerobicWorkout = null
+                selectedAnaerobicWorkout = null
+                expandedAerobic = false
+                expandedAnaerobic = false
+                showExtraOptions = false
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Clear filter")
         }
     }
 }
