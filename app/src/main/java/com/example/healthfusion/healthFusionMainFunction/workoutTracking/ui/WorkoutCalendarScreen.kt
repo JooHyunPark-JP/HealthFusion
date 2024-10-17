@@ -34,6 +34,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import com.example.healthfusion.R
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AerobicWorkout
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AnaerobicWorkout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkOutName
 import io.github.boguszpawlowski.composecalendar.Calendar
 import io.github.boguszpawlowski.composecalendar.rememberCalendarState
@@ -45,17 +47,14 @@ import java.time.ZoneId
 
 @Composable
 fun WorkoutCalendarScreen(
-    viewModel: WorkoutViewModel,
-    aerobicWorkouts: List<WorkOutName>,
-    anaerobicWorkouts: List<WorkOutName>
+    viewModel: WorkoutViewModel
 ) {
     val workouts by viewModel.workouts.collectAsState()
 
-    var selectedAerobicWorkout by remember { mutableStateOf<WorkOutName?>(null) }
-    var selectedAnaerobicWorkout by remember { mutableStateOf<WorkOutName?>(null) }
+    var selectedAerobicWorkout by remember { mutableStateOf<AerobicWorkout?>(null) }
+    var selectedAnaerobicWorkout by remember { mutableStateOf<AnaerobicWorkout?>(null) }
     var expandedAerobic by remember { mutableStateOf(false) }
     var expandedAnaerobic by remember { mutableStateOf(false) }
-
 
     val calendarState = rememberCalendarState(
         minMonth = YearMonth.now().minusMonths(12),
@@ -69,8 +68,8 @@ fun WorkoutCalendarScreen(
 
         // show the filter data
         val filteredWorkouts = workouts.filter { workout ->
-            (selectedAerobicWorkout == null || workout.name == selectedAerobicWorkout?.name) &&
-                    (selectedAnaerobicWorkout == null || workout.name == selectedAnaerobicWorkout?.name)
+            (selectedAerobicWorkout == null || workout.name == selectedAerobicWorkout?.workoutName) &&
+                    (selectedAnaerobicWorkout == null || workout.name == selectedAnaerobicWorkout?.workoutName)
         }
 
         val workoutDates = filteredWorkouts.map { workout ->
@@ -78,7 +77,7 @@ fun WorkoutCalendarScreen(
         }
 
         Box(modifier = Modifier.padding(16.dp)) {
-            //Compose Calendar: External library
+            // Compose Calendar: External library
             Calendar(
                 calendarState = calendarState,
                 dayContent = { day ->
@@ -92,6 +91,7 @@ fun WorkoutCalendarScreen(
             )
         }
 
+        // Dropdown for Aerobic Workout Selection
         Row(modifier = Modifier.fillMaxWidth()) {
             Box(
                 modifier = Modifier
@@ -104,7 +104,7 @@ fun WorkoutCalendarScreen(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = selectedAerobicWorkout?.name ?: "Select Aerobic")
+                    Text(text = selectedAerobicWorkout?.workoutName ?: "Select Aerobic")
                 }
 
                 DropdownMenu(
@@ -112,9 +112,9 @@ fun WorkoutCalendarScreen(
                     onDismissRequest = { expandedAerobic = false },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    aerobicWorkouts.forEach { workout ->
+                    AerobicWorkout.entries.forEach { workout ->
                         DropdownMenuItem(
-                            text = { Text(workout.name) },
+                            text = { Text(workout.workoutName) },
                             onClick = {
                                 selectedAerobicWorkout = workout
                                 selectedAnaerobicWorkout = null
@@ -134,6 +134,7 @@ fun WorkoutCalendarScreen(
 
             Spacer(modifier = Modifier.width(8.dp))
 
+            // Dropdown for Anaerobic Workout Selection
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -145,7 +146,7 @@ fun WorkoutCalendarScreen(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = selectedAnaerobicWorkout?.name ?: "Select Anaerobic")
+                    Text(text = selectedAnaerobicWorkout?.workoutName ?: "Select Anaerobic")
                 }
 
                 DropdownMenu(
@@ -153,9 +154,9 @@ fun WorkoutCalendarScreen(
                     onDismissRequest = { expandedAnaerobic = false },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    anaerobicWorkouts.forEach { workout ->
+                    AnaerobicWorkout.entries.forEach { workout ->
                         DropdownMenuItem(
-                            text = { Text(workout.name) },
+                            text = { Text(workout.workoutName) },
                             onClick = {
                                 selectedAnaerobicWorkout = workout
                                 selectedAerobicWorkout = null
@@ -175,18 +176,7 @@ fun WorkoutCalendarScreen(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-
-
-        /*        LazyColumn {
-                    items(filteredWorkouts) { workout ->
-                        val formattedDate = dateFormatter.formatMillisToDateTime(workout.workoutDate)
-                        Text(
-                            text = "Workout: ${workout.name}, Date: $formattedDate"
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }*/
     }
-
 }
 
 @Composable

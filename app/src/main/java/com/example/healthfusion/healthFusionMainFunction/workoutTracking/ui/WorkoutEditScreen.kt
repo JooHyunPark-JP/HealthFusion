@@ -3,14 +3,12 @@ package com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -29,7 +27,7 @@ import com.example.healthfusion.ui.theme.HealthFusionTheme
 
 
 @Composable
-fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String) {
+fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: WorkoutType) {
 
     val workouts by viewModel.workouts.collectAsState()
 
@@ -52,6 +50,7 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(text = workoutName)
+            Text(text = workoutType.name)
 
             when (workoutName) {
                 "Running", "Cycling", "Walking" -> AerobicInputFields(
@@ -77,14 +76,12 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String) {
                 }
             }
 
-            WorkoutTypeSelector(type = type, onTypeChange = { type = it })
-
             Button(onClick = {
                 viewModel.addWorkout(
                     name = workoutName,
                     duration = duration.toIntOrNull() ?: 0,
                     caloriesBurned = caloriesBurned.toIntOrNull() ?: 0,
-                    type = type
+                    type = workoutType
                 )
             }) {
                 Text("Add Workout")
@@ -181,18 +178,3 @@ fun AnaerobicInputFields(
     }
 }
 
-@Composable
-fun WorkoutTypeSelector(type: WorkoutType, onTypeChange: (WorkoutType) -> Unit) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        RadioButton(
-            selected = type == WorkoutType.AEROBIC,
-            onClick = { onTypeChange(WorkoutType.AEROBIC) }
-        )
-        Text("Aerobic")
-        RadioButton(
-            selected = type == WorkoutType.ANAEROBIC,
-            onClick = { onTypeChange(WorkoutType.ANAEROBIC) }
-        )
-        Text("Anaerobic")
-    }
-}

@@ -35,6 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.healthfusion.R
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AerobicWorkout
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AnaerobicWorkout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkOutName
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoal
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoalType
@@ -119,15 +121,18 @@ fun WorkoutScreen(
                     }
                 }
 
-                val selectedWorkouts =
-                    if (selectedTabIndex == 0) aerobicWorkouts else anaerobicWorkouts
+                val selectedWorkouts = if (selectedTabIndex == 0) {
+                    AerobicWorkout.entries
+                } else {
+                    AnaerobicWorkout.entries
+                }
 
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
                     contentPadding = PaddingValues(8.dp),
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    itemsIndexed(selectedWorkouts) { index, workout ->
+                    itemsIndexed(selectedWorkouts) { _, workout ->
                         WorkoutGridItem(
                             workout = workout,
                             navController = navController,
@@ -145,8 +150,6 @@ fun WorkoutScreen(
             3 -> {
                 WorkoutCalendarScreen(
                     viewModel = viewModel,
-                    aerobicWorkouts = aerobicWorkouts,
-                    anaerobicWorkouts = anaerobicWorkouts
                 )
             }
 
@@ -189,16 +192,40 @@ fun WorkoutGoalBox(
 }
 
 @Composable
-fun WorkoutGridItem(workout: WorkOutName, navController: NavController) {
+fun WorkoutGridItem(workout: Enum<*>, navController: NavController) {
+    val workoutName: String
+    val imageResource: Int
+    val workoutType: WorkoutType
+
+    when (workout) {
+        is AerobicWorkout -> {
+            workoutName = workout.workoutName
+            imageResource = workout.imageResource
+            workoutType = workout.workoutType
+        }
+
+        is AnaerobicWorkout -> {
+            workoutName = workout.workoutName
+            imageResource = workout.imageResource
+            workoutType = workout.workoutType
+        }
+
+        else -> {
+            workoutName = "Unknown"
+            imageResource = 0
+            workoutType = WorkoutType.AEROBIC
+        }
+    }
+
     Column(
         modifier = Modifier
             .padding(8.dp)
-            .clickable { navController.navigate("${Screen.WorkoutEdit.route}/${workout.name}") },
+            .clickable { navController.navigate("${Screen.WorkoutEdit.route}/${workoutName}/${workoutType.name}") },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = workout.imageResource),
-            contentDescription = workout.name,
+            painter = painterResource(id = imageResource),
+            contentDescription = workoutName,
             modifier = Modifier
                 .size(200.dp)
                 .padding(8.dp)

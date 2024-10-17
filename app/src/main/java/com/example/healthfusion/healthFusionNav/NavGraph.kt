@@ -10,6 +10,7 @@ import com.example.healthfusion.healthFusionMainFunction.dietTracking.ui.DietScr
 import com.example.healthfusion.healthFusionMainFunction.dietTracking.ui.DietViewModel
 import com.example.healthfusion.healthFusionMainFunction.sleepTracking.ui.SleepScreen
 import com.example.healthfusion.healthFusionMainFunction.sleepTracking.ui.SleepViewModel
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutEdit
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutGoalScreen
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutScreen
@@ -36,11 +37,21 @@ fun NavGraph(
             WorkoutGoalScreen(viewModel = workoutViewModel)
         }
         composable(
-            route = "${Screen.WorkoutEdit.route}/{workoutName}",
-            arguments = listOf(navArgument("workoutName") { type = NavType.StringType })
+            route = "${Screen.WorkoutEdit.route}/{workoutName}/{workoutType}",
+            arguments = listOf(
+                navArgument("workoutName") { type = NavType.StringType },
+                navArgument("workoutType") { type = NavType.StringType })
         ) { backStackEntry ->
             val workoutName = backStackEntry.arguments?.getString("workoutName")
-            WorkoutEdit(viewModel = workoutViewModel, workoutName = workoutName.toString())
+
+            val workoutTypeString = backStackEntry.arguments?.getString("workoutType")
+            val workoutType = workoutTypeString?.let { WorkoutType.valueOf(it) }
+
+            WorkoutEdit(
+                viewModel = workoutViewModel,
+                workoutName = workoutName.orEmpty(),
+                workoutType = workoutType ?: WorkoutType.AEROBIC
+            )
         }
     }
 }
