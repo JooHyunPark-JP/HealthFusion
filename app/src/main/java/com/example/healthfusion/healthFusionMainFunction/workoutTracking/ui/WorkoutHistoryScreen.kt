@@ -91,9 +91,12 @@ fun WorkoutHistoryScreen(
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (filteredWorkouts.isNotEmpty()) {
-            val lineData = filteredWorkouts.mapIndexed { _, workout ->
-                workout.caloriesBurned.toDouble()
+        if (selectedDetailOption != null && filteredWorkouts.isNotEmpty()) {
+            val lineData = when (selectedDetailOption) {
+                "Calories Burned" -> filteredWorkouts.map { it.caloriesBurned.toDouble() }
+                // "Distance" -> filteredWorkouts.map { it.distance?.toDouble() ?: 0.0 } // distance 필드가 필요
+                "Duration" -> filteredWorkouts.map { it.duration.toDouble() }
+                else -> filteredWorkouts.map { it.caloriesBurned.toDouble() } // Default value is calories burned
             }
             Box(
                 modifier = Modifier
@@ -104,7 +107,7 @@ fun WorkoutHistoryScreen(
                 LineChart(
                     data = listOf(
                         Line(
-                            label = "Calories Burned",
+                            label = selectedDetailOption ?: "Calories Burned",
                             values = lineData,
                             color = SolidColor(Color(0xFF23af92)),
                             curvedEdges = true,
@@ -123,7 +126,14 @@ fun WorkoutHistoryScreen(
                                 contentBuilder = { value ->
                                     val tolerance = 0.01
                                     val workout = filteredWorkouts.find {
-                                        kotlin.math.abs(it.caloriesBurned.toDouble() - value) < tolerance
+                                        when (selectedDetailOption) {
+                                            "Calories Burned" -> kotlin.math.abs(it.caloriesBurned.toDouble() - value) < tolerance
+                                            "Duration" -> kotlin.math.abs(it.duration.toDouble() - value) < tolerance
+                                            //"Distance" -> kotlin.math.abs(it.distance.toDouble() - value) < tolerance
+                                            else -> kotlin.math.abs(it.caloriesBurned.toDouble() - value) < tolerance
+                                        }
+
+
                                     }
                                     workout?.let {
                                         "Workout: ${it.name}\nCalories: ${it.caloriesBurned}\nDuration: ${it.duration} mins"
@@ -268,7 +278,11 @@ fun WorkoutHistoryScreen(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("View More Options")
+                    if (selectedDetailOption == null) {
+                        Text("View more options")
+                    } else {
+                        Text("$selectedDetailOption")
+                    }
                 }
 
                 DropdownMenu(
