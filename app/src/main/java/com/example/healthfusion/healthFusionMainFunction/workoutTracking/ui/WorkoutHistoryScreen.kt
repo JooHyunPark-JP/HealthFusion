@@ -46,9 +46,6 @@ fun WorkoutHistoryScreen(
 ) {
     val workouts by viewModel.workouts.collectAsState()
 
-    var filterName by remember { mutableStateOf("") }
-
-
     var selectedAerobicWorkout by remember { mutableStateOf<Workout?>(null) }
     var selectedAnaerobicWorkout by remember { mutableStateOf<Workout?>(null) }
     var expandedAerobic by remember { mutableStateOf(false) }
@@ -62,7 +59,6 @@ fun WorkoutHistoryScreen(
 
         // show the filter data
         val filteredWorkouts = workouts.filter { workout ->
-            (filterName.isEmpty() || workout.name.contains(filterName, ignoreCase = true)) &&
                     (selectedAerobicWorkout == null || workout.name == selectedAerobicWorkout?.name) &&
                     (selectedAnaerobicWorkout == null || workout.name == selectedAnaerobicWorkout?.name)
         }
@@ -92,11 +88,15 @@ fun WorkoutHistoryScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         if (selectedDetailOption != null && filteredWorkouts.isNotEmpty()) {
-            val lineData = when (selectedDetailOption) {
-                "Calories Burned" -> filteredWorkouts.map { it.caloriesBurned.toDouble() }
-                // "Distance" -> filteredWorkouts.map { it.distance?.toDouble() ?: 0.0 } // distance 필드가 필요
-                "Duration" -> filteredWorkouts.map { it.duration.toDouble() }
-                else -> filteredWorkouts.map { it.caloriesBurned.toDouble() } // Default value is calories burned
+            val lineData: List<Double> = when (selectedDetailOption) {
+                "Calories Burned" -> filteredWorkouts.map { it.caloriesBurned?.toDouble() ?: 0.0 }
+                "Distance" -> filteredWorkouts.map {
+                    it.distance?.toDouble() ?: 0.0
+                }
+                "Duration" -> filteredWorkouts.map { it.duration?.toDouble() ?: 0.0 }
+                else -> filteredWorkouts.map {
+                    it.caloriesBurned?.toDouble() ?: 0.0
+                }
             }
             Box(
                 modifier = Modifier
@@ -127,10 +127,25 @@ fun WorkoutHistoryScreen(
                                     val tolerance = 0.01
                                     val workout = filteredWorkouts.find {
                                         when (selectedDetailOption) {
-                                            "Calories Burned" -> kotlin.math.abs(it.caloriesBurned.toDouble() - value) < tolerance
-                                            "Duration" -> kotlin.math.abs(it.duration.toDouble() - value) < tolerance
-                                            //"Distance" -> kotlin.math.abs(it.distance.toDouble() - value) < tolerance
-                                            else -> kotlin.math.abs(it.caloriesBurned.toDouble() - value) < tolerance
+                                            "Calories Burned" -> kotlin.math.abs(
+                                                (it.caloriesBurned?.toDouble()
+                                                    ?: 0.0) - value
+                                            ) < tolerance
+
+                                            "Duration" -> kotlin.math.abs(
+                                                (it.duration?.toDouble()
+                                                    ?: 0.0) - value
+                                            ) < tolerance
+
+                                            "Distance" -> kotlin.math.abs(
+                                                (it.distance?.toDouble()
+                                                    ?: 0.0) - value
+                                            ) < tolerance
+
+                                            else -> kotlin.math.abs(
+                                                (it.caloriesBurned?.toDouble()
+                                                    ?: 0.0) - value
+                                            ) < tolerance
                                         }
 
 
@@ -167,17 +182,7 @@ fun WorkoutHistoryScreen(
             )
         }
 
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        TextField(
-            value = filterName,
-            onValueChange = { filterName = it },
-            label = { Text("Filter by Name") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.weight(1f))
 
         Row(modifier = Modifier.fillMaxWidth()) {
             val aerobicWorkout =
@@ -209,7 +214,6 @@ fun WorkoutHistoryScreen(
                                     selectedAerobicWorkout = workout
                                     selectedAnaerobicWorkout = null
                                     expandedAerobic = false
-                                    filterName = ""
                                     showExtraOptions = true
                                 }
                             )
@@ -255,7 +259,6 @@ fun WorkoutHistoryScreen(
                                     selectedAnaerobicWorkout = workout
                                     selectedAerobicWorkout = null
                                     expandedAnaerobic = false
-                                    filterName = ""
                                     showExtraOptions = true
                                 }
                             )
@@ -268,6 +271,7 @@ fun WorkoutHistoryScreen(
                 }
             }
         }
+
         Spacer(modifier = Modifier.height(8.dp))
 
         if (showExtraOptions) {
@@ -279,7 +283,7 @@ fun WorkoutHistoryScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     if (selectedDetailOption == null) {
-                        Text("View more options")
+                        Text("Please choose more options")
                     } else {
                         Text("$selectedDetailOption")
                     }
@@ -313,16 +317,8 @@ fun WorkoutHistoryScreen(
                     )
                 }
             }
-
-            selectedDetailOption?.let {
-                Text(
-                    text = "Selected: $it",
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-            }
         }
 
-        Spacer(modifier = Modifier.weight(1f))
 
         OutlinedButton(
             onClick = {

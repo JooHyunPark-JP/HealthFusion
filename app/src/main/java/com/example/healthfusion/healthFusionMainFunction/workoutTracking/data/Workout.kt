@@ -13,9 +13,19 @@ data class Workout(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val name: String = "",
-    val duration: Int = 0,
-    val caloriesBurned: Int = 0,
     val type: WorkoutType = WorkoutType.AEROBIC,
+
+    //Aerobic properties
+    val duration: Int? = null,
+    val caloriesBurned: Int? = null,
+    val distance: Int? = null,
+
+    //Anaerobic properties
+    val set: Int? = null,
+    val repetition: Int? = null,
+    val weight: Int? = null,
+
+
     val userId: String = "",
     val workoutDate: Long = System.currentTimeMillis(),
     val isSynced: Boolean = false,
@@ -24,9 +34,16 @@ data class Workout(
     constructor() : this(
         id = 0,
         name = "",
-        duration = 0,
-        caloriesBurned = 0,
         type = WorkoutType.AEROBIC,
+
+        duration = null,
+        caloriesBurned = null,
+        distance = null,
+
+        set = null,
+        repetition = null,
+        weight = null,
+
         userId = "",
         workoutDate = System.currentTimeMillis(),
         isSynced = false,
@@ -43,9 +60,16 @@ data class WorkOutName(
 data class WorkoutDTO(
     val id: Int,
     val name: String,
-    val duration: Int,
-    val caloriesBurned: Int,
     val type: WorkoutType,
+
+    val duration: Int?,
+    val caloriesBurned: Int?,
+    val distance: Int?,
+
+    val set: Int?,
+    val repetition: Int?,
+    val weight: Int?,
+
     val userId: String,
     val workoutDate: String,
     val lastModified: String
@@ -53,9 +77,18 @@ data class WorkoutDTO(
     constructor() : this(
         id = 0,
         name = "",
-        duration = 0,
-        caloriesBurned = 0,
         type = WorkoutType.AEROBIC,
+
+
+        duration = null,
+        caloriesBurned = null,
+        distance = null,
+
+        set = null,
+        repetition = null,
+        weight = null,
+
+
         userId = "",
         workoutDate = "",
         lastModified = ""
@@ -66,9 +99,16 @@ fun Workout.toDTO(dateFormatter: DateFormatter): WorkoutDTO {
     return WorkoutDTO(
         id = this.id,
         name = this.name,
+        type = this.type,
+
         duration = this.duration,
         caloriesBurned = this.caloriesBurned,
-        type = this.type,
+        distance = this.distance,
+
+        set = this.set,
+        repetition = this.repetition,
+        weight = this.weight,
+
         userId = this.userId,
         workoutDate = dateFormatter.formatMillisToDateTime(this.workoutDate),
         lastModified = dateFormatter.formatMillisToDateTime(this.lastModified)
@@ -81,9 +121,16 @@ fun WorkoutDTO.toEntity(dateFormatter: DateFormatter): Workout {
     return Workout(
         id = this.id,
         name = this.name,
+        type = this.type,
+
         duration = this.duration,
         caloriesBurned = this.caloriesBurned,
-        type = this.type,
+        distance = this.distance,
+
+        set = this.set,
+        repetition = this.repetition,
+        weight = this.weight,
+
         userId = this.userId,
         workoutDate = dateFormatter.parseDateTimeToMillis(this.workoutDate)
             ?: System.currentTimeMillis(),

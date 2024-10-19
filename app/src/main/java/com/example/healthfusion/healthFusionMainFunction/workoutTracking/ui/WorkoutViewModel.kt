@@ -67,14 +67,30 @@ class WorkoutViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
 
-    fun addWorkout(name: String, duration: Int, caloriesBurned: Int, type: WorkoutType) {
+    fun addWorkout(
+        name: String,
+        duration: Int?,
+        caloriesBurned: Int?,
+        type: WorkoutType,
+        distance: Int?,
+        set: Int?,
+        repetition: Int?,
+        weight: Int?
+    ) {
         viewModelScope.launch {
             _userId.value?.let { uid ->
                 var workout = Workout(
                     name = name,
+                    type = type,
+
                     duration = duration,
                     caloriesBurned = caloriesBurned,
-                    type = type,
+                    distance = distance,
+
+                    set = set,
+                    repetition = repetition,
+                    weight = weight,
+
                     userId = uid,
                     workoutDate = System.currentTimeMillis(),
                     isSynced = false,

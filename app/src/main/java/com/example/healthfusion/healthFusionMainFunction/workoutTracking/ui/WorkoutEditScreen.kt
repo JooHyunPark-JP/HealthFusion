@@ -34,9 +34,9 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
     var duration by remember { mutableStateOf("") }
     var caloriesBurned by remember { mutableStateOf("") }
     var distance by remember { mutableStateOf("") }
-    var repetitions by remember { mutableIntStateOf(0) }
-    var sets by remember { mutableIntStateOf(0) }
-    var weights by remember { mutableIntStateOf(0) }
+    var repetitions by remember { mutableStateOf("") }
+    var set by remember { mutableStateOf("") }
+    var weight by remember { mutableStateOf("") }
     var type by remember { mutableStateOf(WorkoutType.AEROBIC) }
 
     var averageSpeed by remember { mutableIntStateOf(0) }
@@ -63,12 +63,12 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
                 )
 
                 "PushUps", "Squats" -> AnaerobicInputFields(
-                    sets = sets,
+                    sets = set,
                     repetitions = repetitions,
-                    weights = weights,
-                    onSetsChange = { sets = it },
+                    weights = weight,
+                    onSetsChange = { set = it },
                     onRepsChange = { repetitions = it },
-                    onWeightsChange = { weights = it }
+                    onWeightsChange = { weight = it }
                 )
 
                 else -> {
@@ -79,9 +79,15 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
             Button(onClick = {
                 viewModel.addWorkout(
                     name = workoutName,
-                    duration = duration.toIntOrNull() ?: 0,
-                    caloriesBurned = caloriesBurned.toIntOrNull() ?: 0,
-                    type = workoutType
+                    type = workoutType,
+
+                    duration = duration.toIntOrNull(),
+                    distance = distance.toIntOrNull(),
+                    caloriesBurned = caloriesBurned.toIntOrNull(),
+
+                    set = set.toIntOrNull(),
+                    repetition = repetitions.toIntOrNull(),
+                    weight = weight.toIntOrNull()
                 )
             }) {
                 Text("Add Workout")
@@ -140,17 +146,17 @@ fun AerobicInputFields(
 
 @Composable
 fun AnaerobicInputFields(
-    sets: Int,
-    repetitions: Int,
-    weights: Int,
-    onSetsChange: (Int) -> Unit,
-    onRepsChange: (Int) -> Unit,
-    onWeightsChange: (Int) -> Unit
+    sets: String,
+    repetitions: String,
+    weights: String,
+    onSetsChange: (String) -> Unit,
+    onRepsChange: (String) -> Unit,
+    onWeightsChange: (String) -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {  // TextField 간격을 8dp로 설정
         TextField(
-            value = sets.toString(),
-            onValueChange = { onSetsChange(it.toIntOrNull() ?: 0) },
+            value = sets,
+            onValueChange = onSetsChange,
             label = { Text("Sets") },
             modifier = Modifier
                 .fillMaxWidth()
@@ -158,8 +164,8 @@ fun AnaerobicInputFields(
                 .padding(horizontal = 4.dp)
         )
         TextField(
-            value = repetitions.toString(),
-            onValueChange = { onRepsChange(it.toIntOrNull() ?: 0) },
+            value = repetitions,
+            onValueChange = onRepsChange,
             label = { Text("Repetitions") },
             modifier = Modifier
                 .fillMaxWidth()
@@ -167,8 +173,8 @@ fun AnaerobicInputFields(
                 .padding(horizontal = 4.dp)
         )
         TextField(
-            value = weights.toString(),
-            onValueChange = { onWeightsChange(it.toIntOrNull() ?: 0) },
+            value = weights,
+            onValueChange = onWeightsChange,
             label = { Text("Weights") },
             modifier = Modifier
                 .fillMaxWidth()
