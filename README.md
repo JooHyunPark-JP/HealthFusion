@@ -35,8 +35,6 @@ While the app currently focuses on workout tracking, future updates will include
 - **Room Database**: For local data storage, enabling offline functionality.
 - **Firebase Firestore**: For cloud-based real-time data synchronization.
 - **Firebase Authentication**: For managing user login and sign-up.
-- **Navigation Component**: For managing navigation between screens in a type-safe and scalable way with Jetpack Compose.
-- **Material Design 3 (Material You)**: For implementing the latest UI design trends from Google.
 
 ## Firebase Setup
 
@@ -100,7 +98,7 @@ To secure your Firestore database, configure Firestore Security Rules as follows
 
 ## Future Features
 - Diet Tracking:
-  -Log food intake and track calories and nutrients.
+  - Log food intake and track calories and nutrients.
 
 - Sleep Tracking:
   - Track sleep duration and quality, and analyze sleep patterns.
