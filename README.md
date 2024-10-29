@@ -2,7 +2,7 @@
 
 **HealthFusion** is an Android application that allows users to track and manage their health. Users can log their workouts, set goals, and visualize data through charts and statistics. This project leverages the latest Android technologies, including Jetpack Compose, Firebase, Coroutines, Flow, Hilt, and Room Database. The app ensures smooth performance with real-time data synchronization between local storage (Room Database) and the cloud (Firebase Firestore), allowing users to manage their data even when offline.
 
-While the app currently focuses on workout tracking, future updates will include features for diet and sleep management.
+While the app currently focuses on workout tracking, future updates will include diet and sleep management features.
 
 ## Features
 
@@ -14,7 +14,7 @@ While the app currently focuses on workout tracking, future updates will include
   - Users can set daily and weekly workout goals, such as "Run for 30 minutes" or "Complete 3 workout sessions". These goals are displayed as a to-do list to help users stay on track with their fitness objectives.
 
 - **Visualization**:
-  - Visualize workout data over time using a line chart showing calories burned, distance covered, and workout duration.
+  - Visualize workout data using a line chart showing calories burned, distance covered, and workout duration.
   - A calendar view allows users to check each workout’s date easily.
 
 - **Login System**:
@@ -41,8 +41,6 @@ While the app currently focuses on workout tracking, future updates will include
 To run this project, configure Firebase for your own use. Follow these steps:
 
 1. **Set up Firebase**:
-   - Create a Firebase project, download the `google-services.json` file, and place it in the **app** directory.
-   - Configure Firebase Authentication and Firestore based on your Firebase project setup.
 
 For detailed step-by-step instructions, refer to the official Firebase setup guide:  
 [Firebase Android Setup](https://firebase.google.com/docs/android/setup)
