@@ -34,20 +34,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.healthfusion.R
+import com.example.healthfusion.healthFusionMainFunction.login.ui.LoginViewModel
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AerobicWorkout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AnaerobicWorkout
-import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkOutName
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoal
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoalType
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
 import com.example.healthfusion.healthFusionNav.Screen
-import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun WorkoutScreen(
     navController: NavController,
     viewModel: WorkoutViewModel,
+    loginViewModel: LoginViewModel,
     modifier: Modifier = Modifier
 ) {
     val workouts by viewModel.workouts.collectAsState()
@@ -57,19 +56,6 @@ fun WorkoutScreen(
 
     var selectedWorkoutTabIndex by remember { mutableIntStateOf(0) }
     var selectedTabIndex by remember { mutableIntStateOf(0) }
-
-    //Later, workout list will be connected and syncroinized to healthconnect API.
-    //For now, just using static list of workouts list.
-    val aerobicWorkouts = listOf(
-        WorkOutName("Running", R.drawable.running_pose2),
-        WorkOutName("Cycling", R.drawable.cycling_pose),
-        WorkOutName("Walking", R.drawable.walking_pose)
-    )
-
-    val anaerobicWorkouts = listOf(
-        WorkOutName("PushUps", R.drawable.pushup_pose),
-        WorkOutName("Squats", R.drawable.squat_pose)
-    )
 
     val tabWorkoutPageTitles = listOf("Goals", "Workout", "History", "Calendar")
     val tabTitles = listOf(WorkoutType.AEROBIC, WorkoutType.ANAEROBIC)
@@ -103,7 +89,7 @@ fun WorkoutScreen(
                 Spacer(modifier = Modifier.height(20.dp))
 
                 Button(onClick = {
-                    FirebaseAuth.getInstance().signOut()
+                    loginViewModel.logout()
                 }) {
                     Text("Sign Out")
                 }

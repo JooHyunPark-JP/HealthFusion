@@ -1,8 +1,10 @@
 package com.example.healthfusion.healthFusionMainFunction.login.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.healthfusion.healthFusionMainFunction.login.di.LoginRepository
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val loginRepository: LoginRepository
+    private val loginRepository: LoginRepository,
+    private val firebaseAuth: FirebaseAuth
 ) : ViewModel() {
 
     private val _currentUserUid = MutableStateFlow<String?>(null)
@@ -23,11 +26,17 @@ class LoginViewModel @Inject constructor(
     private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
     val authState: StateFlow<AuthState> = _authState
 
+
     init {
-        // when app starts, firebaseauth checks if app is logged in and get UID
-        val currentUser = loginRepository.getCurrentUser()
-        _currentUserUid.value = currentUser?.uid
-        _authState.value = if (currentUser != null) AuthState.Success else AuthState.Idle
+        observeAuthState()
+    }
+
+    private fun observeAuthState() {
+        firebaseAuth.addAuthStateListener { auth ->
+            _currentUserUid.value = auth.currentUser?.uid
+            _authState.value = if (auth.currentUser != null) AuthState.Success else AuthState.Idle
+            Log.d("checkinginLoginUserUid", "$_currentUserUid ")
+        }
     }
 
     fun login(email: String, password: String) {
@@ -72,6 +81,12 @@ class LoginViewModel @Inject constructor(
         return if (password.length < 6) {
             "Password must be at least 6 characters."
         } else null
+    }
+
+    fun logout() {
+        //sign out the current ID
+        firebaseAuth.signOut()
+        _currentUserUid.value = null
     }
 
     fun resetState() {

@@ -5,6 +5,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -108,16 +109,18 @@ class MainActivity : ComponentActivity() {
                         //If user is already logged in
                         if (currentUser.value != null) {
 
-                            /*                            val userUid = currentUser.value?.uid
+/*                            val userUid = currentUser.value?.uid
 
-                                                        // checking user UID for debugging
-                                                        Log.d("heybro1", "User UID: $userUid")*/
+                            // checking user UID for debugging
+                            Log.d("CheckingUID", "User UID: $userUid")
+                            Log.d("checkingloginUID", "user UID from loginModel: $currentUserUid ")*/
 
                             NavGraph(
                                 navController = navController,
                                 workoutViewModel = workoutViewModel.apply { setUserId(currentUserUid) },
                                 dietViewModel = dietViewModel.apply { setUserId(currentUserUid) },
-                                sleepViewModel = sleepViewModel.apply { setUserId(currentUserUid) }
+                                sleepViewModel = sleepViewModel.apply { setUserId(currentUserUid) },
+                                loginViewModel = loginViewModel
                             )
                         } else {
                             AuthNavGraph(
