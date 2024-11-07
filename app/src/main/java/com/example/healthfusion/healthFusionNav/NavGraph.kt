@@ -16,6 +16,7 @@ import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.Work
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutGoalScreen
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutScreen
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutViewModel
+import com.example.healthfusion.util.DateFormatter
 
 @Composable
 fun NavGraph(
@@ -30,7 +31,8 @@ fun NavGraph(
             WorkoutScreen(
                 navController,
                 viewModel = workoutViewModel,
-                loginViewModel = loginViewModel
+                loginViewModel = loginViewModel,
+                dateFormatter = DateFormatter()
             )
         }
         composable(Screen.Diet.route) {

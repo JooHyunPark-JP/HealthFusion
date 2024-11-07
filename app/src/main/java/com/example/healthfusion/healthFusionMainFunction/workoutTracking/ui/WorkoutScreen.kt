@@ -41,13 +41,15 @@ import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.Wo
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoalType
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
 import com.example.healthfusion.healthFusionNav.Screen
+import com.example.healthfusion.util.DateFormatter
 
 @Composable
 fun WorkoutScreen(
     navController: NavController,
     viewModel: WorkoutViewModel,
     loginViewModel: LoginViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    dateFormatter: DateFormatter
 ) {
     val workouts by viewModel.workouts.collectAsState()
 
@@ -130,6 +132,7 @@ fun WorkoutScreen(
             2 -> {
                 WorkoutHistoryScreen(
                     viewModel = viewModel,
+                    dateFormatter = dateFormatter
                 )
             }
 

@@ -137,6 +137,12 @@ class WorkoutViewModel @Inject constructor(
         }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
     }
 
+    fun deleteWorkout(workout: Workout) {
+        viewModelScope.launch {
+            workoutDao.delete(workout)
+        }
+    }
+
     fun addWorkoutGoal(text: String) {
         viewModelScope.launch {
             _userId.value?.let { uid ->
