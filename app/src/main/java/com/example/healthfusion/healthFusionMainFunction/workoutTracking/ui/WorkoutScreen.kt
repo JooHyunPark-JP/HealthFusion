@@ -6,15 +6,18 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Tab
@@ -34,9 +37,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.healthfusion.healthFusionMainFunction.login.ui.LoginViewModel
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AerobicWorkout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AnaerobicWorkout
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.Workout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoal
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoalType
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
@@ -47,7 +50,6 @@ import com.example.healthfusion.util.DateFormatter
 fun WorkoutScreen(
     navController: NavController,
     viewModel: WorkoutViewModel,
-    loginViewModel: LoginViewModel,
     modifier: Modifier = Modifier,
     dateFormatter: DateFormatter
 ) {
@@ -87,14 +89,28 @@ fun WorkoutScreen(
                     weeklyGoals = weeklyGoals
                 )
 
-                //temporary sign out function with button
-                Spacer(modifier = Modifier.height(20.dp))
 
-                Button(onClick = {
-                    loginViewModel.logout()
-                }) {
-                    Text("Sign Out")
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "Your last 3 workouts activities.",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                ) {
+                    val sortedByDescent = workouts.sortedByDescending { it.workoutDate }.take(3)
+                    items(sortedByDescent.size) { index ->
+                        val workout = sortedByDescent[index]
+                        WorkoutRecentActivityBox(workout = workout, dateFormatter = dateFormatter)
+                    }
+
                 }
+
             }
 
             1 -> {
@@ -178,6 +194,61 @@ fun WorkoutGoalBox(
             Text("Set Workout Goal")
         }
     }
+}
+
+@Composable
+fun WorkoutRecentActivityBox(workout: Workout, dateFormatter: DateFormatter) {
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+
+        when (workout.type) {
+            WorkoutType.AEROBIC ->
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        workout.name,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Text(
+                        "Date: ${
+                            dateFormatter.simpleDateFormatWithoutSpecificTime(workout.workoutDate)
+                        }"
+                    )
+                    Text("Duration: ${workout.duration ?: "N/A"} mins")
+                    Text("Distance: ${workout.distance ?: "N/A"} km")
+                    Text("Calories Burned: ${workout.caloriesBurned ?: "N/A"}")
+                }
+
+            WorkoutType.ANAEROBIC ->
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        workout.name,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Text(
+                        "Date: ${dateFormatter.simpleDateFormatWithoutSpecificTime(workout.workoutDate)}"
+                    )
+                    Text("Sets: ${workout.set ?: "N/A"}")
+                    Text("Repetitions: ${workout.repetition ?: "N/A"}")
+                    Text("Weight: ${workout.weight ?: "N/A"} kg")
+                }
+
+        }
+    }
+
 }
 
 @Composable

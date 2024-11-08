@@ -9,6 +9,7 @@ import androidx.navigation.navArgument
 import com.example.healthfusion.healthFusionMainFunction.dietTracking.ui.DietScreen
 import com.example.healthfusion.healthFusionMainFunction.dietTracking.ui.DietViewModel
 import com.example.healthfusion.healthFusionMainFunction.login.ui.LoginViewModel
+import com.example.healthfusion.healthFusionMainFunction.profile.ui.ProfileScreen
 import com.example.healthfusion.healthFusionMainFunction.sleepTracking.ui.SleepScreen
 import com.example.healthfusion.healthFusionMainFunction.sleepTracking.ui.SleepViewModel
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
@@ -31,7 +32,6 @@ fun NavGraph(
             WorkoutScreen(
                 navController,
                 viewModel = workoutViewModel,
-                loginViewModel = loginViewModel,
                 dateFormatter = DateFormatter()
             )
         }
@@ -44,6 +44,10 @@ fun NavGraph(
         composable(Screen.WorkoutGoal.route) {
             WorkoutGoalScreen(viewModel = workoutViewModel)
         }
+        composable(Screen.Profile.route) {
+            ProfileScreen(loginViewModel = loginViewModel)
+        }
+
         composable(
             route = "${Screen.WorkoutEdit.route}/{workoutName}/{workoutType}",
             arguments = listOf(
