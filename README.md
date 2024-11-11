@@ -40,8 +40,6 @@ While the app currently focuses on workout tracking, future updates will include
 
 To run this project, configure Firebase for your own use. Follow these steps:
 
-1. **Set up Firebase**:
-
 For detailed step-by-step instructions, refer to the official Firebase setup guide:  
 [Firebase Android Setup](https://firebase.google.com/docs/android/setup)
 
