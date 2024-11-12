@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -92,24 +93,37 @@ fun WorkoutScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text(
-                    text = "Your last 3 workouts activities.",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                if (workouts.isNotEmpty()) {
+                    Text(
+                        text = "Your last 3 workouts activities.",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
 
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                ) {
-                    val sortedByDescent = workouts.sortedByDescending { it.workoutDate }.take(3)
-                    items(sortedByDescent.size) { index ->
-                        val workout = sortedByDescent[index]
-                        WorkoutRecentActivityBox(workout = workout, dateFormatter = dateFormatter)
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                    ) {
+                        val sortedByDescent = workouts.sortedByDescending { it.workoutDate }.take(3)
+                        items(sortedByDescent.size) { index ->
+                            val workout = sortedByDescent[index]
+                            WorkoutRecentActivityBox(
+                                workout = workout,
+                                dateFormatter = dateFormatter
+                            )
+                        }
+
                     }
-
+                } else {
+                    Text(
+                        text = "Your last 3 workouts activity: None!",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    )
                 }
+
 
             }
 

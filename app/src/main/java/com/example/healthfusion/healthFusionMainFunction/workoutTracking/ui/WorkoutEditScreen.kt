@@ -1,13 +1,14 @@
 package com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -21,7 +22,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
 import com.example.healthfusion.ui.theme.HealthFusionTheme
 
@@ -42,6 +46,8 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
     var averageSpeed by remember { mutableIntStateOf(0) }
     var workoutDate by remember { mutableStateOf("") }
 
+    val context = LocalContext.current
+
     HealthFusionTheme {
         Column(
             modifier = Modifier
@@ -49,8 +55,9 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
                 .padding(top = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = workoutName)
-            Text(text = workoutType.name)
+            Text(text = workoutName, fontSize = 24.sp, fontWeight = FontWeight.Bold )
+            Spacer(modifier = Modifier.height(12.dp))
+            //  Text(text = workoutType.name)
 
             when (workoutName) {
                 "Running", "Cycling", "Walking" -> AerobicInputFields(
@@ -76,6 +83,8 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
                 }
             }
 
+            Spacer(modifier = Modifier.height(8.dp))
+
             Button(onClick = {
                 viewModel.addWorkout(
                     name = workoutName,
@@ -89,17 +98,24 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
                     repetition = repetitions.toIntOrNull(),
                     weight = weight.toIntOrNull()
                 )
+
+                Toast.makeText(
+                    context,
+                    "New $workoutName data has been created!",
+                    Toast.LENGTH_LONG
+                ).show()
+
             }) {
                 Text("Add Workout")
             }
 
-            LazyColumn {
-                items(workouts) { workout ->
-                    Text(
-                        text = "Workout: ${workout.name}, Duration: ${workout.duration}, Calories Burned: ${workout.caloriesBurned}, Type: ${workout.type}"
-                    )
-                }
-            }
+            /*            LazyColumn {
+                            items(workouts) { workout ->
+                                Text(
+                                    text = "Workout: ${workout.name}, Duration: ${workout.duration}, Calories Burned: ${workout.caloriesBurned}, Type: ${workout.type}"
+                                )
+                            }
+                        }*/
         }
     }
 }
