@@ -1,7 +1,6 @@
 package com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui
 
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,9 +8,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -25,7 +34,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
 import com.example.healthfusion.ui.theme.HealthFusionTheme
 
@@ -55,67 +63,79 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
                 .padding(top = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = workoutName, fontSize = 24.sp, fontWeight = FontWeight.Bold )
-            Spacer(modifier = Modifier.height(12.dp))
-            //  Text(text = workoutType.name)
+            Text(
+                text = workoutName,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
 
-            when (workoutName) {
-                "Running", "Cycling", "Walking" -> AerobicInputFields(
-                    duration = duration,
-                    distance = distance,
-                    caloriesBurned = caloriesBurned,
-                    onDurationChange = { duration = it },
-                    onDistanceChange = { distance = it },
-                    onCaloriesChange = { caloriesBurned = it }
-                )
+            Card(
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFEFF5F4)),
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.padding(vertical = 12.dp, horizontal = 4.dp)
+            ) {
+                when (workoutType) {
+                    WorkoutType.AEROBIC -> AerobicInputFields(
+                        duration = duration,
+                        distance = distance,
+                        caloriesBurned = caloriesBurned,
+                        onDurationChange = { duration = it },
+                        onDistanceChange = { distance = it },
+                        onCaloriesChange = { caloriesBurned = it }
+                    )
 
-                "PushUps", "Squats" -> AnaerobicInputFields(
-                    sets = set,
-                    repetitions = repetitions,
-                    weights = weight,
-                    onSetsChange = { set = it },
-                    onRepsChange = { repetitions = it },
-                    onWeightsChange = { weight = it }
-                )
-
-                else -> {
-                    Text("Unknown workout type.")
+                    WorkoutType.ANAEROBIC -> AnaerobicInputFields(
+                        sets = set,
+                        repetitions = repetitions,
+                        weights = weight,
+                        onSetsChange = { set = it },
+                        onRepsChange = { repetitions = it },
+                        onWeightsChange = { weight = it }
+                    )
                 }
-            }
 
-            Spacer(modifier = Modifier.height(8.dp))
 
-            Button(onClick = {
-                viewModel.addWorkout(
-                    name = workoutName,
-                    type = workoutType,
-
-                    duration = duration.toIntOrNull(),
-                    distance = distance.toIntOrNull(),
-                    caloriesBurned = caloriesBurned.toIntOrNull(),
-
-                    set = set.toIntOrNull(),
-                    repetition = repetitions.toIntOrNull(),
-                    weight = weight.toIntOrNull()
-                )
-
-                Toast.makeText(
-                    context,
-                    "New $workoutName data has been created!",
-                    Toast.LENGTH_LONG
-                ).show()
-
-            }) {
-                Text("Add Workout")
-            }
-
-            /*            LazyColumn {
+                /*            LazyColumn {
                             items(workouts) { workout ->
                                 Text(
                                     text = "Workout: ${workout.name}, Duration: ${workout.duration}, Calories Burned: ${workout.caloriesBurned}, Type: ${workout.type}"
                                 )
                             }
                         }*/
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(
+                onClick = {
+                    viewModel.addWorkout(
+                        name = workoutName,
+                        type = workoutType,
+
+                        duration = duration.toIntOrNull(),
+                        distance = distance.toIntOrNull(),
+                        caloriesBurned = caloriesBurned.toIntOrNull(),
+
+                        set = set.toIntOrNull(),
+                        repetition = repetitions.toIntOrNull(),
+                        weight = weight.toIntOrNull()
+                    )
+
+                    Toast.makeText(
+                        context,
+                        "New $workoutName data has been created!",
+                        Toast.LENGTH_LONG
+                    ).show()
+
+                }, modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF23af92)),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Add", tint = Color.White)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Add Workout", color = Color.White)
+            }
         }
     }
 }
@@ -129,33 +149,53 @@ fun AerobicInputFields(
     onDistanceChange: (String) -> Unit,
     onCaloriesChange: (String) -> Unit
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = Modifier
+            .padding(horizontal = 4.dp)
+            .fillMaxWidth()
+    ) {
         TextField(
             value = duration,
             onValueChange = onDurationChange,
             label = { Text("Duration (minutes)") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Transparent)
-                .padding(horizontal = 4.dp)
+            modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.colors(
+                unfocusedContainerColor = Color(0xFFF1F1F1),
+                focusedContainerColor = Color(0xFFE0E0E0),
+                unfocusedTextColor = Color.Black,
+                focusedTextColor = Color.Black,
+                unfocusedLabelColor = Color.Gray,
+                focusedLabelColor = Color(0xFF23af92)
+            )
         )
         TextField(
             value = distance,
             onValueChange = onDistanceChange,
             label = { Text("Distance (km)") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Transparent)
-                .padding(horizontal = 4.dp)
+            modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.colors(
+                unfocusedContainerColor = Color(0xFFF1F1F1),
+                focusedContainerColor = Color(0xFFE0E0E0),
+                unfocusedTextColor = Color.Black,
+                focusedTextColor = Color.Black,
+                unfocusedLabelColor = Color.Gray,
+                focusedLabelColor = Color(0xFF23af92)
+            )
         )
         TextField(
             value = caloriesBurned,
             onValueChange = onCaloriesChange,
             label = { Text("Calories Burned") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Transparent)
-                .padding(horizontal = 4.dp)
+            modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.colors(
+                unfocusedContainerColor = Color(0xFFF1F1F1),
+                focusedContainerColor = Color(0xFFE0E0E0),
+                unfocusedTextColor = Color.Black,
+                focusedTextColor = Color.Black,
+                unfocusedLabelColor = Color.Gray,
+                focusedLabelColor = Color(0xFF23af92)
+            )
         )
     }
 }
@@ -169,33 +209,52 @@ fun AnaerobicInputFields(
     onRepsChange: (String) -> Unit,
     onWeightsChange: (String) -> Unit
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {  // TextField 간격을 8dp로 설정
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier
+            .padding(horizontal = 8.dp)
+            .fillMaxWidth()
+    ) {
         TextField(
             value = sets,
             onValueChange = onSetsChange,
             label = { Text("Sets") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Transparent)
-                .padding(horizontal = 4.dp)
+            modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.colors(
+                unfocusedContainerColor = Color(0xFFF1F1F1),
+                focusedContainerColor = Color(0xFFE0E0E0),
+                unfocusedTextColor = Color.Black,
+                focusedTextColor = Color.Black,
+                unfocusedLabelColor = Color.Gray,
+                focusedLabelColor = Color(0xFF23af92)
+            )
         )
         TextField(
             value = repetitions,
             onValueChange = onRepsChange,
             label = { Text("Repetitions") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Transparent)
-                .padding(horizontal = 4.dp)
+            modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.colors(
+                unfocusedContainerColor = Color(0xFFF1F1F1),
+                focusedContainerColor = Color(0xFFE0E0E0),
+                unfocusedTextColor = Color.Black,
+                focusedTextColor = Color.Black,
+                unfocusedLabelColor = Color.Gray,
+                focusedLabelColor = Color(0xFF23af92)
+            )
         )
         TextField(
             value = weights,
             onValueChange = onWeightsChange,
             label = { Text("Weights") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Transparent)
-                .padding(horizontal = 4.dp)
+            modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.colors(
+                unfocusedContainerColor = Color(0xFFF1F1F1),
+                focusedContainerColor = Color(0xFFE0E0E0),
+                unfocusedTextColor = Color.Black,
+                focusedTextColor = Color.Black,
+                unfocusedLabelColor = Color.Gray,
+                focusedLabelColor = Color(0xFF23af92)
+            )
         )
     }
 }

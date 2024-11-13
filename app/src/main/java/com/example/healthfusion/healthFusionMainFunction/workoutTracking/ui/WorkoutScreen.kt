@@ -8,17 +8,26 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -31,6 +40,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -38,6 +48,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.healthfusion.R
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AerobicWorkout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AnaerobicWorkout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.Workout
@@ -213,56 +224,111 @@ fun WorkoutGoalBox(
 @Composable
 fun WorkoutRecentActivityBox(workout: Workout, dateFormatter: DateFormatter) {
 
-    Row(
+    val imageResource = when (workout.type) {
+        WorkoutType.AEROBIC -> AerobicWorkout.entries.find { it.workoutName == workout.name }?.imageResource
+        WorkoutType.ANAEROBIC -> AnaerobicWorkout.entries.find { it.workoutName == workout.name }?.imageResource
+    } ?: R.drawable.ic_placeholder_icon
+
+    Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
+            .shadow(4.dp, RoundedCornerShape(12.dp)),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFF5F5F5)
+        )
     ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
 
-        when (workout.type) {
-            WorkoutType.AEROBIC ->
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Filled.Check,
+                    contentDescription = null,
+                    modifier = Modifier.size(40.dp),
+                    tint = Color(0xFF23af92)
+                )
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Column {
+                    // Workout Title
                     Text(
-                        workout.name,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
+                        text = workout.name,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF212121)
                     )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Workout Details
+                    Text(
+                        text = "Date: ${dateFormatter.simpleDateFormatWithoutSpecificTime(workout.workoutDate)}",
+                        fontSize = 14.sp,
+                        color = Color.Gray
+                    )
+
                     Spacer(modifier = Modifier.height(4.dp))
 
-                    Text(
-                        "Date: ${
-                            dateFormatter.simpleDateFormatWithoutSpecificTime(workout.workoutDate)
-                        }"
-                    )
-                    Text("Duration: ${workout.duration ?: "N/A"} mins")
-                    Text("Distance: ${workout.distance ?: "N/A"} km")
-                    Text("Calories Burned: ${workout.caloriesBurned ?: "N/A"}")
+                    when (workout.type) {
+                        WorkoutType.AEROBIC -> {
+                            Text(
+                                "Duration: ${workout.duration ?: "N/A"} mins",
+                                fontSize = 14.sp,
+                                color = Color(0xFF616161)
+                            )
+                            Text(
+                                "Distance: ${workout.distance ?: "N/A"} km",
+                                fontSize = 14.sp,
+                                color = Color(0xFF616161)
+                            )
+                            Text(
+                                "Calories Burned: ${workout.caloriesBurned ?: "N/A"}",
+                                fontSize = 14.sp,
+                                color = Color(0xFF616161)
+                            )
+                        }
+
+                        WorkoutType.ANAEROBIC -> {
+                            Text(
+                                "Sets: ${workout.set ?: "N/A"}",
+                                fontSize = 14.sp,
+                                color = Color(0xFF616161)
+                            )
+                            Text(
+                                "Repetitions: ${workout.repetition ?: "N/A"}",
+                                fontSize = 14.sp,
+                                color = Color(0xFF616161)
+                            )
+                            Text(
+                                "Weight: ${workout.weight ?: "N/A"} kg",
+                                fontSize = 14.sp,
+                                color = Color(0xFF616161)
+                            )
+                        }
+                    }
                 }
+            }
+            Spacer(modifier = Modifier.weight(1f))
 
-            WorkoutType.ANAEROBIC ->
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        workout.name,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    Text(
-                        "Date: ${dateFormatter.simpleDateFormatWithoutSpecificTime(workout.workoutDate)}"
-                    )
-                    Text("Sets: ${workout.set ?: "N/A"}")
-                    Text("Repetitions: ${workout.repetition ?: "N/A"}")
-                    Text("Weight: ${workout.weight ?: "N/A"} kg")
-                }
-
+            Image(
+                painter = painterResource(id = imageResource),
+                contentDescription = null,
+                modifier = Modifier
+                    .heightIn(max = 100.dp)
+                    .widthIn(max = 100.dp)
+                    .aspectRatio(1f),
+                alignment = Alignment.CenterEnd
+            )
         }
     }
-
 }
 
 @Composable
