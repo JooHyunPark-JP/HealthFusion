@@ -1,6 +1,5 @@
 package com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +14,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -32,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
@@ -92,7 +94,7 @@ fun WorkoutHistoryScreen(
         //if user choose Anaerobic workout, show the list
         if (selectedAnaerobicWorkout != null && filteredWorkouts.isNotEmpty()) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = "Workout Name: ${filteredWorkouts.first().name}")
+                Text(text = "Your '${filteredWorkouts.first().name}' data")
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -101,7 +103,7 @@ fun WorkoutHistoryScreen(
                     items(filteredWorkouts.size) { index ->
                         val sortedByDescent = filteredWorkouts.sortedByDescending { it.workoutDate }
                         val workout = sortedByDescent[index]
-                        AnaerobicWorkoutItem(
+                        WorkoutItem(
                             workout = workout,
                             onDeleteClick = { viewModel.deleteWorkout(workout) },
                             dateFormatter = dateFormatter
@@ -145,7 +147,7 @@ fun WorkoutHistoryScreen(
                                 val sortedByDescent =
                                     filteredWorkouts.sortedByDescending { it.workoutDate }
                                 val workout = sortedByDescent[index]
-                                AerobicWorkoutItem(
+                                WorkoutItem(
                                     workout = workout,
                                     onDeleteClick = { viewModel.deleteWorkout(workout) },
                                     dateFormatter = dateFormatter
@@ -269,66 +271,86 @@ fun WorkoutHistoryScreen(
 }
 
 @Composable
-fun AnaerobicWorkoutItem(
-    workout: Workout,
-    onDeleteClick: () -> Unit,
-    dateFormatter: DateFormatter
-) {
-    Row(
+fun WorkoutItem(workout: Workout, dateFormatter: DateFormatter, onDeleteClick: () -> Unit) {
+    Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
+            .shadow(4.dp, RoundedCornerShape(12.dp)),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFF5F5F5)
+        )
     ) {
-        Column {
-            Text(
-                "Date: ${dateFormatter.simpleDateFormatWithoutSpecificTime(workout.workoutDate)}"
-            )
-            Text("Sets: ${workout.set ?: "N/A"}")
-            Text("Repetitions: ${workout.repetition ?: "N/A"}")
-            Text("Weight: ${workout.weight ?: "N/A"} kg")
-        }
-        IconButton(onClick = onDeleteClick) {
-            Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color.Red)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            // Left side: workout details
+            Column {
+                Text(
+                    text = "Date: ${dateFormatter.simpleDateFormatWithoutSpecificTime(workout.workoutDate)}",
+                    fontSize = 14.sp,
+                    color = Color.Gray
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // Workout details based on type
+                when (workout.type) {
+                    WorkoutType.AEROBIC -> {
+                        Text(
+                            text = "Duration: ${workout.duration ?: "N/A"} mins",
+                            fontSize = 14.sp,
+                            color = Color(0xFF616161)
+                        )
+                        Text(
+                            text = "Distance: ${workout.distance ?: "N/A"} km",
+                            fontSize = 14.sp,
+                            color = Color(0xFF616161)
+                        )
+                        Text(
+                            text = "Calories Burned: ${workout.caloriesBurned ?: "N/A"}",
+                            fontSize = 14.sp,
+                            color = Color(0xFF616161)
+                        )
+                    }
+
+                    WorkoutType.ANAEROBIC -> {
+                        Text(
+                            text = "Sets: ${workout.set ?: "N/A"}",
+                            fontSize = 14.sp,
+                            color = Color(0xFF616161)
+                        )
+                        Text(
+                            text = "Repetitions: ${workout.repetition ?: "N/A"}",
+                            fontSize = 14.sp,
+                            color = Color(0xFF616161)
+                        )
+                        Text(
+                            text = "Weight: ${workout.weight ?: "N/A"} kg",
+                            fontSize = 14.sp,
+                            color = Color(0xFF616161)
+                        )
+                    }
+                }
+            }
+
+            // Right side: delete button
+            IconButton(onClick = onDeleteClick) {
+                Icon(
+                    Icons.Default.Delete,
+                    contentDescription = "Delete",
+                    tint = Color.Red
+                )
+            }
         }
     }
-
 }
 
-
-@Composable
-fun AerobicWorkoutItem(
-    workout: Workout,
-    onDeleteClick: () -> Unit,
-    dateFormatter: DateFormatter
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Column {
-            Text(
-                "Date: ${
-                    dateFormatter.simpleDateFormatWithoutSpecificTime(workout.workoutDate)
-                }"
-            )
-            Text("Duration: ${workout.duration ?: "N/A"} mins")
-            Text("Distance: ${workout.distance ?: "N/A"} km")
-            Text("Calories Burned: ${workout.caloriesBurned ?: "N/A"}")
-        }
-        IconButton(onClick = onDeleteClick) {
-            Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color.Red)
-        }
-    }
-}
 
 @Composable
 fun AerobicLineChart(

@@ -15,19 +15,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -248,20 +244,12 @@ fun WorkoutRecentActivityBox(workout: Workout, dateFormatter: DateFormatter) {
         ) {
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Filled.Check,
-                    contentDescription = null,
-                    modifier = Modifier.size(40.dp),
-                    tint = Color(0xFF23af92)
-                )
-
-                Spacer(modifier = Modifier.width(16.dp))
 
                 Column {
                     // Workout Title
                     Text(
                         text = workout.name,
-                        fontSize = 20.sp,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF212121)
                     )
@@ -322,8 +310,8 @@ fun WorkoutRecentActivityBox(workout: Workout, dateFormatter: DateFormatter) {
                 painter = painterResource(id = imageResource),
                 contentDescription = null,
                 modifier = Modifier
-                    .heightIn(max = 100.dp)
-                    .widthIn(max = 100.dp)
+                    .heightIn(max = 120.dp)
+                    .widthIn(max = 120.dp)
                     .aspectRatio(1f),
                 alignment = Alignment.CenterEnd
             )

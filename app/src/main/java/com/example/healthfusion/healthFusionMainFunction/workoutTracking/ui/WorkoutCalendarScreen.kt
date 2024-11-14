@@ -36,7 +36,6 @@ import androidx.compose.ui.unit.dp
 import com.example.healthfusion.R
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AerobicWorkout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AnaerobicWorkout
-import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkOutName
 import io.github.boguszpawlowski.composecalendar.Calendar
 import io.github.boguszpawlowski.composecalendar.rememberCalendarState
 import kotlinx.coroutines.delay
