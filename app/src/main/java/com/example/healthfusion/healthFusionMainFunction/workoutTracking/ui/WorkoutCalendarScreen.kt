@@ -5,7 +5,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.repeatable
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -184,7 +184,7 @@ fun DayContent(day: LocalDate, isWorkoutDay: Boolean) {
     var isBlinking by remember { mutableStateOf(false) }
 
     val backgroundColor by animateColorAsState(
-        targetValue = if (isWorkoutDay && isBlinking) colorResource(R.color.light_skyblue) else Color.Transparent,
+        targetValue = if (isWorkoutDay && isBlinking) colorResource(R.color.light_peach) else Color.Transparent,
         animationSpec = repeatable(
             iterations = 2,
             animation = tween(durationMillis = 1000),
@@ -204,9 +204,15 @@ fun DayContent(day: LocalDate, isWorkoutDay: Boolean) {
         modifier = Modifier
             .size(48.dp)
             .clip(CircleShape)
-            .background(if (isWorkoutDay && !isBlinking) colorResource(R.color.light_skyblue) else backgroundColor),
+            .border(
+                width = 3.dp,
+                color = if (isWorkoutDay && !isBlinking) colorResource(R.color.light_peach) else backgroundColor,
+                shape = CircleShape
+            ),
         contentAlignment = Alignment.Center
     ) {
         Text(text = day.dayOfMonth.toString())
     }
+
+
 }

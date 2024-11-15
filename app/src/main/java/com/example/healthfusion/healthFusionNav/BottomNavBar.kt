@@ -31,26 +31,31 @@ fun BottomNavBar(navController: NavController) {
                 icon = {
                     when (screen) {
                         is Screen.Workout -> Icon(
-                            painterResource(id = R.drawable.ic_placeholder_icon),
+                            painterResource(id = R.drawable.ic_fitness_center),
                             contentDescription = null
                         )
 
                         is Screen.Diet -> Icon(
-                            painterResource(id = R.drawable.ic_placeholder_icon),
+                            painterResource(id = R.drawable.ic_food),
                             contentDescription = null
                         )
 
                         is Screen.Sleep -> Icon(
-                            painterResource(id = R.drawable.ic_placeholder_icon),
+                            painterResource(id = R.drawable.ic_sleep),
                             contentDescription = null
                         )
 
                         is Screen.Profile -> Icon(
-                            painterResource(id = R.drawable.ic_placeholder_icon),
+                            painterResource(id = R.drawable.ic_profile),
                             contentDescription = null
                         )
 
-                        else -> {}
+                        else -> {
+                            Icon(
+                                painterResource(id = R.drawable.ic_placeholder_icon),
+                                contentDescription = null
+                            )
+                        }
                     }
                 },
                 label = { Text(text = screen.route.replaceFirstChar { it.uppercase() }) },
