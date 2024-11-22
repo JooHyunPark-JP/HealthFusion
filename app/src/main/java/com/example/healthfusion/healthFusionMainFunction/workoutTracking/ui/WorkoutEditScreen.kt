@@ -24,37 +24,49 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AerobicWorkout
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AnaerobicWorkout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
 import com.example.healthfusion.ui.theme.HealthFusionTheme
-
 
 @Composable
 fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: WorkoutType) {
 
     val workouts by viewModel.workouts.collectAsState()
 
-    var duration by remember { mutableStateOf("") }
-    var caloriesBurned by remember { mutableStateOf("") }
-    var distance by remember { mutableStateOf("") }
-    var repetitions by remember { mutableStateOf("") }
-    var set by remember { mutableStateOf("") }
-    var weight by remember { mutableStateOf("") }
-    var type by remember { mutableStateOf(WorkoutType.AEROBIC) }
-
-    var averageSpeed by remember { mutableIntStateOf(0) }
-    var workoutDate by remember { mutableStateOf("") }
-
     val context = LocalContext.current
+
+    val workoutEnum: Any? = when (workoutType) {
+        WorkoutType.AEROBIC -> AerobicWorkout.entries.find { it.workoutName == workoutName }
+        WorkoutType.ANAEROBIC -> AnaerobicWorkout.entries.find { it.workoutName == workoutName }
+    }
+
+    if (workoutEnum == null) {
+        Text("Invalid Workout Type or Name")
+        return
+    }
+
+    val fields = when (workoutEnum) {
+        is AerobicWorkout -> workoutEnum.fields
+        is AnaerobicWorkout -> workoutEnum.fields
+        else -> emptyList()
+    }
+
+    val displayName = when (workoutEnum) {
+        is AerobicWorkout -> workoutEnum.workoutName
+        is AnaerobicWorkout -> workoutEnum.workoutName
+        else -> "Unknown Workout"
+    }
+
+    val inputValues = remember { mutableStateMapOf<String, String>() }
 
     HealthFusionTheme {
         Column(
@@ -64,7 +76,7 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = workoutName,
+                text = displayName,
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )
@@ -74,59 +86,37 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
                 shape = RoundedCornerShape(8.dp),
                 modifier = Modifier.padding(vertical = 12.dp, horizontal = 4.dp)
             ) {
-                when (workoutType) {
-                    WorkoutType.AEROBIC -> AerobicInputFields(
-                        duration = duration,
-                        distance = distance,
-                        caloriesBurned = caloriesBurned,
-                        onDurationChange = { duration = it },
-                        onDistanceChange = { distance = it },
-                        onCaloriesChange = { caloriesBurned = it }
-                    )
-
-                    WorkoutType.ANAEROBIC -> AnaerobicInputFields(
-                        sets = set,
-                        repetitions = repetitions,
-                        weights = weight,
-                        onSetsChange = { set = it },
-                        onRepsChange = { repetitions = it },
-                        onWeightsChange = { weight = it }
-                    )
-                }
-
-
-                /*            LazyColumn {
-                            items(workouts) { workout ->
-                                Text(
-                                    text = "Workout: ${workout.name}, Duration: ${workout.duration}, Calories Burned: ${workout.caloriesBurned}, Type: ${workout.type}"
-                                )
-                            }
-                        }*/
+                DynamicWorkoutInputFields(
+                    fields = fields.map { fieldInfo ->
+                        WorkoutField(
+                            label = fieldInfo.label,
+                            value = inputValues.getOrDefault(fieldInfo.label, ""),
+                            onChange = { inputValues[fieldInfo.label] = it }
+                        )
+                    }
+                )
             }
 
             Spacer(modifier = Modifier.height(8.dp))
             Button(
                 onClick = {
                     viewModel.addWorkout(
-                        name = workoutName,
+                        name = displayName,
                         type = workoutType,
-
-                        duration = duration.toIntOrNull(),
-                        distance = distance.toIntOrNull(),
-                        caloriesBurned = caloriesBurned.toIntOrNull(),
-
-                        set = set.toIntOrNull(),
-                        repetition = repetitions.toIntOrNull(),
-                        weight = weight.toIntOrNull()
+                        duration = inputValues["Duration (minutes)"]?.toIntOrNull(),
+                        distance = inputValues["Distance (km)"]?.toIntOrNull(),
+                        caloriesBurned = inputValues["Calories Burned"]?.toIntOrNull(),
+                        set = inputValues["Sets"]?.toIntOrNull(),
+                        repetition = inputValues["Repetitions"]?.toIntOrNull(),
+                        weight = inputValues["Weights (kg)"]?.toIntOrNull()
                     )
-
                     Toast.makeText(
                         context,
-                        "New $workoutName data has been created!",
+                        "New $displayName data has been created!",
                         Toast.LENGTH_LONG
                     ).show()
-
-                }, modifier = Modifier
+                },
+                modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 32.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF23af92)),
@@ -141,121 +131,26 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
 }
 
 @Composable
-fun AerobicInputFields(
-    duration: String,
-    distance: String,
-    caloriesBurned: String,
-    onDurationChange: (String) -> Unit,
-    onDistanceChange: (String) -> Unit,
-    onCaloriesChange: (String) -> Unit
-) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier
-            .padding(horizontal = 4.dp)
-            .fillMaxWidth()
-    ) {
-        TextField(
-            value = duration,
-            onValueChange = onDurationChange,
-            label = { Text("Duration (minutes)") },
-            modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.colors(
-                unfocusedContainerColor = Color(0xFFF1F1F1),
-                focusedContainerColor = Color(0xFFE0E0E0),
-                unfocusedTextColor = Color.Black,
-                focusedTextColor = Color.Black,
-                unfocusedLabelColor = Color.Gray,
-                focusedLabelColor = Color(0xFF23af92)
+fun DynamicWorkoutInputFields(fields: List<WorkoutField>) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        fields.forEach { field ->
+            TextField(
+                value = field.value,
+                onValueChange = field.onChange,
+                label = { Text(field.label) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = TextFieldDefaults.colors(
+                    unfocusedContainerColor = Color(0xFFF1F1F1),
+                    focusedContainerColor = Color(0xFFE0E0E0),
+                    unfocusedTextColor = Color.Black,
+                    focusedTextColor = Color.Black,
+                    unfocusedLabelColor = Color.Gray,
+                    focusedLabelColor = Color(0xFF23af92)
+                )
             )
-        )
-        TextField(
-            value = distance,
-            onValueChange = onDistanceChange,
-            label = { Text("Distance (km)") },
-            modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.colors(
-                unfocusedContainerColor = Color(0xFFF1F1F1),
-                focusedContainerColor = Color(0xFFE0E0E0),
-                unfocusedTextColor = Color.Black,
-                focusedTextColor = Color.Black,
-                unfocusedLabelColor = Color.Gray,
-                focusedLabelColor = Color(0xFF23af92)
-            )
-        )
-        TextField(
-            value = caloriesBurned,
-            onValueChange = onCaloriesChange,
-            label = { Text("Calories Burned") },
-            modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.colors(
-                unfocusedContainerColor = Color(0xFFF1F1F1),
-                focusedContainerColor = Color(0xFFE0E0E0),
-                unfocusedTextColor = Color.Black,
-                focusedTextColor = Color.Black,
-                unfocusedLabelColor = Color.Gray,
-                focusedLabelColor = Color(0xFF23af92)
-            )
-        )
+        }
     }
 }
 
-@Composable
-fun AnaerobicInputFields(
-    sets: String,
-    repetitions: String,
-    weights: String,
-    onSetsChange: (String) -> Unit,
-    onRepsChange: (String) -> Unit,
-    onWeightsChange: (String) -> Unit
-) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier
-            .padding(horizontal = 8.dp)
-            .fillMaxWidth()
-    ) {
-        TextField(
-            value = sets,
-            onValueChange = onSetsChange,
-            label = { Text("Sets") },
-            modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.colors(
-                unfocusedContainerColor = Color(0xFFF1F1F1),
-                focusedContainerColor = Color(0xFFE0E0E0),
-                unfocusedTextColor = Color.Black,
-                focusedTextColor = Color.Black,
-                unfocusedLabelColor = Color.Gray,
-                focusedLabelColor = Color(0xFF23af92)
-            )
-        )
-        TextField(
-            value = repetitions,
-            onValueChange = onRepsChange,
-            label = { Text("Repetitions") },
-            modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.colors(
-                unfocusedContainerColor = Color(0xFFF1F1F1),
-                focusedContainerColor = Color(0xFFE0E0E0),
-                unfocusedTextColor = Color.Black,
-                focusedTextColor = Color.Black,
-                unfocusedLabelColor = Color.Gray,
-                focusedLabelColor = Color(0xFF23af92)
-            )
-        )
-        TextField(
-            value = weights,
-            onValueChange = onWeightsChange,
-            label = { Text("Weights") },
-            modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.colors(
-                unfocusedContainerColor = Color(0xFFF1F1F1),
-                focusedContainerColor = Color(0xFFE0E0E0),
-                unfocusedTextColor = Color.Black,
-                focusedTextColor = Color.Black,
-                unfocusedLabelColor = Color.Gray,
-                focusedLabelColor = Color(0xFF23af92)
-            )
-        )
-    }
-}
+data class WorkoutField(val label: String, val value: String, val onChange: (String) -> Unit)
 

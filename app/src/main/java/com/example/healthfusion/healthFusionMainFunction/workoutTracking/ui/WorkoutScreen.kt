@@ -321,44 +321,44 @@ fun WorkoutRecentActivityBox(workout: Workout, dateFormatter: DateFormatter) {
 
 @Composable
 fun WorkoutGridItem(workout: Enum<*>, navController: NavController) {
-    val workoutName: String
-    val imageResource: Int
-    val workoutType: WorkoutType
-
-    when (workout) {
-        is AerobicWorkout -> {
-            workoutName = workout.workoutName
-            imageResource = workout.imageResource
-            workoutType = workout.workoutType
-        }
-
-        is AnaerobicWorkout -> {
-            workoutName = workout.workoutName
-            imageResource = workout.imageResource
-            workoutType = workout.workoutType
-        }
-
-        else -> {
-            workoutName = "Unknown"
-            imageResource = 0
-            workoutType = WorkoutType.AEROBIC
-        }
-    }
-
     Column(
         modifier = Modifier
             .padding(8.dp)
-            .clickable { navController.navigate("${Screen.WorkoutEdit.route}/${workoutName}/${workoutType.name}") },
+            .clickable {
+                navController.navigate(
+                    "${Screen.WorkoutEdit.route}/${workout.javaClass.simpleName}/${workout.name}/${
+                        when (workout) {
+                            is AerobicWorkout -> workout.workoutType.name
+                            is AnaerobicWorkout -> workout.workoutType.name
+                            else -> WorkoutType.AEROBIC.name
+                        }
+                    }"
+                )
+            },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = imageResource),
-            contentDescription = workoutName,
+            painter = painterResource(
+                id = when (workout) {
+                    is AerobicWorkout -> workout.imageResource
+                    is AnaerobicWorkout -> workout.imageResource
+                    else -> R.drawable.ic_placeholder_icon
+                }
+            ),
+            contentDescription = (workout as? AerobicWorkout)?.workoutName
+                ?: (workout as? AnaerobicWorkout)?.workoutName,
             modifier = Modifier
                 .size(200.dp)
                 .padding(8.dp)
         )
-        Text(text = workout.name, fontSize = 16.sp)
+        Text(
+            text = when (workout) {
+                is AerobicWorkout -> workout.workoutName
+                is AnaerobicWorkout -> workout.workoutName
+                else -> "Unknown"
+            },
+            fontSize = 16.sp
+        )
     }
 }
 
