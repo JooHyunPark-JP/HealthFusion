@@ -40,8 +40,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AerobicWorkout
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AnaerobicWorkout
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.FieldInfo
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.Workout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.getFieldValue
 import com.example.healthfusion.util.DateFormatter
 import ir.ehsannarmani.compose_charts.LineChart
 import ir.ehsannarmani.compose_charts.models.DotProperties
@@ -77,6 +81,7 @@ fun WorkoutHistoryScreen(
             (selectedAerobicWorkout == null || workout.name == selectedAerobicWorkout?.name) &&
                     (selectedAnaerobicWorkout == null || workout.name == selectedAnaerobicWorkout?.name)
         }
+
 
 
         if (selectedAerobicWorkout != null) {
@@ -116,15 +121,10 @@ fun WorkoutHistoryScreen(
             Spacer(modifier = Modifier.height(8.dp))
             when (aerobicWorkoutTabIndex) {
                 0 -> {
-                    val lineData
-                            : List<Double> = when (selectedDetailOption) {
-                        "Calories Burned" -> filteredWorkouts.map {
-                            it.caloriesBurned?.toDouble() ?: 0.0
-                        }
-
-                        "Distance" -> filteredWorkouts.map { it.distance?.toDouble() ?: 0.0 }
-                        "Duration" -> filteredWorkouts.map { it.duration?.toDouble() ?: 0.0 }
-                        else -> filteredWorkouts.map { it.caloriesBurned?.toDouble() ?: 0.0 }
+                    val lineData: List<Double> = filteredWorkouts.map { workout ->
+                        val selectedField =
+                            FieldInfo.entries.find { it.label == selectedDetailOption }
+                        selectedField?.let { workout.getFieldValue(it) } ?: 0.0
                     }
 
                     AerobicLineChart(
@@ -241,6 +241,14 @@ fun WorkoutHistoryScreen(
         Spacer(modifier = Modifier.height(8.dp))
 
         if (selectedAerobicWorkout != null) {
+
+            val workoutEnum =
+                AerobicWorkout.entries.find { it.workoutName == selectedAerobicWorkout?.name }
+
+            val validFieldsForDropdown = workoutEnum?.fields?.filter { fieldInfo ->
+                fieldInfo !in listOf(FieldInfo.SETS, FieldInfo.REPETITIONS)
+            } ?: emptyList()
+
             Box {
                 OutlinedButton(
                     onClick = {
@@ -255,14 +263,13 @@ fun WorkoutHistoryScreen(
                     onDismissRequest = { expandedDetailOptions = false },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    listOf("Calories Burned", "Distance", "Duration").forEach { option ->
+                    validFieldsForDropdown.forEach { option ->
                         DropdownMenuItem(
-                            text = { Text(option) },
+                            text = { Text(option.label) },
                             onClick = {
-                                selectedDetailOption = option
+                                selectedDetailOption = option.label
                                 expandedDetailOptions = false
-                            }
-                        )
+                            })
                     }
                 }
             }
@@ -271,7 +278,23 @@ fun WorkoutHistoryScreen(
 }
 
 @Composable
-fun WorkoutItem(workout: Workout, dateFormatter: DateFormatter, onDeleteClick: () -> Unit) {
+fun WorkoutItem(
+    workout: Workout,
+    dateFormatter: DateFormatter,
+    onDeleteClick: () -> Unit
+) {
+    val workoutEnum = when (workout.type) {
+        WorkoutType.AEROBIC -> AerobicWorkout.entries.find { it.workoutName == workout.name }
+        WorkoutType.ANAEROBIC -> AnaerobicWorkout.entries.find { it.workoutName == workout.name }
+        else -> null
+    }
+
+    val fields = when (workoutEnum) {
+        is AerobicWorkout -> workoutEnum.fields
+        is AnaerobicWorkout -> workoutEnum.fields
+        else -> emptyList()
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -299,46 +322,23 @@ fun WorkoutItem(workout: Workout, dateFormatter: DateFormatter, onDeleteClick: (
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                // Workout details based on type
-                when (workout.type) {
-                    WorkoutType.AEROBIC -> {
-                        Text(
-                            text = "Duration: ${workout.duration ?: "N/A"} mins",
-                            fontSize = 14.sp,
-                            color = Color(0xFF616161)
-                        )
-                        Text(
-                            text = "Distance: ${workout.distance ?: "N/A"} km",
-                            fontSize = 14.sp,
-                            color = Color(0xFF616161)
-                        )
-                        Text(
-                            text = "Calories Burned: ${workout.caloriesBurned ?: "N/A"}",
-                            fontSize = 14.sp,
-                            color = Color(0xFF616161)
-                        )
+                fields.forEach { fieldInfo ->
+                    val value = when (fieldInfo) {
+                        FieldInfo.DURATION -> workout.duration?.toString() ?: "N/A"
+                        FieldInfo.DISTANCE -> workout.distance?.toString() ?: "N/A"
+                        FieldInfo.CALORIES_BURNED -> workout.caloriesBurned?.toString() ?: "N/A"
+                        FieldInfo.SETS -> workout.set?.toString() ?: "N/A"
+                        FieldInfo.REPETITIONS -> workout.repetition?.toString() ?: "N/A"
+                        FieldInfo.WEIGHTS -> workout.weight?.toString() ?: "N/A"
                     }
 
-                    WorkoutType.ANAEROBIC -> {
-                        Text(
-                            text = "Sets: ${workout.set ?: "N/A"}",
-                            fontSize = 14.sp,
-                            color = Color(0xFF616161)
-                        )
-                        Text(
-                            text = "Repetitions: ${workout.repetition ?: "N/A"}",
-                            fontSize = 14.sp,
-                            color = Color(0xFF616161)
-                        )
-                        Text(
-                            text = "Weight: ${workout.weight ?: "N/A"} kg",
-                            fontSize = 14.sp,
-                            color = Color(0xFF616161)
-                        )
-                    }
+                    Text(
+                        text = "${fieldInfo.label}: $value",
+                        fontSize = 14.sp,
+                        color = Color(0xFF616161)
+                    )
                 }
             }
-
             // Right side: delete button
             IconButton(onClick = onDeleteClick) {
                 Icon(
@@ -437,6 +437,12 @@ fun AerobicLineChart(
 }
 
 fun getDateLabels(filteredWorkouts: List<Workout>): List<String> {
+
+
+    /*    // All workout data shown in the line chart... use it for later
+    return filteredWorkouts.sortedBy { it.workoutDate }
+            .map { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date(it.workoutDate)) }*/
+
     val firstWorkoutDate = filteredWorkouts.minOfOrNull { it.workoutDate }
     val lastWorkoutDate = filteredWorkouts.maxOfOrNull { it.workoutDate }
 

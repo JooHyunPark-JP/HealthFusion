@@ -41,51 +41,31 @@ enum class AerobicWorkout(
         "Running",
         R.drawable.running_pose2,
         WorkoutType.AEROBIC,
-        fields = listOf(
-            FieldInfo("Duration (minutes)", FieldType.TEXT),
-            FieldInfo("Distance (km)", FieldType.TEXT),
-            FieldInfo("Calories Burned", FieldType.TEXT)
-        )
+        fields = listOf(FieldInfo.DURATION, FieldInfo.DISTANCE, FieldInfo.CALORIES_BURNED)
     ),
     CYCLING(
         "Cycling",
         R.drawable.cycling_pose,
         WorkoutType.AEROBIC,
-        fields = listOf(
-            FieldInfo("Duration (minutes)", FieldType.TEXT),
-            FieldInfo("Distance (km)", FieldType.TEXT),
-            FieldInfo("Calories Burned", FieldType.TEXT)
-        )
+        fields = listOf(FieldInfo.DURATION, FieldInfo.DISTANCE, FieldInfo.CALORIES_BURNED)
     ),
     WALKING(
         "Walking",
         R.drawable.walking_pose,
         WorkoutType.AEROBIC,
-        fields = listOf(
-            FieldInfo("Duration (minutes)", FieldType.TEXT),
-            FieldInfo("Distance (km)", FieldType.TEXT),
-            FieldInfo("Calories Burned", FieldType.TEXT)
-        )
+        fields = listOf(FieldInfo.DURATION, FieldInfo.DISTANCE, FieldInfo.CALORIES_BURNED)
     ),
     SWIMMING(
         "Swimming",
         R.drawable.swimming_pose,
         WorkoutType.AEROBIC,
-        fields = listOf(
-            FieldInfo("Duration (minutes)", FieldType.TEXT),
-            FieldInfo("Distance (km)", FieldType.TEXT),
-            FieldInfo("Calories Burned", FieldType.TEXT)
-        )
+        fields = listOf(FieldInfo.DURATION, FieldInfo.DISTANCE, FieldInfo.CALORIES_BURNED)
     ),
     JUMPING_ROPE(
         "Jumping_Rope",
         R.drawable.jumping_rope_pose,
         WorkoutType.AEROBIC,
-        fields = listOf(
-            FieldInfo("Sets", FieldType.TEXT),
-            FieldInfo("Repetitions", FieldType.TEXT),
-            FieldInfo("Calories Burned", FieldType.TEXT)
-        )
+        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.CALORIES_BURNED)
     )
 }
 
@@ -99,67 +79,37 @@ enum class AnaerobicWorkout(
         "Push_Up",
         R.drawable.pushup_pose,
         WorkoutType.ANAEROBIC,
-        fields = listOf(
-            FieldInfo("Sets", FieldType.TEXT),
-            FieldInfo("Repetitions", FieldType.TEXT)
-        )
+        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS)
     ),
     SQUAT(
         "Squat",
         R.drawable.squat_pose,
         WorkoutType.ANAEROBIC,
-        fields = listOf(
-            FieldInfo("Sets", FieldType.TEXT),
-            FieldInfo("Repetitions", FieldType.TEXT),
-            FieldInfo("Weights (kg)", FieldType.TEXT)
-        )
+        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS)
     ),
     BENCH_PRESS(
         "Bench_Press",
         R.drawable.squat_pose,
         WorkoutType.ANAEROBIC,
-        fields = listOf(
-            FieldInfo("Sets", FieldType.TEXT),
-            FieldInfo("Repetitions", FieldType.TEXT),
-            FieldInfo("Weights (kg)", FieldType.TEXT)
-        )
+        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS)
     ),
     BICEP_CURLS(
         "Bicep_Curls",
         R.drawable.bicep_curl_pose,
         WorkoutType.ANAEROBIC,
-        fields = listOf(
-            FieldInfo("Sets", FieldType.TEXT),
-            FieldInfo("Repetitions", FieldType.TEXT),
-            FieldInfo("Weights (kg)", FieldType.TEXT)
-        )
+        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS)
     ),
     PLANK(
         "Plank",
         R.drawable.plank_pose,
         WorkoutType.ANAEROBIC,
-        fields = listOf(
-            FieldInfo("Sets", FieldType.TEXT),
-            FieldInfo("Duration (seconds)", FieldType.TEXT)
-        )
+        fields = listOf(FieldInfo.SETS, FieldInfo.DURATION)
     ),
     DEAD_LIFT(
         "Dead_Lift",
         R.drawable.dead_lift_pose,
         WorkoutType.ANAEROBIC,
-        fields = listOf(
-            FieldInfo("Sets", FieldType.TEXT),
-            FieldInfo("Repetitions", FieldType.TEXT),
-            FieldInfo("Weights (kg)", FieldType.TEXT)
-        )
+        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS)
     )
 }
 
-enum class FieldType {
-    TEXT // expand later: TIMER, UNIT_SELECTION (km,m) etc
-}
-
-data class FieldInfo(
-    val label: String,
-    val fieldType: FieldType
-)

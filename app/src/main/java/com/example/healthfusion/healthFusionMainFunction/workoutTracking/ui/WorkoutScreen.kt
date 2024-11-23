@@ -47,6 +47,7 @@ import androidx.navigation.NavController
 import com.example.healthfusion.R
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AerobicWorkout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AnaerobicWorkout
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.FieldInfo
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.Workout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoal
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoalType
@@ -220,10 +221,23 @@ fun WorkoutGoalBox(
 @Composable
 fun WorkoutRecentActivityBox(workout: Workout, dateFormatter: DateFormatter) {
 
-    val imageResource = when (workout.type) {
-        WorkoutType.AEROBIC -> AerobicWorkout.entries.find { it.workoutName == workout.name }?.imageResource
-        WorkoutType.ANAEROBIC -> AnaerobicWorkout.entries.find { it.workoutName == workout.name }?.imageResource
-    } ?: R.drawable.ic_placeholder_icon
+    val workoutEnum = when (workout.type) {
+        WorkoutType.AEROBIC -> AerobicWorkout.entries.find { it.workoutName == workout.name }
+        WorkoutType.ANAEROBIC -> AnaerobicWorkout.entries.find { it.workoutName == workout.name }
+        else -> null
+    }
+
+    val fields = when (workoutEnum) {
+        is AerobicWorkout -> workoutEnum.fields
+        is AnaerobicWorkout -> workoutEnum.fields
+        else -> emptyList()
+    }
+
+    val imageResource = when (workoutEnum) {
+        is AerobicWorkout -> workoutEnum.imageResource
+        is AnaerobicWorkout -> workoutEnum.imageResource
+        else -> R.drawable.ic_placeholder_icon
+    }
 
     Card(
         modifier = Modifier
@@ -231,9 +245,7 @@ fun WorkoutRecentActivityBox(workout: Workout, dateFormatter: DateFormatter) {
             .padding(8.dp)
             .shadow(4.dp, RoundedCornerShape(12.dp)),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFF5F5F5)
-        )
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5))
     ) {
         Row(
             modifier = Modifier
@@ -243,67 +255,43 @@ fun WorkoutRecentActivityBox(workout: Workout, dateFormatter: DateFormatter) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Column {
+                // Workout Title
+                Text(
+                    text = workout.name,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF212121)
+                )
 
-                Column {
-                    // Workout Title
-                    Text(
-                        text = workout.name,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF212121)
-                    )
+                Spacer(modifier = Modifier.height(8.dp))
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Date: ${dateFormatter.simpleDateFormatWithoutSpecificTime(workout.workoutDate)}",
+                    fontSize = 14.sp,
+                    color = Color.Gray
+                )
 
-                    // Workout Details
-                    Text(
-                        text = "Date: ${dateFormatter.simpleDateFormatWithoutSpecificTime(workout.workoutDate)}",
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
+                Spacer(modifier = Modifier.height(8.dp))
 
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    when (workout.type) {
-                        WorkoutType.AEROBIC -> {
-                            Text(
-                                "Duration: ${workout.duration ?: "N/A"} mins",
-                                fontSize = 14.sp,
-                                color = Color(0xFF616161)
-                            )
-                            Text(
-                                "Distance: ${workout.distance ?: "N/A"} km",
-                                fontSize = 14.sp,
-                                color = Color(0xFF616161)
-                            )
-                            Text(
-                                "Calories Burned: ${workout.caloriesBurned ?: "N/A"}",
-                                fontSize = 14.sp,
-                                color = Color(0xFF616161)
-                            )
-                        }
-
-                        WorkoutType.ANAEROBIC -> {
-                            Text(
-                                "Sets: ${workout.set ?: "N/A"}",
-                                fontSize = 14.sp,
-                                color = Color(0xFF616161)
-                            )
-                            Text(
-                                "Repetitions: ${workout.repetition ?: "N/A"}",
-                                fontSize = 14.sp,
-                                color = Color(0xFF616161)
-                            )
-                            Text(
-                                "Weight: ${workout.weight ?: "N/A"} kg",
-                                fontSize = 14.sp,
-                                color = Color(0xFF616161)
-                            )
-                        }
+                fields.forEach { fieldInfo ->
+                    val value = when (fieldInfo) {
+                        FieldInfo.DURATION -> workout.duration?.toString() ?: "N/A"
+                        FieldInfo.DISTANCE -> workout.distance?.toString() ?: "N/A"
+                        FieldInfo.CALORIES_BURNED -> workout.caloriesBurned?.toString() ?: "N/A"
+                        FieldInfo.SETS -> workout.set?.toString() ?: "N/A"
+                        FieldInfo.REPETITIONS -> workout.repetition?.toString() ?: "N/A"
+                        FieldInfo.WEIGHTS -> workout.weight?.toString() ?: "N/A"
                     }
+
+                    Text(
+                        text = "${fieldInfo.label}: $value",
+                        fontSize = 14.sp,
+                        color = Color(0xFF616161)
+                    )
                 }
             }
+
             Spacer(modifier = Modifier.weight(1f))
 
             Image(

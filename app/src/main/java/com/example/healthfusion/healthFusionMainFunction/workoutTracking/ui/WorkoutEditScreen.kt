@@ -22,8 +22,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -34,16 +32,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AerobicWorkout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AnaerobicWorkout
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.FieldInfo
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
 import com.example.healthfusion.ui.theme.HealthFusionTheme
 
 @Composable
 fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: WorkoutType) {
 
-    val workouts by viewModel.workouts.collectAsState()
-
     val context = LocalContext.current
 
+    // Retrieve the corresponding enum based on the workoutType
     val workoutEnum: Any? = when (workoutType) {
         WorkoutType.AEROBIC -> AerobicWorkout.entries.find { it.workoutName == workoutName }
         WorkoutType.ANAEROBIC -> AnaerobicWorkout.entries.find { it.workoutName == workoutName }
@@ -54,20 +52,24 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
         return
     }
 
+    // Get the fields from the workout enum
     val fields = when (workoutEnum) {
         is AerobicWorkout -> workoutEnum.fields
         is AnaerobicWorkout -> workoutEnum.fields
         else -> emptyList()
     }
 
+    // Display name for the workout
     val displayName = when (workoutEnum) {
         is AerobicWorkout -> workoutEnum.workoutName
         is AnaerobicWorkout -> workoutEnum.workoutName
         else -> "Unknown Workout"
     }
 
-    val inputValues = remember { mutableStateMapOf<String, String>() }
+    // MutableStateMap to track input values
+    val inputValues = remember { mutableStateMapOf<FieldInfo, String>() }
 
+    // UI rendering
     HealthFusionTheme {
         Column(
             modifier = Modifier
@@ -90,8 +92,8 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
                     fields = fields.map { fieldInfo ->
                         WorkoutField(
                             label = fieldInfo.label,
-                            value = inputValues.getOrDefault(fieldInfo.label, ""),
-                            onChange = { inputValues[fieldInfo.label] = it }
+                            value = inputValues.getOrDefault(fieldInfo, ""),
+                            onChange = { inputValues[fieldInfo] = it }
                         )
                     }
                 )
@@ -103,12 +105,12 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
                     viewModel.addWorkout(
                         name = displayName,
                         type = workoutType,
-                        duration = inputValues["Duration (minutes)"]?.toIntOrNull(),
-                        distance = inputValues["Distance (km)"]?.toIntOrNull(),
-                        caloriesBurned = inputValues["Calories Burned"]?.toIntOrNull(),
-                        set = inputValues["Sets"]?.toIntOrNull(),
-                        repetition = inputValues["Repetitions"]?.toIntOrNull(),
-                        weight = inputValues["Weights (kg)"]?.toIntOrNull()
+                        duration = inputValues[FieldInfo.DURATION]?.toIntOrNull(),
+                        distance = inputValues[FieldInfo.DISTANCE]?.toIntOrNull(),
+                        caloriesBurned = inputValues[FieldInfo.CALORIES_BURNED]?.toIntOrNull(),
+                        set = inputValues[FieldInfo.SETS]?.toIntOrNull(),
+                        repetition = inputValues[FieldInfo.REPETITIONS]?.toIntOrNull(),
+                        weight = inputValues[FieldInfo.WEIGHTS]?.toIntOrNull()
                     )
                     Toast.makeText(
                         context,
