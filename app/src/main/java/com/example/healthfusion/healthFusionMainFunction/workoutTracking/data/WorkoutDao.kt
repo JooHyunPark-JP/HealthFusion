@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface WorkoutDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(workout: Workout) : Long
+    suspend fun insert(workout: Workout): Long
 
     @Delete
     suspend fun delete(workout: Workout)

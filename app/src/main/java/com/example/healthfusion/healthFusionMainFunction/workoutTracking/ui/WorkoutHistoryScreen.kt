@@ -137,7 +137,14 @@ fun WorkoutHistoryScreen(
 
                 1 -> {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = "Workout Name: ${filteredWorkouts.first().name.replace("_", " ")}")
+                        Text(
+                            text = "Workout Name: ${
+                                filteredWorkouts.first().name.replace(
+                                    "_",
+                                    " "
+                                )
+                            }"
+                        )
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -217,7 +224,10 @@ fun WorkoutHistoryScreen(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = selectedAnaerobicWorkout?.name?.replace("_", " ") ?: "Select Anaerobic")
+                    Text(
+                        text = selectedAnaerobicWorkout?.name?.replace("_", " ")
+                            ?: "Select Anaerobic"
+                    )
                 }
                 DropdownMenu(
                     expanded = expandedAnaerobic,
