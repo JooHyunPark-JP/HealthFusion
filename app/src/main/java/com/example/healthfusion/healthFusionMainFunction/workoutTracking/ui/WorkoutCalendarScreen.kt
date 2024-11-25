@@ -5,7 +5,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.repeatable
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,7 +36,6 @@ import androidx.compose.ui.unit.dp
 import com.example.healthfusion.R
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AerobicWorkout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AnaerobicWorkout
-import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkOutName
 import io.github.boguszpawlowski.composecalendar.Calendar
 import io.github.boguszpawlowski.composecalendar.rememberCalendarState
 import kotlinx.coroutines.delay
@@ -104,7 +103,10 @@ fun WorkoutCalendarScreen(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = selectedAerobicWorkout?.workoutName ?: "Select Aerobic")
+                    Text(
+                        text = selectedAerobicWorkout?.workoutName?.replace("_", " ")
+                            ?: "Select Aerobic"
+                    )
                 }
 
                 DropdownMenu(
@@ -114,7 +116,7 @@ fun WorkoutCalendarScreen(
                 ) {
                     AerobicWorkout.entries.forEach { workout ->
                         DropdownMenuItem(
-                            text = { Text(workout.workoutName) },
+                            text = { Text(workout.workoutName.replace("_", " ")) },
                             onClick = {
                                 selectedAerobicWorkout = workout
                                 selectedAnaerobicWorkout = null
@@ -146,7 +148,10 @@ fun WorkoutCalendarScreen(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = selectedAnaerobicWorkout?.workoutName ?: "Select Anaerobic")
+                    Text(
+                        text = selectedAnaerobicWorkout?.workoutName?.replace("_", " ")
+                            ?: "Select Anaerobic"
+                    )
                 }
 
                 DropdownMenu(
@@ -156,7 +161,7 @@ fun WorkoutCalendarScreen(
                 ) {
                     AnaerobicWorkout.entries.forEach { workout ->
                         DropdownMenuItem(
-                            text = { Text(workout.workoutName) },
+                            text = { Text(workout.workoutName.replace("_", " ")) },
                             onClick = {
                                 selectedAnaerobicWorkout = workout
                                 selectedAerobicWorkout = null
@@ -185,7 +190,7 @@ fun DayContent(day: LocalDate, isWorkoutDay: Boolean) {
     var isBlinking by remember { mutableStateOf(false) }
 
     val backgroundColor by animateColorAsState(
-        targetValue = if (isWorkoutDay && isBlinking) colorResource(R.color.light_skyblue) else Color.Transparent,
+        targetValue = if (isWorkoutDay && isBlinking) colorResource(R.color.light_peach) else Color.Transparent,
         animationSpec = repeatable(
             iterations = 2,
             animation = tween(durationMillis = 1000),
@@ -205,9 +210,15 @@ fun DayContent(day: LocalDate, isWorkoutDay: Boolean) {
         modifier = Modifier
             .size(48.dp)
             .clip(CircleShape)
-            .background(if (isWorkoutDay && !isBlinking) colorResource(R.color.light_skyblue) else backgroundColor),
+            .border(
+                width = 3.dp,
+                color = if (isWorkoutDay && !isBlinking) colorResource(R.color.light_peach) else backgroundColor,
+                shape = CircleShape
+            ),
         contentAlignment = Alignment.Center
     ) {
         Text(text = day.dayOfMonth.toString())
     }
+
+
 }

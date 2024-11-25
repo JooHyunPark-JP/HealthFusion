@@ -26,4 +26,9 @@ class DateFormatter {
         val date = Date(millis)
         return dateFormat.format(date)
     }
+
+    fun simpleDateFormatWithoutSpecificTime(timestamp: Long): String {
+        val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        return formatter.format(Date(timestamp))
+    }
 }
