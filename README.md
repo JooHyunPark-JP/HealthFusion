@@ -1,55 +1,49 @@
 # HealthFusion
 
-**HealthFusion** is an Android application that allows users to track and manage their health. Users can log their workouts, set goals, and visualize data through charts and statistics. This project leverages the latest Android technologies, including Jetpack Compose, Firebase, Coroutines, Flow, Hilt, and Room Database. The app ensures smooth performance with real-time data synchronization between local storage (Room Database) and the cloud (Firebase Firestore), allowing users to manage their data even when offline.
-
-While the app currently focuses on workout tracking, future updates will include diet and sleep management features.
+HealthFusion is a modern Android application that helps users track and manage their health efficiently. With features such as workout tracking, goal setting, and data visualization, the app empowers users to stay on top of their fitness journey. Built using cutting-edge Android technologies, HealthFusion ensures a seamless experience with real-time data synchronization between local (Room Database) and cloud storage (Firebase Firestore), even when offline.
 
 ## Features
 
 - **Workout Tracking**:
-  - **Aerobic Workouts**: Track exercises like running, cycling, and walking, with time, distance, and calories burned.
-  - **Anaerobic Workouts**: Log strength-based exercises like push-ups and squats, including sets, repetitions, and weight.
+  - **Aerobic Workouts**: Log exercises like running, cycling, and walking with time, distance, and calories burned.
+  - **Anaerobic Workouts**: Track strength-based exercises like push-ups and squats, including sets, repetitions, and weights.
 
 - **Simple Goal Setting**:
-  - Users can set daily and weekly workout goals, such as "Run for 30 minutes" or "Complete 3 workout sessions". These goals are displayed as a to-do list to help users stay on track with their fitness objectives.
+  - Set daily and weekly goals (e.g., "Run 30 minutes daily").
+  - Track goal progress with progress bars.
 
 - **Visualization**:
-  - Visualize workout data using a line chart showing calories burned, distance covered, and workout duration.
+  - Visualize workout data using a line chart.
   - A calendar view allows users to check each workout’s date easily.
 
 - **Login System**:
-  - Implements login and sign-up functionality with Firebase Authentication.
+  - Secure login and sign-up with Firebase Authentication.
 
 - **Real-Time Data Sync**:
-  - Sync workout data between local storage (Room Database) and the cloud (Firebase Firestore) to ensure data availability on any device.
-
-- **Offline Mode**:
-  - Use the app without an internet connection, with automatic data synchronization when the network is restored.
-
+  - Automatically sync workout data between Room Database and Firebase Firestore.
+  - Supports offline mode with automatic synchronization upon network recovery.
+    
 ## Technologies Used
 
-- **Jetpack Compose**: For building a modern, reactive user interface.
-- **MVVM (Model-View-ViewModel)**: For separation of concerns and maintainability.
-- **Hilt**: For dependency injection, simplifying code and testing.
-- **Coroutines + Flow**: For handling asynchronous operations and data streams.
-- **Room Database**: For local data storage, enabling offline functionality.
-- **Firebase Firestore**: For cloud-based real-time data synchronization.
-- **Firebase Authentication**: For managing user login and sign-up.
+- **Jetpack Compose**: Modern, reactive UI.
+- **MVVM Architecture**: Clean separation of concerns.
+- **Hilt**: Dependency injection.
+- **Room Database**: Offline data storage.
+- **Firebase Firestore**: Cloud-based data synchronization.
+- **Firebase Authentication**: User authentication.
+- **Coroutines + Flow**: Asynchronous programming.
 
 ## Firebase Setup
 
-To run this project, configure Firebase for your own use. Follow these steps:
-
-For detailed step-by-step instructions, refer to the official Firebase setup guide:  
-[Firebase Android Setup](https://firebase.google.com/docs/android/setup)
+1. Follow the [official Firebase setup guide](https://firebase.google.com/docs/android/setup).
+2. Configure `google-services.json` in the `app` directory.
 
 ### Firebase Authentication Sign-In Method
 
 To use the login and sign-up system, set up the Firebase Authentication sign-in method.
 
-1. In **Firebase Console** → **Authentication** → **Sign-in method**.
-2. Click **Add new provider**.
-3. Enable **Email/Password**.
+1. Navigate to **Firebase Console → Authentication → Sign-in method**.
+2. Enable the "Email/Password" provider.
 
 ## Firestore Security Rules Setup
 
@@ -93,17 +87,10 @@ To secure your Firestore database, configure Firestore Security Rules as follows
 <!-- Goal setting screen screenshot -->
 
 ## Future Features
-- Diet Tracking:
-  - Log food intake and track calories and nutrients.
-
-- Sleep Tracking:
-  - Track sleep duration and quality, and analyze sleep patterns.
-
-- Push Notifications:
-  - Reminders for workouts, meals, and sleep.
-
-- User Profile Management:
-  - Allow users to set personal health goals and manage profile data.
+- **Diet Tracking**: Log meals and monitor calorie intake.
+- **Sleep Tracking**: Track sleep patterns and quality.
+- **Push Notifications**: Get workouts, meals, and sleep reminders.
+- **User Profile Management**: Manage personal health goals.
 
 ## License
 Distributed under the MIT License. See LICENSE for more information.
