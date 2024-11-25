@@ -103,7 +103,7 @@ fun WorkoutCalendarScreen(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = selectedAerobicWorkout?.workoutName ?: "Select Aerobic")
+                    Text(text = selectedAerobicWorkout?.workoutName?.replace("_", " ") ?: "Select Aerobic")
                 }
 
                 DropdownMenu(
@@ -113,7 +113,7 @@ fun WorkoutCalendarScreen(
                 ) {
                     AerobicWorkout.entries.forEach { workout ->
                         DropdownMenuItem(
-                            text = { Text(workout.workoutName) },
+                            text = { Text(workout.workoutName.replace("_", " ")) },
                             onClick = {
                                 selectedAerobicWorkout = workout
                                 selectedAnaerobicWorkout = null
@@ -145,7 +145,7 @@ fun WorkoutCalendarScreen(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = selectedAnaerobicWorkout?.workoutName ?: "Select Anaerobic")
+                    Text(text = selectedAnaerobicWorkout?.workoutName?.replace("_", " ") ?: "Select Anaerobic")
                 }
 
                 DropdownMenu(
@@ -155,7 +155,7 @@ fun WorkoutCalendarScreen(
                 ) {
                     AnaerobicWorkout.entries.forEach { workout ->
                         DropdownMenuItem(
-                            text = { Text(workout.workoutName) },
+                            text = { Text(workout.workoutName.replace("_", " ")) },
                             onClick = {
                                 selectedAnaerobicWorkout = workout
                                 selectedAerobicWorkout = null

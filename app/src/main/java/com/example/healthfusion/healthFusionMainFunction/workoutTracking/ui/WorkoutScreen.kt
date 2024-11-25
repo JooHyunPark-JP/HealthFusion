@@ -256,9 +256,8 @@ fun WorkoutRecentActivityBox(workout: Workout, dateFormatter: DateFormatter) {
         ) {
 
             Column {
-                // Workout Title
                 Text(
-                    text = workout.name,
+                    text = workout.name.replace("_", " "),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF212121)
@@ -341,8 +340,8 @@ fun WorkoutGridItem(workout: Enum<*>, navController: NavController) {
         )
         Text(
             text = when (workout) {
-                is AerobicWorkout -> workout.workoutName
-                is AnaerobicWorkout -> workout.workoutName
+                is AerobicWorkout -> workout.workoutName.replace("_", " ")
+                is AnaerobicWorkout -> workout.workoutName.replace("_", " ")
                 else -> "Unknown"
             },
             fontSize = 16.sp

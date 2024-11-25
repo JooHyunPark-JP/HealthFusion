@@ -78,7 +78,7 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = displayName,
+                text = displayName.replace("_", " "),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )

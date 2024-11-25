@@ -99,7 +99,7 @@ fun WorkoutHistoryScreen(
         //if user choose Anaerobic workout, show the list
         if (selectedAnaerobicWorkout != null && filteredWorkouts.isNotEmpty()) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = "Your '${filteredWorkouts.first().name}' data")
+                Text(text = "Your '${filteredWorkouts.first().name.replace("_", " ")}' data")
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -137,7 +137,7 @@ fun WorkoutHistoryScreen(
 
                 1 -> {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = "Workout Name: ${filteredWorkouts.first().name}")
+                        Text(text = "Workout Name: ${filteredWorkouts.first().name.replace("_", " ")}")
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -183,7 +183,7 @@ fun WorkoutHistoryScreen(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = selectedAerobicWorkout?.name ?: "Select Aerobic")
+                    Text(text = selectedAerobicWorkout?.name?.replace("_", " ") ?: "Select Aerobic")
                 }
                 DropdownMenu(
                     expanded = expandedAerobic,
@@ -192,7 +192,7 @@ fun WorkoutHistoryScreen(
                 ) {
                     aerobicWorkout.forEach { workout ->
                         DropdownMenuItem(
-                            text = { Text(workout.name) },
+                            text = { Text(workout.name.replace("_", " ")) },
                             onClick = {
                                 selectedAerobicWorkout = workout
                                 selectedAnaerobicWorkout = null
@@ -217,7 +217,7 @@ fun WorkoutHistoryScreen(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = selectedAnaerobicWorkout?.name ?: "Select Anaerobic")
+                    Text(text = selectedAnaerobicWorkout?.name?.replace("_", " ") ?: "Select Anaerobic")
                 }
                 DropdownMenu(
                     expanded = expandedAnaerobic,
@@ -226,7 +226,7 @@ fun WorkoutHistoryScreen(
                 ) {
                     anaerobicWorkout.forEach { workout ->
                         DropdownMenuItem(
-                            text = { Text(workout.name) },
+                            text = { Text(workout.name.replace("_", " ")) },
                             onClick = {
                                 selectedAnaerobicWorkout = workout
                                 selectedAerobicWorkout = null
