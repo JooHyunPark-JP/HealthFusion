@@ -119,5 +119,14 @@ class DietViewModel @Inject constructor(
 
     fun setUserId(uid: String?) {
         _userId.value = uid
+
+        if (uid != null) {
+            syncDietRoomDatabaseAndFirestoreData()
+        }
+    }
+
+    private fun syncDietRoomDatabaseAndFirestoreData() {
+        syncUnsyncedDiets()
+        syncDietFromFirestore()
     }
 }

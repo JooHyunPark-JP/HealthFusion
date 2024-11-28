@@ -38,6 +38,7 @@ class WorkoutViewModel @Inject constructor(
     private val _userId = MutableStateFlow<String?>(null)
 
 
+
     // get the workout data of current user and convert flow to stateFlow by using stainIn
     @OptIn(ExperimentalCoroutinesApi::class)
     val workouts: StateFlow<List<Workout>> = _userId.flatMapLatest { uid ->
@@ -204,6 +205,7 @@ class WorkoutViewModel @Inject constructor(
 
     //when firestore has data but room database hasn't, get data from firestore and update room database
     fun syncWorkoutsFromFirestore() {
+        Log.d("checkingloginUID2", "${_userId.value} ")
         viewModelScope.launch {
             _userId.value?.let { uid ->
                 if (networkHelper.isNetworkConnected()) {
@@ -237,12 +239,23 @@ class WorkoutViewModel @Inject constructor(
                     }
                 }
             }
+
         }
     }
 
 
     fun setUserId(uid: String?) {
         _userId.value = uid
+
+        // Trigger syncing once the userId is set
+        if (uid != null) {
+            syncWorkoutRoomDatabaseAndFirestoreData()
+        }
+    }
+
+    private fun syncWorkoutRoomDatabaseAndFirestoreData() {
+        syncUnsyncedWorkouts()
+        syncWorkoutsFromFirestore()
     }
 
 }
