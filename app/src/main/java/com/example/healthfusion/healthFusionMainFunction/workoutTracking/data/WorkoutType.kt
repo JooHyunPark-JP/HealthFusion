@@ -83,6 +83,21 @@ enum class AnaerobicWorkout(
         WorkoutType.ANAEROBIC,
         fields = listOf(FieldInfo.SETS, FieldInfo.DURATION)
     ),
+
+    HAND_GRIPPER(
+        "Hand_Gripper",
+        R.drawable.hand_grippler_pose,
+        WorkoutType.ANAEROBIC,
+        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS)
+    ),
+
+    SHOULDER_PRESS(
+        "Shoulder_Press",
+        R.drawable.shoulder_press_pose,
+        WorkoutType.ANAEROBIC,
+        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS)
+    ),
+
     DEAD_LIFT(
         "Dead_Lift",
         R.drawable.dead_lift_pose,
@@ -96,7 +111,6 @@ enum class AnaerobicWorkout(
         WorkoutType.ANAEROBIC,
         fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS)
     ),
-
 
 }
 
