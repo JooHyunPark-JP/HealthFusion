@@ -6,30 +6,6 @@ enum class WorkoutType {
     AEROBIC, ANAEROBIC
 }
 
-/*enum class AerobicWorkout(
-    val workoutName: String,
-    val imageResource: Int,
-    val workoutType: WorkoutType
-) {
-    RUNNING("Running", R.drawable.running_pose2, workoutType = WorkoutType.AEROBIC),
-    CYCLING("Cycling", R.drawable.cycling_pose, workoutType = WorkoutType.AEROBIC),
-    WALKING("Walking", R.drawable.walking_pose, workoutType = WorkoutType.AEROBIC),
-    SWIMMING("Swimming", R.drawable.swimming_pose, workoutType = WorkoutType.AEROBIC),
-    JUMPING_ROPE("Jumping_Rope", R.drawable.jumping_rope_pose, workoutType = WorkoutType.AEROBIC)
-}
-
-enum class AnaerobicWorkout(
-    val workoutName: String,
-    val imageResource: Int,
-    val workoutType: WorkoutType
-) {
-    PUSH_UP("Push_Up", R.drawable.pushup_pose, workoutType = WorkoutType.ANAEROBIC),
-    SQUAT("Squat", R.drawable.squat_pose, workoutType = WorkoutType.ANAEROBIC),
-    BENCH_PRESS("Bench_Press", R.drawable.squat_pose, workoutType = WorkoutType.ANAEROBIC),
-    BICEP_CURLS("Bicep_Curls", R.drawable.bicep_curl_pose, workoutType = WorkoutType.ANAEROBIC),
-    PLANK("Plank", R.drawable.plank_pose, workoutType = WorkoutType.ANAEROBIC),
-    DEAD_LIFT("Dead_Lift", R.drawable.dead_lift_pose, workoutType = WorkoutType.ANAEROBIC),
-}*/
 
 enum class AerobicWorkout(
     val workoutName: String,
@@ -87,12 +63,14 @@ enum class AnaerobicWorkout(
         WorkoutType.ANAEROBIC,
         fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS)
     ),
-    BENCH_PRESS(
-        "Bench_Press",
-        R.drawable.squat_pose,
+
+    DONKEY_KICK(
+        "Donkey_Kick",
+        R.drawable.donkey_kick_pose,
         WorkoutType.ANAEROBIC,
-        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS)
+        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS)
     ),
+
     BICEP_CURLS(
         "Bicep_Curls",
         R.drawable.bicep_curl_pose,
@@ -110,6 +88,15 @@ enum class AnaerobicWorkout(
         R.drawable.dead_lift_pose,
         WorkoutType.ANAEROBIC,
         fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS)
-    )
+    ),
+
+    BENCH_PRESS(
+        "Bench_Press",
+        R.drawable.bench_press_pose,
+        WorkoutType.ANAEROBIC,
+        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS)
+    ),
+
+
 }
 
