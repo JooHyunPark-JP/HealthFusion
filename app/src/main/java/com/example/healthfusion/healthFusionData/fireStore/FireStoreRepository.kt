@@ -18,9 +18,9 @@ class FirestoreRepository @Inject constructor(
     // save workout data into firestore
     suspend fun saveWorkout(userId: String, workoutDTO: WorkoutDTO): Result<Unit> {
         return try {
-            val docRef = firestore.collection("users").document(userId)
-                .collection("workouts").document()
-            docRef.set(workoutDTO).await()
+            val docId = workoutDTO.id.toString() // Use workout ID as Firestore document ID
+            firestore.collection("users").document(userId)
+                .collection("workouts").document(docId).set(workoutDTO).await()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
@@ -94,4 +94,16 @@ class FirestoreRepository @Inject constructor(
             emptyList()
         }
     }
+
+    suspend fun deleteWorkout(userId: String, workoutId: String): Result<Unit> {
+        return try {
+            firestore.collection("users").document(userId)
+                .collection("workouts").document(workoutId).delete().await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("FirestoreError", "Failed to delete workout: ${e.localizedMessage}")
+            Result.failure(e)
+        }
+    }
+
 }

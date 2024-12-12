@@ -140,7 +140,18 @@ class WorkoutViewModel @Inject constructor(
 
     fun deleteWorkout(workout: Workout) {
         viewModelScope.launch {
-            workoutDao.delete(workout)
+            _userId.value?.let { uid ->
+                try {
+                    // Remove from Firestore if connected to the network
+                    if (networkHelper.isNetworkConnected()) {
+                        firestoreRepository.deleteWorkout(uid, workout.id.toString())
+                    }
+                    // Always delete from Room database
+                    workoutDao.delete(workout)
+                } catch (e: Exception) {
+                    Log.e("DeleteError", "Failed to delete workout: ${e.localizedMessage}")
+                }
+            }
         }
     }
 
