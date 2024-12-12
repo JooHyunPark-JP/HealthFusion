@@ -6,18 +6,20 @@ import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.repeatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import com.example.healthfusion.R
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AerobicWorkout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AnaerobicWorkout
+import com.example.healthfusion.util.DateFormatter
 import io.github.boguszpawlowski.composecalendar.Calendar
 import io.github.boguszpawlowski.composecalendar.rememberCalendarState
 import kotlinx.coroutines.delay
@@ -43,6 +46,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun WorkoutCalendarScreen(
@@ -54,6 +58,7 @@ fun WorkoutCalendarScreen(
     var selectedAnaerobicWorkout by remember { mutableStateOf<AnaerobicWorkout?>(null) }
     var expandedAerobic by remember { mutableStateOf(false) }
     var expandedAnaerobic by remember { mutableStateOf(false) }
+    var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
 
     val calendarState = rememberCalendarState(
         minMonth = YearMonth.now().minusMonths(12),
@@ -63,7 +68,15 @@ fun WorkoutCalendarScreen(
 
     val currentMonth = calendarState.monthState.currentMonth
 
-    Column(modifier = Modifier.padding(16.dp)) {
+
+    val workoutsForSelectedDate = selectedDate?.let { date ->
+        workouts.filter { workout ->
+            Instant.ofEpochMilli(workout.workoutDate).atZone(ZoneId.systemDefault())
+                .toLocalDate() == date
+        }
+    } ?: emptyList()
+
+    Column(modifier = Modifier.padding(8.dp)) {
 
         // show the filter data
         val filteredWorkouts = workouts.filter { workout ->
@@ -75,14 +88,19 @@ fun WorkoutCalendarScreen(
             Instant.ofEpochMilli(workout.workoutDate).atZone(ZoneId.systemDefault()).toLocalDate()
         }
 
-        Box(modifier = Modifier.padding(16.dp)) {
+        Box(modifier = Modifier.padding(8.dp)) {
             // Compose Calendar: External library
             Calendar(
                 calendarState = calendarState,
                 dayContent = { day ->
                     if (day.date.month == currentMonth.month) {
                         val isWorkoutDay = workoutDates.contains(day.date)
-                        DayContent(day = day.date, isWorkoutDay = isWorkoutDay)
+                        Box(
+                            modifier = Modifier
+                                .clickable { selectedDate = day.date }
+                        ) {
+                            DayContent(day = day.date, isWorkoutDay = isWorkoutDay)
+                        }
                     } else {
                         Box(modifier = Modifier.size(48.dp))
                     }
@@ -176,11 +194,42 @@ fun WorkoutCalendarScreen(
                             selectedAnaerobicWorkout = null
                             expandedAnaerobic = false
                         })
+
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        // Display selected date
+        selectedDate?.let { date ->
+            Text(
+                text = "Selected Date: ${date.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy"))}",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(start = 16.dp, top = 4.dp, bottom = 4.dp)
+            )
+        }
+
+        LazyColumn(modifier = Modifier.fillMaxWidth()) {
+            if (workoutsForSelectedDate.isEmpty()) {
+                item {
+                    Text(
+                        text = "No workouts for this date",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            } else {
+                items(workoutsForSelectedDate.size) {
+                    workoutsForSelectedDate.forEach { workout ->
+                        WorkoutItem(
+                            workout = workout,
+                            showWorkoutName = true,
+                            dateFormatter = DateFormatter(), // Pass your DateFormatter instance
+                            onDeleteClick = { viewModel.deleteWorkout(workout) }
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 

@@ -127,5 +127,14 @@ class SleepViewModel @Inject constructor(
 
     fun setUserId(uid: String?) {
         _userId.value = uid
+
+        if (uid != null) {
+            syncSleepRoomDatabaseAndFirestoreData()
+        }
+    }
+
+    private fun syncSleepRoomDatabaseAndFirestoreData() {
+        syncUnsyncedSleepRecords()
+        syncSleepsFromFirestore()
     }
 }
