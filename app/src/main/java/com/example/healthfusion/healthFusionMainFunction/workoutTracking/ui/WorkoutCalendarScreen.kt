@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -202,7 +203,7 @@ fun WorkoutCalendarScreen(
         // Display selected date
         selectedDate?.let { date ->
             Text(
-                text = "Selected Date: ${date.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy"))}",
+                text = "All workout activities on: ${date.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy"))}",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(start = 16.dp, top = 4.dp, bottom = 4.dp)
             )
@@ -218,15 +219,14 @@ fun WorkoutCalendarScreen(
                     )
                 }
             } else {
-                items(workoutsForSelectedDate.size) {
-                    workoutsForSelectedDate.forEach { workout ->
-                        WorkoutItem(
-                            workout = workout,
-                            showWorkoutName = true,
-                            dateFormatter = DateFormatter(), // Pass your DateFormatter instance
-                            onDeleteClick = { viewModel.deleteWorkout(workout) }
-                        )
-                    }
+                items(workoutsForSelectedDate) { workout ->
+                    WorkoutItem(
+                        workout = workout,
+                        showWorkoutName = true,
+                        dateFormatter = DateFormatter(), // Pass your DateFormatter instance
+                        onDeleteClick = { viewModel.deleteWorkout(workout) }
+                    )
+
                 }
             }
         }
