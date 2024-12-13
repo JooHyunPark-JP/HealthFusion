@@ -7,4 +7,10 @@ plugins {
     alias(libs.plugins.kotlinAndroidKsp) apply false
 
     alias(libs.plugins.googleService) apply false
+
+    //alias(libs.plugins.kotlinJVM) apply false
+    alias(libs.plugins.kotlinxSerialization) apply false
+
+
+
 }

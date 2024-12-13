@@ -6,6 +6,10 @@ plugins {
     alias(libs.plugins.hiltAndroid)
 
     alias(libs.plugins.googleService)
+
+    //alias(libs.plugins.kotlinJVM)
+    alias(libs.plugins.kotlinxSerialization)
+
 }
 
 android {
@@ -45,11 +49,13 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.15"
     }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/INDEX.LIST" // removed duplicated index.list
+            excludes += "/META-INF/io.netty.versions.properties"
         }
     }
 }
@@ -96,6 +102,16 @@ dependencies {
 
     //Compose charts (line, bar, pie etc)
     implementation(libs.compose.chartEhsannarmani)
+
+    //Ktor
+    implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.client.negotiation)
+
+    //Kotlinx-serilization
+    //  implementation(libs.kotlinx.serialization)
 
     //Test
     testImplementation(libs.junit)

@@ -19,6 +19,10 @@ googleService = "4.4.2"
 googleFirebaseBom = "33.1.2"
 composeCalendar = "1.3.0"
 composeChartEhsannarmani = "0.0.14"
+kTor = "3.0.2"
+kotlinxSerialization = "v1.8.0-RC"
+kotlinxSerializationPlugin = "1.9.25"
+
 
 
 [libraries]
@@ -60,6 +64,14 @@ google-firestore-ktx = { group = "com.google.firebase", name = "firebase-firesto
 compose-calendar = { group = "io.github.boguszpawlowski.composecalendar", name = "composecalendar", version.ref = "composeCalendar" }
 compose-chartEhsannarmani = { group = "io.github.ehsannarmani", name = "compose-charts", version.ref = "composeChartEhsannarmani" }
 
+ktor-server-netty = {group = "io.ktor", name = "ktor-server-netty", version.ref = "kTor"}
+ktor-client-core = {group = "io.ktor", name = "ktor-client-core", version.ref = "kTor"}
+ktor-client-cio = {group = "io.ktor", name = "ktor-client-cio", version.ref = "kTor"}
+ktor-client-negotiation = {group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "kTor"}
+
+kotlinx-serialization = {group = "org.jetbrains", name = "kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization"}
+
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
@@ -68,4 +80,7 @@ hiltAndroid = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlinAndroidKsp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
 googleService = { id = "com.google.gms.google-services", version.ref = "googleService" }
+
+kotlinxSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinxSerializationPlugin" }
+
 
