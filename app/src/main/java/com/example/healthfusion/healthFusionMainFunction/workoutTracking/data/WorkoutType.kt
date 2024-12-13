@@ -98,6 +98,13 @@ enum class AnaerobicWorkout(
         fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS)
     ),
 
+    DUMBBELL_LOW(
+        "Dumbbell_Low",
+        R.drawable.dumbbell_row_pose,
+        WorkoutType.ANAEROBIC,
+        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS)
+    ),
+
     DEAD_LIFT(
         "Dead_Lift",
         R.drawable.dead_lift_pose,
