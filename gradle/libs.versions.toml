@@ -20,7 +20,7 @@ googleFirebaseBom = "33.1.2"
 composeCalendar = "1.3.0"
 composeChartEhsannarmani = "0.0.14"
 kTor = "3.0.2"
-kotlinxSerialization = "v1.8.0-RC"
+kotlinxSerialization = "1.6.3"
 kotlinxSerializationPlugin = "1.9.25"
 
 
@@ -68,8 +68,10 @@ ktor-server-netty = {group = "io.ktor", name = "ktor-server-netty", version.ref 
 ktor-client-core = {group = "io.ktor", name = "ktor-client-core", version.ref = "kTor"}
 ktor-client-cio = {group = "io.ktor", name = "ktor-client-cio", version.ref = "kTor"}
 ktor-client-negotiation = {group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "kTor"}
+ktor-json = {group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "kTor"}
 
-kotlinx-serialization = {group = "org.jetbrains", name = "kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization"}
+kotlinx-serialization = {group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization"}
+
 
 
 [plugins]

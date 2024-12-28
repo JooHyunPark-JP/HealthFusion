@@ -107,11 +107,11 @@ dependencies {
     implementation(libs.ktor.server.netty)
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.cio)
-    implementation(libs.ktor.server.netty)
     implementation(libs.ktor.client.negotiation)
+    implementation(libs.ktor.json)
 
     //Kotlinx-serilization
-    //  implementation(libs.kotlinx.serialization)
+    implementation(libs.kotlinx.serialization)
 
     //Test
     testImplementation(libs.junit)

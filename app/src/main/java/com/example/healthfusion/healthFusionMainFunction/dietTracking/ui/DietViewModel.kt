@@ -8,6 +8,7 @@ import com.example.healthfusion.healthFusionMainFunction.dietTracking.data.Diet
 import com.example.healthfusion.healthFusionMainFunction.dietTracking.data.DietDao
 import com.example.healthfusion.healthFusionMainFunction.dietTracking.data.toDTO
 import com.example.healthfusion.healthFusionMainFunction.dietTracking.data.toEntity
+import com.example.healthfusion.healthFusionMainFunction.dietTracking.di.DietRepository
 import com.example.healthfusion.util.DateFormatter
 import com.example.healthfusion.util.NetworkHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,7 +27,8 @@ class DietViewModel @Inject constructor(
     private val dietDao: DietDao,
     private val firestoreRepository: FirestoreRepository,
     private val networkHelper: NetworkHelper,
-    private val dateFormatter: DateFormatter
+    private val dateFormatter: DateFormatter,
+    private val dietRepository: DietRepository
 ) : ViewModel() {
 
     private val _userId = MutableStateFlow<String?>(null)
@@ -37,6 +39,17 @@ class DietViewModel @Inject constructor(
             dietDao.getDietForUser(it)
         } ?: flowOf(emptyList())
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    private val _searchResults = MutableStateFlow<List<Diet>>(emptyList())
+    val searchResults: StateFlow<List<Diet>> = _searchResults
+
+    fun searchFood(query: String) {
+        viewModelScope.launch {
+            val results = dietRepository.searchFood(query)
+            _searchResults.value = results
+        }
+    }
+
 
     fun addDiet(name: String, calories: Int) {
         viewModelScope.launch {
@@ -129,4 +142,6 @@ class DietViewModel @Inject constructor(
         syncUnsyncedDiets()
         syncDietFromFirestore()
     }
+
+
 }
