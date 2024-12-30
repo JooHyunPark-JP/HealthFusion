@@ -59,7 +59,7 @@ class MainActivity : ComponentActivity() {
             //Check the current device internet connection. When network is back online, try unsyncedData.
             networkCallback = NetworkCallback(
                 onNetworkAvailable = {
-                    syncRoomDatabaseAndFirestoreData()
+                        syncRoomDatabaseAndFirestoreData()
                 },
                 onNetworkLost = {
                     // if network is disconnected, add extra work here.

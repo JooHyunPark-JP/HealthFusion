@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -19,15 +20,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 
 @Composable
 fun DietScreen(viewModel: DietViewModel, modifier: Modifier = Modifier) {
+
     var searchQuery by remember { mutableStateOf("") }
-  //  val searchResults by viewModel.searchResults.collectAsState()
+
+    val searchResults by viewModel.searchResults.collectAsState()
     val diets by viewModel.diets.collectAsState()
 
     Column(
@@ -35,6 +37,7 @@ fun DietScreen(viewModel: DietViewModel, modifier: Modifier = Modifier) {
             .fillMaxSize()
             .padding(16.dp)
     ) {
+        // 검색 입력 필드
         TextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },
@@ -44,8 +47,9 @@ fun DietScreen(viewModel: DietViewModel, modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        //Search button
         Button(
-            onClick = { /*viewModel.searchFood(searchQuery)*/ },
+            onClick = { viewModel.searchFood(searchQuery) },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Search")
@@ -53,25 +57,28 @@ fun DietScreen(viewModel: DietViewModel, modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // 검색 결과 리스트
+
         Text("Search Results", style = MaterialTheme.typography.bodyMedium)
-/*        LazyColumn {
-            items(searchResults) { diet ->
+        LazyColumn {
+            items(searchResults) { product ->
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 4.dp),
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = 10.dp
+                    )
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Name: ${diet.name}")
-                        Text("Calories: ${diet.calories} kcal")
-                        Button(onClick = { viewModel.addDiet(diet.name, diet.calories) }) {
+                        Text("Name: ${product.name}")
+                        Text("Calories: ${product.calories} kcal")
+                        Button(onClick = { viewModel.addDiet(product.name, product.calories) }) {
                             Text("Add")
                         }
                     }
                 }
             }
-        }*/
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
