@@ -14,8 +14,8 @@ class DietRepository @Inject constructor(private val api: OpenFoodFactsApi) {
             val response: FoodSearchResponse = api.searchFood(query)
             response.products.map { product ->
                 Diet(
-                    name = product.product_name ?: "Unknown",
-                    calories = product.nutriments?.energy_kcal?.toInt() ?: 0,
+                    name = product.productName ?: "Unknown",
+                    calories = product.nutriments?.energyKcal?.toInt() ?: 0,
                     userId = "",
                     isSynced = false,
                     lastModified = System.currentTimeMillis()

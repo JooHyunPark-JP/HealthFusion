@@ -37,7 +37,7 @@ fun DietScreen(viewModel: DietViewModel, modifier: Modifier = Modifier) {
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        // 검색 입력 필드
+
         TextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },
