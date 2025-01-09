@@ -1,5 +1,6 @@
 package com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui
 
+import android.app.DatePickerDialog
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,8 +23,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,6 +40,10 @@ import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.An
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.FieldInfo
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
 import com.example.healthfusion.ui.theme.HealthFusionTheme
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: WorkoutType) {
@@ -69,6 +78,11 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
     // MutableStateMap to track input values
     val inputValues = remember { mutableStateMapOf<FieldInfo, String>() }
 
+    // State for the selected workout date
+    val currentTimestamp = System.currentTimeMillis()
+    var selectedDate by remember { mutableLongStateOf(currentTimestamp) }
+    var showDatePicker by remember { mutableStateOf(false) }
+
     // UI rendering
     HealthFusionTheme {
         Column(
@@ -82,6 +96,8 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             Card(
                 colors = CardDefaults.cardColors(containerColor = Color(0xFFEFF5F4)),
@@ -97,6 +113,31 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
                         )
                     }
                 )
+            }
+
+            // Date Picker Button
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(
+                onClick = { showDatePicker = true },
+                modifier = Modifier.padding(horizontal = 32.dp)
+            ) {
+                Text("Select Date: ${formatDate(selectedDate)}")
+            }
+
+            // DatePickerDialog
+            if (showDatePicker) {
+                DatePickerDialog(
+                    context,
+                    { _, year, month, dayOfMonth ->
+                        val calendar = Calendar.getInstance()
+                        calendar.set(year, month, dayOfMonth)
+                        selectedDate = calendar.timeInMillis
+                        showDatePicker = false
+                    },
+                    Calendar.getInstance().get(Calendar.YEAR),
+                    Calendar.getInstance().get(Calendar.MONTH),
+                    Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+                ).show()
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -130,6 +171,12 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
             }
         }
     }
+}
+
+
+fun formatDate(timestamp: Long): String {
+    val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    return sdf.format(Date(timestamp))
 }
 
 @Composable
