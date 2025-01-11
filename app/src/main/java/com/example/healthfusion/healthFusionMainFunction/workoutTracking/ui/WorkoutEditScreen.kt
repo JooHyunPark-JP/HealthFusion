@@ -151,7 +151,8 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
                         caloriesBurned = inputValues[FieldInfo.CALORIES_BURNED]?.toIntOrNull(),
                         set = inputValues[FieldInfo.SETS]?.toIntOrNull(),
                         repetition = inputValues[FieldInfo.REPETITIONS]?.toIntOrNull(),
-                        weight = inputValues[FieldInfo.WEIGHTS]?.toIntOrNull()
+                        weight = inputValues[FieldInfo.WEIGHTS]?.toIntOrNull(),
+                        workoutDate = selectedDate
                     )
                     Toast.makeText(
                         context,

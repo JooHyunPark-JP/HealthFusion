@@ -77,7 +77,8 @@ class WorkoutViewModel @Inject constructor(
         distance: Int?,
         set: Int?,
         repetition: Int?,
-        weight: Int?
+        weight: Int?,
+        workoutDate: Long
     ) {
         viewModelScope.launch {
             _userId.value?.let { uid ->
@@ -94,7 +95,7 @@ class WorkoutViewModel @Inject constructor(
                     weight = weight,
 
                     userId = uid,
-                    workoutDate = System.currentTimeMillis(),
+                    workoutDate = workoutDate,
                     isSynced = false,
                     lastModified = System.currentTimeMillis()
                 )
