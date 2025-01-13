@@ -82,9 +82,8 @@ To secure your Firestore database, configure Firestore Security Rules as follows
 4. Click Publish to save the rules.
 
 ## Screenshots
-<!-- Workout screen screenshot -->
-<!-- Statistics visualization screen screenshot -->
-<!-- Goal setting screen screenshot -->
+<img src="./image/image1.png" alt="Example Image" width="200"/> <img src="./image/image2.png" alt="Example Image" width="200"/> <img src="./image/image5.png" alt="Example Image" width="200"/> <img src="./image/image3.png" alt="Example Image" width="200"/> <img src="./image/image6.png" alt="Example Image" width="200"/>
+
 
 ## Future Features
 - **Diet Tracking**: Log meals and monitor calorie intake.
