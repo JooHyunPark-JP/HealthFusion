@@ -86,6 +86,7 @@ To secure your Firestore database, configure Firestore Security Rules as follows
 
 
 ## Future Features
+- **More workout options**: Different options (eg: Timer, time [minute or hour], distance [km or m])
 - **Diet Tracking**: Log meals and monitor calorie intake.
 - **Sleep Tracking**: Track sleep patterns and quality.
 - **Push Notifications**: Get workouts, meals, and sleep reminders.
