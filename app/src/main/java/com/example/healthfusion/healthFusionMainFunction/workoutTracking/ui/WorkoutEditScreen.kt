@@ -117,6 +117,7 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
 
             // Date Picker Button
             Spacer(modifier = Modifier.height(8.dp))
+
             Button(
                 onClick = { showDatePicker = true },
                 modifier = Modifier.padding(horizontal = 32.dp)
@@ -126,7 +127,7 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
 
             // DatePickerDialog
             if (showDatePicker) {
-                DatePickerDialog(
+                val datePickerDialog = DatePickerDialog(
                     context,
                     { _, year, month, dayOfMonth ->
                         val calendar = Calendar.getInstance()
@@ -137,7 +138,13 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
                     Calendar.getInstance().get(Calendar.YEAR),
                     Calendar.getInstance().get(Calendar.MONTH),
                     Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
-                ).show()
+                )
+
+                datePickerDialog.setOnDismissListener {
+                    showDatePicker = false
+                }
+
+                datePickerDialog.show()
             }
 
             Spacer(modifier = Modifier.height(8.dp))

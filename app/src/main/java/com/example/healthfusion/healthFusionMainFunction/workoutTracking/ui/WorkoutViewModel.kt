@@ -38,7 +38,6 @@ class WorkoutViewModel @Inject constructor(
     private val _userId = MutableStateFlow<String?>(null)
 
 
-
     // get the workout data of current user and convert flow to stateFlow by using stainIn
     @OptIn(ExperimentalCoroutinesApi::class)
     val workouts: StateFlow<List<Workout>> = _userId.flatMapLatest { uid ->
