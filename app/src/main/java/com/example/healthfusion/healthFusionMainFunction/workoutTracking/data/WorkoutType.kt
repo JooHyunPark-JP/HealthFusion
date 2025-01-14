@@ -17,25 +17,45 @@ enum class AerobicWorkout(
         "Running",
         R.drawable.running_pose2,
         WorkoutType.AEROBIC,
-        fields = listOf(FieldInfo.DURATION, FieldInfo.DISTANCE, FieldInfo.CALORIES_BURNED)
+        fields = listOf(
+            FieldInfo.DURATION,
+            FieldInfo.DISTANCE,
+            FieldInfo.CALORIES_BURNED,
+            FieldInfo.TIMER
+        )
     ),
     CYCLING(
         "Cycling",
         R.drawable.cycling_pose,
         WorkoutType.AEROBIC,
-        fields = listOf(FieldInfo.DURATION, FieldInfo.DISTANCE, FieldInfo.CALORIES_BURNED)
+        fields = listOf(
+            FieldInfo.DURATION,
+            FieldInfo.DISTANCE,
+            FieldInfo.CALORIES_BURNED,
+            FieldInfo.TIMER
+        )
     ),
     WALKING(
         "Walking",
         R.drawable.walking_pose,
         WorkoutType.AEROBIC,
-        fields = listOf(FieldInfo.DURATION, FieldInfo.DISTANCE, FieldInfo.CALORIES_BURNED)
+        fields = listOf(
+            FieldInfo.DURATION,
+            FieldInfo.DISTANCE,
+            FieldInfo.CALORIES_BURNED,
+            FieldInfo.TIMER
+        )
     ),
     SWIMMING(
         "Swimming",
         R.drawable.swimming_pose,
         WorkoutType.AEROBIC,
-        fields = listOf(FieldInfo.DURATION, FieldInfo.DISTANCE, FieldInfo.CALORIES_BURNED)
+        fields = listOf(
+            FieldInfo.DURATION,
+            FieldInfo.DISTANCE,
+            FieldInfo.CALORIES_BURNED,
+            FieldInfo.TIMER
+        )
     ),
     JUMPING_ROPE(
         "Jumping_Rope",

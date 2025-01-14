@@ -1,9 +1,12 @@
 package com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui
 
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -33,11 +37,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AerobicWorkout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AnaerobicWorkout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.FieldInfo
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.FieldType
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
 import com.example.healthfusion.ui.theme.HealthFusionTheme
 import java.text.SimpleDateFormat
@@ -109,14 +117,15 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
                         WorkoutField(
                             label = fieldInfo.label,
                             value = inputValues.getOrDefault(fieldInfo, ""),
+                            type = fieldInfo.type,
                             onChange = { inputValues[fieldInfo] = it }
                         )
-                    }
+                    },
+                    inputValues = inputValues
                 )
             }
 
             // Date Picker Button
-            Spacer(modifier = Modifier.height(8.dp))
 
             Button(
                 onClick = { showDatePicker = true },
@@ -188,26 +197,136 @@ fun formatDate(timestamp: Long): String {
 }
 
 @Composable
-fun DynamicWorkoutInputFields(fields: List<WorkoutField>) {
+fun DynamicWorkoutInputFields(
+    fields: List<WorkoutField>,
+    inputValues: MutableMap<FieldInfo, String>
+) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         fields.forEach { field ->
-            TextField(
-                value = field.value,
-                onValueChange = field.onChange,
-                label = { Text(field.label) },
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.colors(
-                    unfocusedContainerColor = Color(0xFFF1F1F1),
-                    focusedContainerColor = Color(0xFFE0E0E0),
-                    unfocusedTextColor = Color.Black,
-                    focusedTextColor = Color.Black,
-                    unfocusedLabelColor = Color.Gray,
-                    focusedLabelColor = Color(0xFF23af92)
-                )
-            )
+            when (field.type) {
+                FieldType.TEXT -> {
+                    TextField(
+                        value = field.value,
+                        onValueChange = field.onChange, // Update inputValues when changed
+                        label = { Text(field.label) },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Color(0xFFF1F1F1),
+                            focusedContainerColor = Color(0xFFE0E0E0),
+                            unfocusedTextColor = Color.Black,
+                            focusedTextColor = Color.Black,
+                            unfocusedLabelColor = Color.Gray,
+                            focusedLabelColor = Color(0xFF23af92)
+                        )
+                    )
+                }
+
+                FieldType.TIMER -> {
+                    TimerComponentWithToggle(
+                        field = field,
+                        inputValues = inputValues
+                    ) // Timer component
+                }
+            }
         }
     }
 }
 
-data class WorkoutField(val label: String, val value: String, val onChange: (String) -> Unit)
+@Composable
+fun TimerComponent(inputValues: MutableMap<FieldInfo, String>) {
+    var elapsedTime by remember { mutableLongStateOf(0L) } // Elapsed time in seconds
+    var isRunning by remember { mutableStateOf(false) } // Timer running state
+
+    // Timer logic
+    LaunchedEffect(isRunning) {
+        if (isRunning) {
+            while (true) {
+                kotlinx.coroutines.delay(1000L) // Wait for 1 second
+                elapsedTime++
+            }
+        }
+    }
+
+    // UI rendering
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Elapsed Time: ${formatSeconds(elapsedTime)}",
+            style = MaterialTheme.typography.bodyLarge
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Button(
+                onClick = { isRunning = true }, // Start the timer
+                enabled = !isRunning
+            ) {
+                Text("Start")
+            }
+            Button(
+                onClick = { isRunning = false }, // Pause the timer
+                enabled = isRunning
+            ) {
+                Text("Pause")
+            }
+            Button(
+                onClick = {
+                    // Record button: Save elapsed time to the inputValues map
+                    val minute = (elapsedTime) / 60
+                    inputValues[FieldInfo.DURATION] = minute.toString() // Update duration field
+                }
+            ) {
+                Text("Record")
+            }
+        }
+    }
+}
+
+@Composable
+fun TimerComponentWithToggle(field: WorkoutField, inputValues: MutableMap<FieldInfo, String>) {
+    var showTimer by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        // Text button to toggle the timer
+        Text(
+            text = "Need Timer for this workout?",
+            style = TextStyle(
+                color = Color.Blue,
+                textDecoration = TextDecoration.Underline,
+                fontSize = 16.sp
+            ),
+            modifier = Modifier
+                .clickable { showTimer = !showTimer }
+                .padding(12.dp)
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Conditionally render the TimerComponent
+        if (showTimer) {
+            TimerComponent(inputValues = inputValues)
+        }
+    }
+}
+
+// Convert seconds into a formatted string (HH:mm:ss)
+@SuppressLint("DefaultLocale")
+fun formatSeconds(seconds: Long): String {
+    val h = seconds / 3600
+    val m = (seconds % 3600) / 60
+    val s = seconds % 60
+    return String.format("%02d:%02d:%02d", h, m, s)
+}
+
+data class WorkoutField(
+    val label: String,
+    val value: String,
+    val type: FieldType,
+    val onChange: (String) -> Unit
+)
 

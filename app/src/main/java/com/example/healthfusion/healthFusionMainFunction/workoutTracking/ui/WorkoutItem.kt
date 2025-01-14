@@ -89,6 +89,7 @@ fun WorkoutItem(
                         FieldInfo.SETS -> workout.set?.toString() ?: "N/A"
                         FieldInfo.REPETITIONS -> workout.repetition?.toString() ?: "N/A"
                         FieldInfo.WEIGHTS -> workout.weight?.toString() ?: "N/A"
+                        FieldInfo.TIMER -> "N/A"
                     }
 
                     Text(
