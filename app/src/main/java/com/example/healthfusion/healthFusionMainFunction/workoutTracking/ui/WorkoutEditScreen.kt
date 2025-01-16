@@ -2,6 +2,7 @@ package com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui
 
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
+import android.widget.NumberPicker
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -28,6 +29,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -42,6 +44,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AerobicWorkout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AnaerobicWorkout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.FieldInfo
@@ -196,6 +199,7 @@ fun formatDate(timestamp: Long): String {
     return sdf.format(Date(timestamp))
 }
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun DynamicWorkoutInputFields(
     fields: List<WorkoutField>,
@@ -204,6 +208,24 @@ fun DynamicWorkoutInputFields(
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         fields.forEach { field ->
             when (field.type) {
+
+                FieldType.TIMEPICKER -> {
+                    val context = LocalContext.current
+                    TimePickerWithSpinners { hour, minute, second ->
+                        val totalSeconds = hour * 3600 + minute * 60 + second
+                        /*                       val totalMinute = hour * 60 + minute + (second / 60.0)
+                                               val roundedTotalMinutes =
+                                                   String.format("%.2f", totalMinute) // Round to 2 decimal places*/
+                        inputValues[FieldInfo.DURATION] = totalSeconds.toString()
+
+                        Toast.makeText(
+                            context,
+                            "Selected Duration: ${inputValues[FieldInfo.DURATION]}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+
                 FieldType.TEXT -> {
                     TextField(
                         value = field.value,
@@ -225,7 +247,8 @@ fun DynamicWorkoutInputFields(
                     TimerComponentWithToggle(
                         field = field,
                         inputValues = inputValues
-                    ) // Timer component
+                    )
+
                 }
             }
         }
@@ -253,7 +276,7 @@ fun TimerComponent(inputValues: MutableMap<FieldInfo, String>) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Elapsed Time: ${formatSeconds(elapsedTime)}",
+            text = "Time: ${formatSeconds(elapsedTime)}",
             style = MaterialTheme.typography.bodyLarge
         )
 
@@ -314,6 +337,7 @@ fun TimerComponentWithToggle(field: WorkoutField, inputValues: MutableMap<FieldI
     }
 }
 
+
 // Convert seconds into a formatted string (HH:mm:ss)
 @SuppressLint("DefaultLocale")
 fun formatSeconds(seconds: Long): String {
@@ -322,6 +346,101 @@ fun formatSeconds(seconds: Long): String {
     val s = seconds % 60
     return String.format("%02d:%02d:%02d", h, m, s)
 }
+
+@Composable
+fun TimePickerWithSpinners(onTimeSelected: (Int, Int, Int) -> Unit) {
+    // States for hours, minutes, and seconds
+    var selectedHour by remember { mutableIntStateOf(0) }
+    var selectedMinute by remember { mutableIntStateOf(0) }
+    var selectedSecond by remember { mutableIntStateOf(0) }
+
+    var durationText by remember { mutableStateOf("Your workout duration is: 00h 00m 00s") }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Hour Spinner
+            NumberPickerSpinner(
+                label = "Hour",
+                range = 0..23,
+                value = selectedHour,
+                onValueChange = { selectedHour = it }
+            )
+
+            // Minute Spinner
+            NumberPickerSpinner(
+                label = "Minute",
+                range = 0..59,
+                value = selectedMinute,
+                onValueChange = { selectedMinute = it }
+            )
+
+            // Second Spinner
+            NumberPickerSpinner(
+                label = "Second",
+                range = 0..59,
+                value = selectedSecond,
+                onValueChange = { selectedSecond = it }
+            )
+        }
+        // Confirm Button
+        Button(onClick = {
+            durationText = "Your workout duration is: ${"%02d".format(selectedHour)}h ${
+                "%02d".format(selectedMinute)
+            }m ${"%02d".format(selectedSecond)}s"
+            onTimeSelected(selectedHour, selectedMinute, selectedSecond)
+        }) {
+            Text("Confirm Time")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Display the workout duration
+        Text(
+            text = durationText,
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+}
+
+@Composable
+fun NumberPickerSpinner(
+    label: String,
+    range: IntRange,
+    value: Int,
+    onValueChange: (Int) -> Unit
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(label, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+
+        // Integrate Android's NumberPicker
+        AndroidView(
+            factory = { context ->
+                NumberPicker(context).apply {
+                    minValue = range.first
+                    maxValue = range.last
+                    wrapSelectorWheel = true // Allows cycling through values
+                }
+            },
+            update = { picker ->
+                picker.value = value
+                picker.setOnValueChangedListener { _, _, newVal ->
+                    onValueChange(newVal)
+                }
+            },
+            modifier = Modifier.width(100.dp)
+        )
+    }
+}
+
 
 data class WorkoutField(
     val label: String,

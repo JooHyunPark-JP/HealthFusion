@@ -1,11 +1,11 @@
 package com.example.healthfusion.healthFusionMainFunction.workoutTracking.data
 
 enum class FieldType {
-    TEXT, TIMER // expand later: UNIT_SELECTION (km,m) etc
+    TEXT, TIMER, TIMEPICKER // expand later: UNIT_SELECTION (km,m) etc
 }
 
 enum class FieldInfo(val label: String, val type: FieldType) {
-    DURATION("Duration (minutes)", FieldType.TEXT),
+    DURATION("Duration", FieldType.TIMEPICKER),
     DISTANCE("Distance (km)", FieldType.TEXT),
     CALORIES_BURNED("Calories Burned", FieldType.TEXT),
     SETS("Sets", FieldType.TEXT),

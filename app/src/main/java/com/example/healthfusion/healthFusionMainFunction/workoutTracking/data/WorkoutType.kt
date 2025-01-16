@@ -101,7 +101,7 @@ enum class AnaerobicWorkout(
         "Plank",
         R.drawable.plank_pose,
         WorkoutType.ANAEROBIC,
-        fields = listOf(FieldInfo.SETS, FieldInfo.DURATION)
+        fields = listOf(FieldInfo.SETS, FieldInfo.DURATION, FieldInfo.TIMER)
     ),
 
     HAND_GRIPPER(
