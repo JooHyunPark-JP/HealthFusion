@@ -14,7 +14,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
@@ -86,6 +88,9 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
         else -> "Unknown Workout"
     }
 
+    // Scroll state
+    val scrollState = rememberScrollState()
+
     // MutableStateMap to track input values
     val inputValues = remember { mutableStateMapOf<FieldInfo, String>() }
 
@@ -99,7 +104,8 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 16.dp),
+                .padding(top = 16.dp)
+                .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
@@ -317,7 +323,7 @@ fun TimerComponentWithToggle(field: WorkoutField, inputValues: MutableMap<FieldI
     ) {
         // Text button to toggle the timer
         Text(
-            text = "Need Timer for this workout?",
+            text = "Use a timer if needed! (click)",
             style = TextStyle(
                 color = Color.Blue,
                 textDecoration = TextDecoration.Underline,
@@ -354,7 +360,7 @@ fun TimePickerWithSpinners(onTimeSelected: (Int, Int, Int) -> Unit) {
     var selectedMinute by remember { mutableIntStateOf(0) }
     var selectedSecond by remember { mutableIntStateOf(0) }
 
-    var durationText by remember { mutableStateOf("Your workout duration is: 00h 00m 00s") }
+    var durationText by remember { mutableStateOf("00h 00m 00s") }
 
     Column(
         modifier = Modifier
@@ -393,7 +399,7 @@ fun TimePickerWithSpinners(onTimeSelected: (Int, Int, Int) -> Unit) {
         }
         // Confirm Button
         Button(onClick = {
-            durationText = "Your workout duration is: ${"%02d".format(selectedHour)}h ${
+            durationText = "${"%02d".format(selectedHour)}h ${
                 "%02d".format(selectedMinute)
             }m ${"%02d".format(selectedSecond)}s"
             onTimeSelected(selectedHour, selectedMinute, selectedSecond)
@@ -401,12 +407,24 @@ fun TimePickerWithSpinners(onTimeSelected: (Int, Int, Int) -> Unit) {
             Text("Confirm Time")
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
 
-        // Display the workout duration
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text(
+            text = "Workout duration:",
+            style = MaterialTheme.typography.bodyLarge.copy(
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+        )
+
         Text(
             text = durationText,
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyLarge.copy(
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            ),
+            modifier = Modifier.padding(top = 4.dp)
         )
     }
 }
