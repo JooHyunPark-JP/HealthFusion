@@ -41,12 +41,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.example.healthfusion.R
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AerobicWorkout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AnaerobicWorkout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.FieldInfo
@@ -138,9 +140,16 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
 
             Button(
                 onClick = { showDatePicker = true },
-                modifier = Modifier.padding(horizontal = 32.dp)
-            ) {
-                Text("Select Date: ${formatDate(selectedDate)}")
+                modifier = Modifier.padding(horizontal = 32.dp),
+
+                ) {
+
+                Icon(
+                    painterResource(id = R.drawable.ic_calendar),
+                    contentDescription = "calendar",
+                    tint = Color.White
+                )
+                Text(" Select Date: ${formatDate(selectedDate)}")
             }
 
             // DatePickerDialog
@@ -216,20 +225,7 @@ fun DynamicWorkoutInputFields(
             when (field.type) {
 
                 FieldType.TIMEPICKER -> {
-                    val context = LocalContext.current
-                    TimePickerWithSpinners { hour, minute, second ->
-                        val totalSeconds = hour * 3600 + minute * 60 + second
-                        /*                       val totalMinute = hour * 60 + minute + (second / 60.0)
-                                               val roundedTotalMinutes =
-                                                   String.format("%.2f", totalMinute) // Round to 2 decimal places*/
-                        inputValues[FieldInfo.DURATION] = totalSeconds.toString()
-
-                        Toast.makeText(
-                            context,
-                            "Selected Duration: ${inputValues[FieldInfo.DURATION]}",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
+                    TimePickerWithSpinners(inputValues = inputValues)
                 }
 
                 FieldType.TEXT -> {
@@ -283,32 +279,36 @@ fun TimerComponent(inputValues: MutableMap<FieldInfo, String>) {
     ) {
         Text(
             text = "Time: ${formatSeconds(elapsedTime)}",
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.bodyLarge.copy(
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
             Button(
-                onClick = { isRunning = true }, // Start the timer
+                onClick = { isRunning = true },
                 enabled = !isRunning
             ) {
                 Text("Start")
             }
             Button(
-                onClick = { isRunning = false }, // Pause the timer
+                onClick = { isRunning = false },
                 enabled = isRunning
             ) {
                 Text("Pause")
             }
             Button(
                 onClick = {
-                    // Record button: Save elapsed time to the inputValues map
-                    val minute = (elapsedTime) / 60
-                    inputValues[FieldInfo.DURATION] = minute.toString() // Update duration field
+                    elapsedTime = 0
                 }
             ) {
-                Text("Record")
+                Text("Reset")
             }
         }
     }
@@ -323,7 +323,7 @@ fun TimerComponentWithToggle(field: WorkoutField, inputValues: MutableMap<FieldI
     ) {
         // Text button to toggle the timer
         Text(
-            text = "Use a timer if needed! (click)",
+            text = "Use a timer if needed (click)",
             style = TextStyle(
                 color = Color.Blue,
                 textDecoration = TextDecoration.Underline,
@@ -354,13 +354,16 @@ fun formatSeconds(seconds: Long): String {
 }
 
 @Composable
-fun TimePickerWithSpinners(onTimeSelected: (Int, Int, Int) -> Unit) {
+fun TimePickerWithSpinners(inputValues: MutableMap<FieldInfo, String>) {
     // States for hours, minutes, and seconds
     var selectedHour by remember { mutableIntStateOf(0) }
     var selectedMinute by remember { mutableIntStateOf(0) }
     var selectedSecond by remember { mutableIntStateOf(0) }
 
-    var durationText by remember { mutableStateOf("00h 00m 00s") }
+    fun updateDuration() {
+        val totalSeconds = selectedHour * 3600 + selectedMinute * 60 + selectedSecond
+        inputValues[FieldInfo.DURATION] = totalSeconds.toString()
+    }
 
     Column(
         modifier = Modifier
@@ -378,7 +381,10 @@ fun TimePickerWithSpinners(onTimeSelected: (Int, Int, Int) -> Unit) {
                 label = "Hour",
                 range = 0..23,
                 value = selectedHour,
-                onValueChange = { selectedHour = it }
+                onValueChange = {
+                    selectedHour = it
+                    updateDuration()
+                }
             )
 
             // Minute Spinner
@@ -386,7 +392,10 @@ fun TimePickerWithSpinners(onTimeSelected: (Int, Int, Int) -> Unit) {
                 label = "Minute",
                 range = 0..59,
                 value = selectedMinute,
-                onValueChange = { selectedMinute = it }
+                onValueChange = {
+                    selectedMinute = it
+                    updateDuration()
+                }
             )
 
             // Second Spinner
@@ -394,37 +403,24 @@ fun TimePickerWithSpinners(onTimeSelected: (Int, Int, Int) -> Unit) {
                 label = "Second",
                 range = 0..59,
                 value = selectedSecond,
-                onValueChange = { selectedSecond = it }
+                onValueChange = {
+                    selectedSecond = it
+                    updateDuration()
+                }
             )
         }
-        // Confirm Button
-        Button(onClick = {
-            durationText = "${"%02d".format(selectedHour)}h ${
-                "%02d".format(selectedMinute)
-            }m ${"%02d".format(selectedSecond)}s"
-            onTimeSelected(selectedHour, selectedMinute, selectedSecond)
-        }) {
-            Text("Confirm Time")
-        }
-
 
         Spacer(modifier = Modifier.height(12.dp))
 
+        // Display updated duration dynamically
         Text(
-            text = "Workout duration:",
+            text = "Workout Time: ${"%02d".format(selectedHour)}h ${
+                "%02d".format(selectedMinute)
+            }m ${"%02d".format(selectedSecond)}s",
             style = MaterialTheme.typography.bodyLarge.copy(
                 fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold
             )
-        )
-
-        Text(
-            text = durationText,
-            style = MaterialTheme.typography.bodyLarge.copy(
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            ),
-            modifier = Modifier.padding(top = 4.dp)
         )
     }
 }
