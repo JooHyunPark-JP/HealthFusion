@@ -81,7 +81,7 @@ enum class AnaerobicWorkout(
         "Squat",
         R.drawable.squat_pose,
         WorkoutType.ANAEROBIC,
-        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS, FieldInfo.TIMER)
+        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS, FieldInfo.EQUIPMENT, FieldInfo.TIMER)
     ),
 
     DONKEY_KICK(
@@ -95,7 +95,7 @@ enum class AnaerobicWorkout(
         "Bicep_Curls",
         R.drawable.bicep_curl_pose,
         WorkoutType.ANAEROBIC,
-        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS, FieldInfo.TIMER)
+        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS, FieldInfo.EQUIPMENT, FieldInfo.GRIP_STYLE, FieldInfo.TIMER)
     ),
     PLANK(
         "Plank",
@@ -115,28 +115,28 @@ enum class AnaerobicWorkout(
         "Shoulder_Press",
         R.drawable.shoulder_press_pose,
         WorkoutType.ANAEROBIC,
-        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS, FieldInfo.TIMER)
+        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS, FieldInfo.EQUIPMENT, FieldInfo.GRIP_STYLE, FieldInfo.TIMER)
     ),
 
     DUMBBELL_LOW(
         "Dumbbell_Low",
         R.drawable.dumbbell_row_pose,
         WorkoutType.ANAEROBIC,
-        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS, FieldInfo.TIMER)
+        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS, FieldInfo.EQUIPMENT, FieldInfo.GRIP_STYLE, FieldInfo.TIMER)
     ),
 
     DEAD_LIFT(
         "Dead_Lift",
         R.drawable.dead_lift_pose,
         WorkoutType.ANAEROBIC,
-        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS, FieldInfo.TIMER)
+        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS, FieldInfo.EQUIPMENT, FieldInfo.GRIP_STYLE, FieldInfo.TIMER)
     ),
 
     BENCH_PRESS(
         "Bench_Press",
         R.drawable.bench_press_pose,
         WorkoutType.ANAEROBIC,
-        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS, FieldInfo.TIMER)
+        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS, FieldInfo.EQUIPMENT, FieldInfo.GRIP_STYLE, FieldInfo.TIMER)
     ),
 
 }

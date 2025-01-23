@@ -2,12 +2,9 @@ package com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui
 
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
-import android.widget.NumberPicker
 import android.widget.Toast
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,9 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -42,18 +37,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import com.example.healthfusion.R
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AerobicWorkout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AnaerobicWorkout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.FieldInfo
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.FieldType
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.editScreenUI.SegmentedControl
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.editScreenUI.TimePickerWithSpinners
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.editScreenUI.TimerComponentWithToggle
 import com.example.healthfusion.ui.theme.HealthFusionTheme
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -252,93 +246,33 @@ fun DynamicWorkoutInputFields(
                     )
 
                 }
-            }
-        }
-    }
-}
 
-@Composable
-fun TimerComponent(inputValues: MutableMap<FieldInfo, String>) {
-    var elapsedTime by remember { mutableLongStateOf(0L) } // Elapsed time in seconds
-    var isRunning by remember { mutableStateOf(false) } // Timer running state
+                FieldType.SEGMENTED -> {
+                    when (field.label) {
+                        "Equipment" -> {
+                            SegmentedControl(
+                                options = listOf("Dumbbell", "Barbell", "Machine"),
+                                selectedOption = inputValues.getOrDefault(
+                                    FieldInfo.EQUIPMENT,
+                                    "Dumbbell"
+                                ),
+                                onOptionSelected = { inputValues[FieldInfo.EQUIPMENT] = it }
+                            )
+                        }
 
-    // Timer logic
-    LaunchedEffect(isRunning) {
-        if (isRunning) {
-            while (true) {
-                kotlinx.coroutines.delay(1000L) // Wait for 1 second
-                elapsedTime++
-            }
-        }
-    }
-
-    // UI rendering
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Time: ${formatSeconds(elapsedTime)}",
-            style = MaterialTheme.typography.bodyLarge.copy(
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            Button(
-                onClick = { isRunning = true },
-                enabled = !isRunning
-            ) {
-                Text("Start")
-            }
-            Button(
-                onClick = { isRunning = false },
-                enabled = isRunning
-            ) {
-                Text("Pause")
-            }
-            Button(
-                onClick = {
-                    elapsedTime = 0
+                        "Grip Style" -> {
+                            SegmentedControl(
+                                options = listOf("Overhand", "Underhand", "Neutral"),
+                                selectedOption = inputValues.getOrDefault(
+                                    FieldInfo.GRIP_STYLE,
+                                    "Neutral"
+                                ),
+                                onOptionSelected = { inputValues[FieldInfo.GRIP_STYLE] = it }
+                            )
+                        }
+                    }
                 }
-            ) {
-                Text("Reset")
             }
-        }
-    }
-}
-
-@Composable
-fun TimerComponentWithToggle(field: WorkoutField, inputValues: MutableMap<FieldInfo, String>) {
-    var showTimer by remember { mutableStateOf(false) }
-
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        // Text button to toggle the timer
-        Text(
-            text = "Use a timer if needed (click)",
-            style = TextStyle(
-                color = Color.Blue,
-                textDecoration = TextDecoration.Underline,
-                fontSize = 16.sp
-            ),
-            modifier = Modifier
-                .clickable { showTimer = !showTimer }
-                .padding(12.dp)
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Conditionally render the TimerComponent
-        if (showTimer) {
-            TimerComponent(inputValues = inputValues)
         }
     }
 }
@@ -351,108 +285,6 @@ fun formatSeconds(seconds: Long): String {
     val m = (seconds % 3600) / 60
     val s = seconds % 60
     return String.format("%02d:%02d:%02d", h, m, s)
-}
-
-@Composable
-fun TimePickerWithSpinners(inputValues: MutableMap<FieldInfo, String>) {
-    // States for hours, minutes, and seconds
-    var selectedHour by remember { mutableIntStateOf(0) }
-    var selectedMinute by remember { mutableIntStateOf(0) }
-    var selectedSecond by remember { mutableIntStateOf(0) }
-
-    fun updateDuration() {
-        val totalSeconds = selectedHour * 3600 + selectedMinute * 60 + selectedSecond
-        inputValues[FieldInfo.DURATION] = totalSeconds.toString()
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(4.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Hour Spinner
-            NumberPickerSpinner(
-                label = "Hour",
-                range = 0..23,
-                value = selectedHour,
-                onValueChange = {
-                    selectedHour = it
-                    updateDuration()
-                }
-            )
-
-            // Minute Spinner
-            NumberPickerSpinner(
-                label = "Minute",
-                range = 0..59,
-                value = selectedMinute,
-                onValueChange = {
-                    selectedMinute = it
-                    updateDuration()
-                }
-            )
-
-            // Second Spinner
-            NumberPickerSpinner(
-                label = "Second",
-                range = 0..59,
-                value = selectedSecond,
-                onValueChange = {
-                    selectedSecond = it
-                    updateDuration()
-                }
-            )
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Display updated duration dynamically
-        Text(
-            text = "Workout Time: ${"%02d".format(selectedHour)}h ${
-                "%02d".format(selectedMinute)
-            }m ${"%02d".format(selectedSecond)}s",
-            style = MaterialTheme.typography.bodyLarge.copy(
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold
-            )
-        )
-    }
-}
-
-@Composable
-fun NumberPickerSpinner(
-    label: String,
-    range: IntRange,
-    value: Int,
-    onValueChange: (Int) -> Unit
-) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(label, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-
-        // Integrate Android's NumberPicker
-        AndroidView(
-            factory = { context ->
-                NumberPicker(context).apply {
-                    minValue = range.first
-                    maxValue = range.last
-                    wrapSelectorWheel = true // Allows cycling through values
-                }
-            },
-            update = { picker ->
-                picker.value = value
-                picker.setOnValueChangedListener { _, _, newVal ->
-                    onValueChange(newVal)
-                }
-            },
-            modifier = Modifier.width(100.dp)
-        )
-    }
 }
 
 
