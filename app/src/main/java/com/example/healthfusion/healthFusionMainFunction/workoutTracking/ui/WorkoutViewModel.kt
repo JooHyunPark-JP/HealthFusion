@@ -77,7 +77,9 @@ class WorkoutViewModel @Inject constructor(
         set: Int?,
         repetition: Int?,
         weight: Int?,
-        workoutDate: Long
+        workoutDate: Long,
+        equipmentType: String?,
+        gripStyle: String?
     ) {
         viewModelScope.launch {
             _userId.value?.let { uid ->
@@ -92,6 +94,8 @@ class WorkoutViewModel @Inject constructor(
                     set = set,
                     repetition = repetition,
                     weight = weight,
+                    equipmentType = equipmentType,
+                    gripStyle = gripStyle,
 
                     userId = uid,
                     workoutDate = workoutDate,

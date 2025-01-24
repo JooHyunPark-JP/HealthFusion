@@ -93,8 +93,8 @@ fun WorkoutItem(
                         FieldInfo.REPETITIONS -> workout.repetition?.toString() ?: "N/A"
                         FieldInfo.WEIGHTS -> workout.weight?.toString() ?: "N/A"
                         FieldInfo.TIMER -> null
-                        FieldInfo.EQUIPMENT -> null
-                        FieldInfo.GRIP_STYLE -> null
+                        FieldInfo.EQUIPMENT_TYPE -> workout.equipmentType
+                        FieldInfo.GRIP_STYLE -> workout.gripStyle
                     }
 
                     if (!value.isNullOrEmpty()) {

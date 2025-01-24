@@ -12,7 +12,7 @@ enum class FieldInfo(val label: String, val type: FieldType) {
     REPETITIONS("Repetitions", FieldType.TEXT),
     WEIGHTS("Weights (kg)", FieldType.TEXT),
     TIMER("Timer", FieldType.TIMER),
-    EQUIPMENT("Equipment", FieldType.SEGMENTED), // New field
+    EQUIPMENT_TYPE("Equipment Type", FieldType.SEGMENTED), // New field
     GRIP_STYLE("Grip Style", FieldType.SEGMENTED) // New field
 }
 
@@ -25,7 +25,7 @@ fun Workout.getFieldValue(field: FieldInfo): Double {
         FieldInfo.REPETITIONS -> this.repetition?.toDouble() ?: 0.0
         FieldInfo.WEIGHTS -> this.weight?.toDouble() ?: 0.0
         FieldInfo.TIMER -> 0.0
-        FieldInfo.EQUIPMENT -> 0.0
+        FieldInfo.EQUIPMENT_TYPE -> 0.0
         FieldInfo.GRIP_STYLE -> 0.0
 
     }

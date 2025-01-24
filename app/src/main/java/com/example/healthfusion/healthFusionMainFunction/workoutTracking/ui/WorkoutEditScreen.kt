@@ -39,6 +39,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.healthfusion.R
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AerobicWorkout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AnaerobicWorkout
@@ -180,7 +181,9 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
                         set = inputValues[FieldInfo.SETS]?.toIntOrNull(),
                         repetition = inputValues[FieldInfo.REPETITIONS]?.toIntOrNull(),
                         weight = inputValues[FieldInfo.WEIGHTS]?.toIntOrNull(),
-                        workoutDate = selectedDate
+                        workoutDate = selectedDate,
+                        equipmentType = inputValues[FieldInfo.EQUIPMENT_TYPE],
+                        gripStyle = inputValues[FieldInfo.GRIP_STYLE]
                     )
                     Toast.makeText(
                         context,
@@ -225,7 +228,7 @@ fun DynamicWorkoutInputFields(
                 FieldType.TEXT -> {
                     TextField(
                         value = field.value,
-                        onValueChange = field.onChange, // Update inputValues when changed
+                        onValueChange = field.onChange,
                         label = { Text(field.label) },
                         modifier = Modifier.fillMaxWidth(),
                         colors = TextFieldDefaults.colors(
@@ -249,26 +252,54 @@ fun DynamicWorkoutInputFields(
 
                 FieldType.SEGMENTED -> {
                     when (field.label) {
-                        "Equipment" -> {
-                            SegmentedControl(
-                                options = listOf("Dumbbell", "Barbell", "Machine"),
-                                selectedOption = inputValues.getOrDefault(
-                                    FieldInfo.EQUIPMENT,
-                                    "Dumbbell"
-                                ),
-                                onOptionSelected = { inputValues[FieldInfo.EQUIPMENT] = it }
-                            )
+                        "Equipment Type" -> {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp)
+                            ) {
+                                Text(
+                                    text = "Equipment Type:",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier
+                                        .padding(6.dp)
+                                )
+                                SegmentedControl(
+                                    options = listOf("Dumbbell", "Barbell", "No Equipment"),
+                                    selectedOption = inputValues.getOrDefault(
+                                        FieldInfo.EQUIPMENT_TYPE,
+                                        "Dumbbell"
+                                    ),
+                                    onOptionSelected = {
+                                        inputValues[FieldInfo.EQUIPMENT_TYPE] = it
+                                    }
+                                )
+                            }
                         }
 
                         "Grip Style" -> {
-                            SegmentedControl(
-                                options = listOf("Overhand", "Underhand", "Neutral"),
-                                selectedOption = inputValues.getOrDefault(
-                                    FieldInfo.GRIP_STYLE,
-                                    "Neutral"
-                                ),
-                                onOptionSelected = { inputValues[FieldInfo.GRIP_STYLE] = it }
-                            )
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp)
+                            ) {
+                                Text(
+                                    text = "Grip Type:",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier
+                                        .padding(6.dp)
+                                )
+                                SegmentedControl(
+                                    options = listOf("Neutral", "Overhand", "Underhand"),
+                                    selectedOption = inputValues.getOrDefault(
+                                        FieldInfo.GRIP_STYLE,
+                                        "Neutral"
+                                    ),
+                                    onOptionSelected = { inputValues[FieldInfo.GRIP_STYLE] = it }
+                                )
+                            }
                         }
                     }
                 }

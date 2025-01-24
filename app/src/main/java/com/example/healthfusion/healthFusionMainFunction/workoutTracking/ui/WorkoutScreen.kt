@@ -283,8 +283,8 @@ fun WorkoutRecentActivityBox(workout: Workout, dateFormatter: DateFormatter) {
                         FieldInfo.REPETITIONS -> workout.repetition?.toString() ?: "N/A"
                         FieldInfo.WEIGHTS -> workout.weight?.toString() ?: "N/A"
                         FieldInfo.TIMER -> null
-                        FieldInfo.GRIP_STYLE -> null
-                        FieldInfo.EQUIPMENT -> null
+                        FieldInfo.GRIP_STYLE -> workout.gripStyle ?: "N/A"
+                        FieldInfo.EQUIPMENT_TYPE -> workout.equipmentType ?: "N/A"
                     }
 
                     if (!value.isNullOrEmpty()) {

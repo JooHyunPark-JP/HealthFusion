@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,11 +22,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.healthfusion.R
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.FieldInfo
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutField
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.formatSeconds
@@ -95,17 +99,22 @@ fun TimerComponentWithToggle(field: WorkoutField, inputValues: MutableMap<FieldI
         modifier = Modifier.fillMaxWidth(),
     ) {
         // Text button to toggle the timer
-        Text(
-            text = "Use a timer if needed (click)",
-            style = TextStyle(
-                color = Color.Blue,
-                textDecoration = TextDecoration.Underline,
-                fontSize = 16.sp
-            ),
-            modifier = Modifier
-                .clickable { showTimer = !showTimer }
-                .padding(12.dp)
-        )
+        Row(modifier = Modifier.fillMaxWidth().padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically) {
+            Icon(painterResource(id = R.drawable.ic_timer), contentDescription = "Add")
+            Text(
+                text = "Need timer? (Click)",
+                style = TextStyle(
+                    color = Color.Blue,
+                    textAlign = TextAlign.Center,
+                    textDecoration = TextDecoration.Underline,
+                    fontSize = 16.sp
+                ),
+                modifier = Modifier
+                    .clickable { showTimer = !showTimer }
+                    .padding(start= 4.dp)
+            )
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
