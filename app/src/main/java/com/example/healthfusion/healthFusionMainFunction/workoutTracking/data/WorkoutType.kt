@@ -17,25 +17,45 @@ enum class AerobicWorkout(
         "Running",
         R.drawable.running_pose2,
         WorkoutType.AEROBIC,
-        fields = listOf(FieldInfo.DURATION, FieldInfo.DISTANCE, FieldInfo.CALORIES_BURNED)
+        fields = listOf(
+            FieldInfo.DURATION,
+            FieldInfo.DISTANCE,
+            FieldInfo.CALORIES_BURNED,
+            FieldInfo.TIMER
+        )
     ),
     CYCLING(
         "Cycling",
         R.drawable.cycling_pose,
         WorkoutType.AEROBIC,
-        fields = listOf(FieldInfo.DURATION, FieldInfo.DISTANCE, FieldInfo.CALORIES_BURNED)
+        fields = listOf(
+            FieldInfo.DURATION,
+            FieldInfo.DISTANCE,
+            FieldInfo.CALORIES_BURNED,
+            FieldInfo.TIMER
+        )
     ),
     WALKING(
         "Walking",
         R.drawable.walking_pose,
         WorkoutType.AEROBIC,
-        fields = listOf(FieldInfo.DURATION, FieldInfo.DISTANCE, FieldInfo.CALORIES_BURNED)
+        fields = listOf(
+            FieldInfo.DURATION,
+            FieldInfo.DISTANCE,
+            FieldInfo.CALORIES_BURNED,
+            FieldInfo.TIMER
+        )
     ),
     SWIMMING(
         "Swimming",
         R.drawable.swimming_pose,
         WorkoutType.AEROBIC,
-        fields = listOf(FieldInfo.DURATION, FieldInfo.DISTANCE, FieldInfo.CALORIES_BURNED)
+        fields = listOf(
+            FieldInfo.DURATION,
+            FieldInfo.DISTANCE,
+            FieldInfo.CALORIES_BURNED,
+            FieldInfo.TIMER
+        )
     ),
     JUMPING_ROPE(
         "Jumping_Rope",
@@ -55,68 +75,109 @@ enum class AnaerobicWorkout(
         "Push_Up",
         R.drawable.pushup_pose,
         WorkoutType.ANAEROBIC,
-        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS)
+        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.TIMER)
     ),
     SQUAT(
         "Squat",
         R.drawable.squat_pose,
         WorkoutType.ANAEROBIC,
-        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS)
+        fields = listOf(
+            FieldInfo.SETS,
+            FieldInfo.REPETITIONS,
+            FieldInfo.WEIGHTS,
+            FieldInfo.EQUIPMENT_TYPE,
+            FieldInfo.TIMER
+        )
     ),
 
     DONKEY_KICK(
         "Donkey_Kick",
         R.drawable.donkey_kick_pose,
         WorkoutType.ANAEROBIC,
-        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS)
+        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.TIMER)
     ),
 
     BICEP_CURLS(
         "Bicep_Curls",
         R.drawable.bicep_curl_pose,
         WorkoutType.ANAEROBIC,
-        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS)
+        fields = listOf(
+            FieldInfo.SETS,
+            FieldInfo.REPETITIONS,
+            FieldInfo.WEIGHTS,
+            FieldInfo.EQUIPMENT_TYPE,
+            FieldInfo.GRIP_STYLE,
+            FieldInfo.TIMER
+        )
     ),
     PLANK(
         "Plank",
         R.drawable.plank_pose,
         WorkoutType.ANAEROBIC,
-        fields = listOf(FieldInfo.SETS, FieldInfo.DURATION)
+        fields = listOf(FieldInfo.SETS, FieldInfo.DURATION, FieldInfo.TIMER, FieldInfo.TIMER)
     ),
 
     HAND_GRIPPER(
         "Hand_Gripper",
         R.drawable.hand_grippler_pose,
         WorkoutType.ANAEROBIC,
-        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS)
+        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS, FieldInfo.TIMER)
     ),
 
     SHOULDER_PRESS(
         "Shoulder_Press",
         R.drawable.shoulder_press_pose,
         WorkoutType.ANAEROBIC,
-        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS)
+        fields = listOf(
+            FieldInfo.SETS,
+            FieldInfo.REPETITIONS,
+            FieldInfo.WEIGHTS,
+            FieldInfo.EQUIPMENT_TYPE,
+            FieldInfo.GRIP_STYLE,
+            FieldInfo.TIMER
+        )
     ),
 
     DUMBBELL_LOW(
         "Dumbbell_Low",
         R.drawable.dumbbell_row_pose,
         WorkoutType.ANAEROBIC,
-        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS)
+        fields = listOf(
+            FieldInfo.SETS,
+            FieldInfo.REPETITIONS,
+            FieldInfo.WEIGHTS,
+            FieldInfo.EQUIPMENT_TYPE,
+            FieldInfo.GRIP_STYLE,
+            FieldInfo.TIMER
+        )
     ),
 
     DEAD_LIFT(
         "Dead_Lift",
         R.drawable.dead_lift_pose,
         WorkoutType.ANAEROBIC,
-        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS)
+        fields = listOf(
+            FieldInfo.SETS,
+            FieldInfo.REPETITIONS,
+            FieldInfo.WEIGHTS,
+            FieldInfo.EQUIPMENT_TYPE,
+            FieldInfo.GRIP_STYLE,
+            FieldInfo.TIMER
+        )
     ),
 
     BENCH_PRESS(
         "Bench_Press",
         R.drawable.bench_press_pose,
         WorkoutType.ANAEROBIC,
-        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.WEIGHTS)
+        fields = listOf(
+            FieldInfo.SETS,
+            FieldInfo.REPETITIONS,
+            FieldInfo.WEIGHTS,
+            FieldInfo.EQUIPMENT_TYPE,
+            FieldInfo.GRIP_STYLE,
+            FieldInfo.TIMER
+        )
     ),
 
 }

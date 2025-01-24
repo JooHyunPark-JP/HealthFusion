@@ -224,7 +224,6 @@ fun WorkoutRecentActivityBox(workout: Workout, dateFormatter: DateFormatter) {
     val workoutEnum = when (workout.type) {
         WorkoutType.AEROBIC -> AerobicWorkout.entries.find { it.workoutName == workout.name }
         WorkoutType.ANAEROBIC -> AnaerobicWorkout.entries.find { it.workoutName == workout.name }
-        else -> null
     }
 
     val fields = when (workoutEnum) {
@@ -274,20 +273,27 @@ fun WorkoutRecentActivityBox(workout: Workout, dateFormatter: DateFormatter) {
                 Spacer(modifier = Modifier.height(8.dp))
 
                 fields.forEach { fieldInfo ->
+                    val formattedDuration =
+                        workout.duration?.toLong()?.let { formatSecondsDuration(it) }
                     val value = when (fieldInfo) {
-                        FieldInfo.DURATION -> workout.duration?.toString() ?: "N/A"
+                        FieldInfo.DURATION -> formattedDuration.toString() ?: "N/A"
                         FieldInfo.DISTANCE -> workout.distance?.toString() ?: "N/A"
                         FieldInfo.CALORIES_BURNED -> workout.caloriesBurned?.toString() ?: "N/A"
                         FieldInfo.SETS -> workout.set?.toString() ?: "N/A"
                         FieldInfo.REPETITIONS -> workout.repetition?.toString() ?: "N/A"
                         FieldInfo.WEIGHTS -> workout.weight?.toString() ?: "N/A"
+                        FieldInfo.TIMER -> null
+                        FieldInfo.GRIP_STYLE -> workout.gripStyle ?: "N/A"
+                        FieldInfo.EQUIPMENT_TYPE -> workout.equipmentType ?: "N/A"
                     }
 
-                    Text(
-                        text = "${fieldInfo.label}: $value",
-                        fontSize = 14.sp,
-                        color = Color(0xFF616161)
-                    )
+                    if (!value.isNullOrEmpty()) {
+                        Text(
+                            text = "${fieldInfo.label}: $value",
+                            fontSize = 14.sp,
+                            color = Color(0xFF616161)
+                        )
+                    }
                 }
             }
 

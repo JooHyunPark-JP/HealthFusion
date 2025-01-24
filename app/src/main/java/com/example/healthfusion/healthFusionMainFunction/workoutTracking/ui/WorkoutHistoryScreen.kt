@@ -65,6 +65,10 @@ fun WorkoutHistoryScreen(
     var aerobicWorkoutTabIndex by remember { mutableIntStateOf(0) }
     val tabWorkoutPageTitles = listOf("Line Chart", "Workout List")
 
+    var selectedUnit by remember { mutableStateOf("minutes") }
+    var expandedUnitSelection by remember { mutableStateOf(false) }
+
+
     Column(modifier = Modifier.padding(16.dp)) {
 
         val filteredWorkouts = workouts.filter { workout ->
@@ -114,14 +118,22 @@ fun WorkoutHistoryScreen(
                     val lineData: List<Double> = filteredWorkouts.map { workout ->
                         val selectedField =
                             FieldInfo.entries.find { it.label == selectedDetailOption }
-                        selectedField?.let { workout.getFieldValue(it) } ?: 0.0
+
+                        // Convert duration from seconds to minutes if the selected option is "Duration"
+                        val rawValue = selectedField?.let { workout.getFieldValue(it) } ?: 0.0
+                        if (selectedDetailOption == "Duration") {
+                            //    rawValue / 60.0
+                            convertDuration(rawValue, selectedUnit)
+                        } else {
+                            rawValue
+                        }
                     }
 
                     AerobicLineChart(
-                        lineData,
-                        selectedDetailOption,
+                        lineData = lineData,
+                        selectedDetailOption = selectedDetailOption,
                         dateLabels = getDateLabels(filteredWorkouts),
-                        filteredWorkouts
+                        filteredWorkouts = filteredWorkouts
                     )
                 }
 
@@ -275,6 +287,34 @@ fun WorkoutHistoryScreen(
                 }
             }
         }
+
+        if (selectedDetailOption == "Duration")
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                OutlinedButton(
+                    onClick = { expandedUnitSelection = true },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = "Unit: ${selectedUnit.replaceFirstChar { it.uppercase() }}")
+                }
+                DropdownMenu(
+                    expanded = expandedUnitSelection,
+                    onDismissRequest = { expandedUnitSelection = false },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    listOf("minutes", "hours").forEach { unit ->
+                        DropdownMenuItem(
+                            text = { Text(unit.replaceFirstChar { it.uppercase() }) },
+                            onClick = {
+                                selectedUnit = unit
+                                expandedUnitSelection = false
+                            }
+                        )
+                    }
+                }
+            }
     }
 }
 
@@ -364,8 +404,6 @@ fun AerobicLineChart(
 }
 
 fun getDateLabels(filteredWorkouts: List<Workout>): List<String> {
-
-
     /*    // All workout data shown in the line chart... use it for later
     return filteredWorkouts.sortedBy { it.workoutDate }
             .map { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date(it.workoutDate)) }*/
@@ -381,4 +419,12 @@ fun getDateLabels(filteredWorkouts: List<Workout>): List<String> {
             SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date(it))
         }
     )
+}
+
+fun convertDuration(durationInSeconds: Double, unit: String): Double {
+    return when (unit) {
+        "minutes" -> durationInSeconds / 60.0
+        "hours" -> durationInSeconds / 3600.0
+        else -> durationInSeconds
+    }
 }

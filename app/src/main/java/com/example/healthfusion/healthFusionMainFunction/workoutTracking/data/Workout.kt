@@ -24,6 +24,8 @@ data class Workout(
     val set: Int? = null,
     val repetition: Int? = null,
     val weight: Int? = null,
+    val equipmentType : String? = null,
+    val gripStyle : String? = null,
 
 
     val userId: String = "",
@@ -43,6 +45,8 @@ data class Workout(
         set = null,
         repetition = null,
         weight = null,
+        equipmentType = null,
+        gripStyle = null,
 
         userId = "",
         workoutDate = System.currentTimeMillis(),
@@ -63,6 +67,9 @@ data class WorkoutDTO(
     val set: Int?,
     val repetition: Int?,
     val weight: Int?,
+    val equipmentType : String? = null,
+    val gripStyle : String? = null,
+
 
     val userId: String,
     val workoutDate: String,
@@ -81,6 +88,8 @@ data class WorkoutDTO(
         set = null,
         repetition = null,
         weight = null,
+        equipmentType = null,
+        gripStyle = null,
 
 
         userId = "",
@@ -102,6 +111,8 @@ fun Workout.toDTO(dateFormatter: DateFormatter): WorkoutDTO {
         set = this.set,
         repetition = this.repetition,
         weight = this.weight,
+        equipmentType = this.equipmentType,
+        gripStyle = this.gripStyle,
 
         userId = this.userId,
         workoutDate = dateFormatter.formatMillisToDateTime(this.workoutDate),
@@ -124,6 +135,8 @@ fun WorkoutDTO.toEntity(dateFormatter: DateFormatter): Workout {
         set = this.set,
         repetition = this.repetition,
         weight = this.weight,
+        equipmentType = this.equipmentType,
+        gripStyle = this.gripStyle,
 
         userId = this.userId,
         workoutDate = dateFormatter.parseDateTimeToMillis(this.workoutDate)

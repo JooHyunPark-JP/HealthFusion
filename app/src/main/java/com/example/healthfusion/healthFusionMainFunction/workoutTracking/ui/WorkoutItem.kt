@@ -1,5 +1,6 @@
 package com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -82,20 +83,27 @@ fun WorkoutItem(
 
                 Spacer(modifier = Modifier.height(4.dp))
                 fields.forEach { fieldInfo ->
+                    val formattedDuration =
+                        workout.duration?.toLong()?.let { formatSecondsDuration(it) }
                     val value = when (fieldInfo) {
-                        FieldInfo.DURATION -> workout.duration?.toString() ?: "N/A"
+                        FieldInfo.DURATION -> formattedDuration.toString() ?: "N/A"
                         FieldInfo.DISTANCE -> workout.distance?.toString() ?: "N/A"
                         FieldInfo.CALORIES_BURNED -> workout.caloriesBurned?.toString() ?: "N/A"
                         FieldInfo.SETS -> workout.set?.toString() ?: "N/A"
                         FieldInfo.REPETITIONS -> workout.repetition?.toString() ?: "N/A"
                         FieldInfo.WEIGHTS -> workout.weight?.toString() ?: "N/A"
+                        FieldInfo.TIMER -> null
+                        FieldInfo.EQUIPMENT_TYPE -> workout.equipmentType
+                        FieldInfo.GRIP_STYLE -> workout.gripStyle
                     }
 
-                    Text(
-                        text = "${fieldInfo.label}: $value",
-                        fontSize = 14.sp,
-                        color = Color(0xFF616161)
-                    )
+                    if (!value.isNullOrEmpty()) {
+                        Text(
+                            text = "${fieldInfo.label}: $value",
+                            fontSize = 14.sp,
+                            color = Color(0xFF616161)
+                        )
+                    }
                 }
             }
             // Right side: delete button
@@ -108,4 +116,12 @@ fun WorkoutItem(
             }
         }
     }
+}
+
+@SuppressLint("DefaultLocale")
+fun formatSecondsDuration(seconds: Long): String {
+    val h = seconds / 3600
+    val m = (seconds % 3600) / 60
+    val s = seconds % 60
+    return String.format("%02dh %02dm %02ds", h, m, s)
 }
