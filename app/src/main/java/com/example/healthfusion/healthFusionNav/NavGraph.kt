@@ -16,6 +16,7 @@ import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.Ae
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AnaerobicWorkout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutEdit
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutGoalList
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutGoalScreen
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutScreen
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutViewModel
@@ -44,10 +45,13 @@ fun NavGraph(
             SleepScreen(viewModel = sleepViewModel)
         }
         composable(Screen.WorkoutGoal.route) {
-            WorkoutGoalScreen(viewModel = workoutViewModel)
+            WorkoutGoalScreen(viewModel = workoutViewModel, navController = navController)
         }
         composable(Screen.Profile.route) {
             ProfileScreen(loginViewModel = loginViewModel)
+        }
+        composable(Screen.WorkoutGoalList.route) {
+            WorkoutGoalList(workoutViewModel = workoutViewModel)
         }
 
         composable(

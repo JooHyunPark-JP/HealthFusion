@@ -161,7 +161,15 @@ fun WorkoutScreen(
                     itemsIndexed(selectedWorkouts) { _, workout ->
                         WorkoutGridItem(
                             workout = workout,
-                            navController = navController,
+                            onClick = {
+                                navController.navigate("${Screen.WorkoutEdit.route}/${workout.javaClass.simpleName}/${workout.name}/${
+                                    when (workout) {
+                                        is AerobicWorkout -> workout.workoutType.name
+                                        is AnaerobicWorkout -> workout.workoutType.name
+                                        else -> WorkoutType.AEROBIC.name
+                                    }
+                                }")
+                            }
                         )
                     }
                 }
@@ -312,7 +320,7 @@ fun WorkoutRecentActivityBox(workout: Workout, dateFormatter: DateFormatter) {
     }
 }
 
-@Composable
+/*@Composable
 fun WorkoutGridItem(workout: Enum<*>, navController: NavController) {
     Column(
         modifier = Modifier
@@ -353,7 +361,7 @@ fun WorkoutGridItem(workout: Enum<*>, navController: NavController) {
             fontSize = 16.sp
         )
     }
-}
+}*/
 
 
 @Composable

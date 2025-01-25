@@ -16,11 +16,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -38,12 +41,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoal
+import com.example.healthfusion.healthFusionNav.Screen
 import com.example.healthfusion.ui.theme.HealthFusionTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
-fun WorkoutGoalScreen(viewModel: WorkoutViewModel) {
+fun WorkoutGoalScreen(viewModel: WorkoutViewModel, navController: NavController) {
 
     val dailyGoals by viewModel.dailyGoals.collectAsState()
     val weeklyGoals by viewModel.weeklyGoals.collectAsState()
@@ -85,6 +90,7 @@ fun WorkoutGoalScreen(viewModel: WorkoutViewModel) {
                     onGoalDelete = { workoutGoal ->
                         viewModel.deleteWorkoutGoal(workoutGoal)
                     },
+                    navController = navController,
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
@@ -105,6 +111,7 @@ fun WorkoutGoalScreen(viewModel: WorkoutViewModel) {
                     onGoalDelete = { workoutGoal ->
                         viewModel.deleteWorkoutGoal(workoutGoal)
                     },
+                    navController = navController,
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
@@ -115,6 +122,7 @@ fun WorkoutGoalScreen(viewModel: WorkoutViewModel) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutGoalSection(
     title: String,
@@ -122,12 +130,15 @@ fun WorkoutGoalSection(
     onAddGoalClick: (String) -> Unit,
     onGoalClick: (WorkoutGoal) -> Unit,
     onGoalDelete: (WorkoutGoal) -> Unit,
+    navController: NavController,
     modifier: Modifier = Modifier
 ) {
 
     var showDialog by rememberSaveable { mutableStateOf(false) }
     val completedGoals = goals.count { it.isCompleted }
     val totalGoals = goals.size
+
+    var showBottomSheet by remember { mutableStateOf(false) }
 
 
     Box(
@@ -166,13 +177,55 @@ fun WorkoutGoalSection(
             }
         }
 
+        /*        FloatingActionButton(
+                    onClick = { showDialog = true },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(16.dp)
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Add Goal")
+                }*/
+
         FloatingActionButton(
-            onClick = { showDialog = true },
+            onClick = { showBottomSheet = true },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp)
         ) {
             Icon(Icons.Default.Add, contentDescription = "Add Goal")
+        }
+
+        if (showBottomSheet) {
+            ModalBottomSheet(
+                onDismissRequest = { showBottomSheet = false }
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text("Choose an option:", style = MaterialTheme.typography.bodyLarge)
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Button(onClick = {
+                        // Custom goal logic
+                        showBottomSheet = false
+                        showDialog = true
+                    }) {
+                        Text("Write a custom goal")
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Button(onClick = {
+                        navController.navigate(Screen.WorkoutGoalList.route)
+                        showBottomSheet = false
+                    }) {
+                        Text("Choose workout and frequency")
+                    }
+                }
+            }
         }
 
         if (showDialog) {
