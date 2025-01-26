@@ -8,6 +8,8 @@ import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.Wo
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutDao
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoal
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoalDao
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoalDetails
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoalDetailsDao
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoalType
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.toDTO
@@ -20,16 +22,19 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import javax.inject.Inject
 
 @HiltViewModel
 class WorkoutViewModel @Inject constructor(
     private val workoutDao: WorkoutDao,
     private val workoutGoalDao: WorkoutGoalDao,
+    private val workoutGoalDetailsDao: WorkoutGoalDetailsDao,
     private val firestoreRepository: FirestoreRepository,
     private val networkHelper: NetworkHelper,
     private val dateFormatter: DateFormatter
@@ -64,6 +69,21 @@ class WorkoutViewModel @Inject constructor(
     val weeklyGoals: StateFlow<List<WorkoutGoal>> = _userId.flatMapLatest { uid ->
         uid?.let {
             workoutGoalDao.getGoalsForUserAndType(it, WorkoutGoalType.WEEKLY)
+        } ?: flowOf(emptyList())
+    }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val workoutGoalDetails: StateFlow<List<WorkoutGoalDetails>> = _userId.flatMapLatest { uid ->
+        uid?.let {
+            workoutGoalDetailsDao.getGoalsByPeriod(it, "weekly")
+        } ?: flowOf(emptyList())
+    }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val currentWeekGoals: StateFlow<List<WorkoutGoalDetails>> = _userId.flatMapLatest { uid ->
+        uid?.let {
+            val (startOfWeek, endOfWeek) = getCurrentWeekRange()
+            workoutGoalDetailsDao.getGoalsByPeriodAndTimeRange(it, "weekly", startOfWeek, endOfWeek)
         } ?: flowOf(emptyList())
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
@@ -271,6 +291,94 @@ class WorkoutViewModel @Inject constructor(
     private fun syncWorkoutRoomDatabaseAndFirestoreData() {
         syncUnsyncedWorkouts()
         syncWorkoutsFromFirestore()
+    }
+
+
+    fun addWorkoutGoalDetail(
+        workoutName: String,
+        workoutType: WorkoutType,
+        goalFrequency: Int,
+        goalPeriod: String
+    ) {
+        viewModelScope.launch {
+            _userId.value?.let { uid ->
+                val goalDetail = WorkoutGoalDetails(
+                    workoutName = workoutName,
+                    workoutType = workoutType,
+                    goalFrequency = goalFrequency,
+                    goalPeriod = goalPeriod,
+                    userId = uid
+                )
+                workoutGoalDetailsDao.insert(goalDetail)
+            }
+        }
+    }
+
+    // Fetch goals for a specific workout
+    fun getWorkoutGoalDetails(userId: String, workoutName: String): Flow<List<WorkoutGoalDetails>> {
+        return workoutGoalDetailsDao.getWorkoutGoalDetails(userId, workoutName)
+    }
+
+    /*    suspend fun getWorkoutGoal(userId: String, workoutName: String): WorkoutGoalDetails? {
+            return workoutGoalDetailsDao.getWorkoutGoal(userId, workoutName)
+        }
+
+
+        fun addWorkoutGoalDetails(workoutGoalDetails: WorkoutGoalDetails) = viewModelScope.launch {
+            workoutGoalDetailsDao.insert(workoutGoalDetails)
+        }
+
+
+        fun updateWorkoutGoalDetails(workoutGoalDetails: WorkoutGoalDetails) = viewModelScope.launch {
+            workoutGoalDetailsDao.update(workoutGoalDetails)
+        }
+
+
+        fun deleteWorkoutGoalDetails(workoutGoalDetails: WorkoutGoalDetails) = viewModelScope.launch {
+            workoutGoalDetailsDao.delete(workoutGoalDetails)
+        }
+
+
+        val weeklyGoalsDetails: Flow<List<WorkoutGoalDetails>> = workoutGoalDetailsDao.getGoalsByPeriod(
+            userId = "currentUserId", // Replace with actual user ID
+            goalPeriod = "weekly"
+        )*/
+
+    private fun getCurrentWeekRange(): Pair<Long, Long> {
+        val calendar = Calendar.getInstance()
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+        val startOfWeek = calendar.timeInMillis
+
+        calendar.add(Calendar.DAY_OF_WEEK, 6)
+        val endOfWeek = calendar.timeInMillis
+
+        return Pair(startOfWeek, endOfWeek)
+    }
+
+    fun updateCurrentProgress(workoutName: String) {
+        viewModelScope.launch {
+            _userId.value?.let { uid ->
+                val (startOfWeek, endOfWeek) = getCurrentWeekRange()
+
+                val workoutsForCurrentWeek =
+                    workoutDao.getWorkoutsByDateRange(uid, startOfWeek, endOfWeek)
+                        .firstOrNull()
+                        ?.filter { it.name == workoutName }
+
+                val completedCount = workoutsForCurrentWeek?.size ?: 0
+
+                val goalDetails = workoutGoalDetailsDao.getGoalsByPeriodAndTimeRange(
+                    uid, "weekly", startOfWeek, endOfWeek
+                ).firstOrNull()
+
+                val targetGoal = goalDetails?.find { it.workoutName == workoutName }
+
+                targetGoal?.let { goal ->
+                    val updatedGoal = goal.copy(currentProgress = completedCount)
+                    workoutGoalDetailsDao.update(updatedGoal)
+                }
+            }
+        }
     }
 
 }

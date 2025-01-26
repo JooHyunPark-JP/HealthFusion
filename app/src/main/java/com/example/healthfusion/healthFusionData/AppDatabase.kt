@@ -10,11 +10,20 @@ import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.Wo
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutDao
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoal
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoalDao
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoalDetails
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoalDetailsDao
 
-@Database(entities = [Workout::class, Diet::class, Sleep::class, WorkoutGoal::class], version = 2, exportSchema = false)
+@Database(
+    entities = [Workout::class,
+        Diet::class,
+        Sleep::class,
+        WorkoutGoal::class,
+        WorkoutGoalDetails::class], version = 2, exportSchema = false
+)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun workoutDao(): WorkoutDao
     abstract fun dietDao(): DietDao
     abstract fun sleepDao(): SleepDao
     abstract fun workoutGoalDao(): WorkoutGoalDao
+    abstract fun workoutGoalDetailsDao(): WorkoutGoalDetailsDao
 }

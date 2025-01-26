@@ -36,4 +36,17 @@ interface WorkoutDao {
 
     @Query("SELECT * FROM workout_table WHERE id = :id")
     suspend fun getWorkoutById(id: Int): Workout?
+
+    @Query(
+        """
+    SELECT * FROM workout_table 
+    WHERE userId = :userId AND workoutDate BETWEEN :startOfWeek AND :endOfWeek
+"""
+    )
+    fun getWorkoutsByDateRange(
+        userId: String,
+        startOfWeek: Long,
+        endOfWeek: Long
+    ): Flow<List<Workout>>
+
 }

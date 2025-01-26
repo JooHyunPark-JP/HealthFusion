@@ -18,6 +18,7 @@ import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.Wo
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutEdit
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutGoalList
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutGoalScreen
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutGoalSettingScreen
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutScreen
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutViewModel
 import com.example.healthfusion.util.DateFormatter
@@ -51,7 +52,17 @@ fun NavGraph(
             ProfileScreen(loginViewModel = loginViewModel)
         }
         composable(Screen.WorkoutGoalList.route) {
-            WorkoutGoalList(workoutViewModel = workoutViewModel)
+            WorkoutGoalList(workoutViewModel = workoutViewModel, navController = navController)
+        }
+
+        composable(
+            route = Screen.WorkoutGoalSetting.route,
+            arguments = listOf(
+                navArgument("workoutName") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val workoutName = backStackEntry.arguments?.getString("workoutName")
+            WorkoutGoalSettingScreen(workoutViewModel = workoutViewModel, workoutName)
         }
 
         composable(

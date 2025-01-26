@@ -18,13 +18,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AerobicWorkout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AnaerobicWorkout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
+import com.example.healthfusion.healthFusionNav.Screen
 import com.example.healthfusion.ui.theme.HealthFusionTheme
 
 @Composable
-fun WorkoutGoalList(workoutViewModel: WorkoutViewModel) {
+fun WorkoutGoalList(workoutViewModel: WorkoutViewModel, navController: NavController) {
     val workouts by workoutViewModel.workouts.collectAsState()
 
     var selectedTabIndex by remember { mutableIntStateOf(0) }
@@ -64,7 +66,13 @@ fun WorkoutGoalList(workoutViewModel: WorkoutViewModel) {
                     WorkoutGridItem(
                         workout = workout,
                         onClick = {
-                            //TO do
+                            // Navigate to WorkoutGoalSettingScreen with workoutName
+                            val workoutName = when (workout) {
+                                is AerobicWorkout -> workout.workoutName
+                                is AnaerobicWorkout -> workout.workoutName
+                                else -> "Unknown Workout"
+                            }
+                            navController.navigate(Screen.WorkoutGoalSetting.createRoute(workoutName))
                         }
                     )
 
