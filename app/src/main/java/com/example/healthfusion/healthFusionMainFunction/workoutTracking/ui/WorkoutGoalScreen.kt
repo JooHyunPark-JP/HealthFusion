@@ -93,6 +93,8 @@ fun WorkoutGoalScreen(viewModel: WorkoutViewModel, navController: NavController)
                         viewModel.deleteWorkoutGoal(workoutGoal)
                     },
                     navController = navController,
+                    onGoalCompleted = {},
+                    onGoalNotCompletedYet = {},
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
@@ -115,6 +117,13 @@ fun WorkoutGoalScreen(viewModel: WorkoutViewModel, navController: NavController)
                         viewModel.deleteWorkoutGoal(workoutGoal)
                     },
                     navController = navController,
+
+                    onGoalCompleted = { goal ->
+                        viewModel.markGoalAsCompleted(goal)
+                    },
+                    onGoalNotCompletedYet = { goal ->
+                        viewModel.markGoalAsNotCompleted(goal)
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
@@ -134,6 +143,8 @@ fun WorkoutGoalSection(
     onAddGoalClick: (String) -> Unit,
     onGoalClick: (WorkoutGoal) -> Unit,
     onGoalDelete: (WorkoutGoal) -> Unit,
+    onGoalCompleted: (WorkoutGoal) -> Unit,
+    onGoalNotCompletedYet: (WorkoutGoal) -> Unit,
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
@@ -175,20 +186,13 @@ fun WorkoutGoalSection(
                     GoalItem(
                         goal = goal,
                         onGoalClick = onGoalClick,
-                        onGoalDelete = onGoalDelete
+                        onGoalDelete = onGoalDelete,
+                        onGoalCompleted = onGoalCompleted,
+                        onGoalNotCompletedYet = onGoalNotCompletedYet
                     )
                 }
             }
         }
-
-        /*        FloatingActionButton(
-                    onClick = { showDialog = true },
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(16.dp)
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = "Add Goal")
-                }*/
 
         FloatingActionButton(
             onClick = { showBottomSheet = true },
@@ -246,14 +250,20 @@ fun WorkoutGoalSection(
 fun GoalItem(
     goal: WorkoutGoal,
     onGoalClick: (WorkoutGoal) -> Unit,
-    onGoalDelete: (WorkoutGoal) -> Unit
+    onGoalDelete: (WorkoutGoal) -> Unit,
+    onGoalCompleted: (WorkoutGoal) -> Unit,
+    onGoalNotCompletedYet: (WorkoutGoal) -> Unit
 ) {
+    val isAutoManaged = goal.workoutName.isNotEmpty() && goal.goalFrequency > 0
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 4.dp)
             .background(if (goal.isCompleted) Color.Gray else Color.Transparent)
-            .clickable { onGoalClick(goal) }
+            .then(
+                if (!isAutoManaged) Modifier.clickable { onGoalClick(goal) }
+                else Modifier
+            )
             .padding(4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -266,27 +276,30 @@ fun GoalItem(
             )
         }
 
-        /*        Text(
-                    text = goal.text,
-                    modifier = Modifier.weight(1f),
-                )*/
-
         Column(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            Text(
-                text = goal.text,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
-            )
-            if (goal.workoutName.isNotEmpty() && goal.goalFrequency > 0) {
+
                 Text(
-                    text = "Progress: ${goal.currentProgress}/${goal.goalFrequency}",
-                    fontSize = 14.sp,
-                    color = Color.Gray
+                    text = goal.text,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
                 )
+                if (isAutoManaged) {
+                    Text(
+                        text = "Progress: ${goal.currentProgress}/${goal.goalFrequency}",
+                        fontSize = 14.sp,
+                        color = Color.Gray
+                    )
+                    if (goal.goalFrequency <= goal.currentProgress && !goal.isCompleted) {
+                        onGoalCompleted(goal)
+                    } else if (goal.goalFrequency > goal.currentProgress && goal.isCompleted) {
+                        onGoalNotCompletedYet(goal)
+                    }
+
             }
+
         }
 
         IconButton(onClick = { onGoalDelete(goal) }) {

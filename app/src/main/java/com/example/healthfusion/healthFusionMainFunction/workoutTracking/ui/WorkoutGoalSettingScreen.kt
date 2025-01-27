@@ -66,7 +66,7 @@ fun WorkoutGoalSettingScreen(
                 onValueChange = { goalFrequency = it },
                 label = { Text("How many times per ${goalType.name.lowercase()}?") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-               // enabled = !isGoalAlreadySet
+                enabled = !isGoalAlreadySet
             )
 
             Button(onClick = {
@@ -77,20 +77,10 @@ fun WorkoutGoalSettingScreen(
                     goalPeriod = goalType.name.lowercase()
                 )
 
-/*                when (goalType.name.lowercase()) {
-                    "daily" -> workoutViewModel.addWorkoutGoal(
-                        text = "Do $workoutName ${goalFrequency.toIntOrNull() ?: 0} times per ${goalType.name.lowercase()}",
-                    )
-
-                    "weekly" -> workoutViewModel.addWeeklyGoal(
-                        text = "Do $workoutName ${goalFrequency.toIntOrNull() ?: 0} times per ${goalType.name.lowercase()}",
-                    )
-                }*/
-
                 navController.navigate(Screen.WorkoutGoal.route) {
                     popUpTo(Screen.WorkoutGoalList.route) { inclusive = true }
                 }
-            }, /*enabled = !isGoalAlreadySet*/) {
+            }, enabled = !isGoalAlreadySet) {
                 Text("Save Goal")
             }
 

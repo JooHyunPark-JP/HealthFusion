@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -95,7 +94,8 @@ fun WorkoutScreen(
                 WorkoutGoalBox(
                     navController = navController,
                     dailyGoals = dailyGoals,
-                    weeklyGoals = weeklyGoals
+                    weeklyGoals = weeklyGoals,
+                    viewModel = viewModel
                 )
 
 
@@ -162,13 +162,15 @@ fun WorkoutScreen(
                         WorkoutGridItem(
                             workout = workout,
                             onClick = {
-                                navController.navigate("${Screen.WorkoutEdit.route}/${workout.javaClass.simpleName}/${workout.name}/${
-                                    when (workout) {
-                                        is AerobicWorkout -> workout.workoutType.name
-                                        is AnaerobicWorkout -> workout.workoutType.name
-                                        else -> WorkoutType.AEROBIC.name
-                                    }
-                                }")
+                                navController.navigate(
+                                    "${Screen.WorkoutEdit.route}/${workout.javaClass.simpleName}/${workout.name}/${
+                                        when (workout) {
+                                            is AerobicWorkout -> workout.workoutType.name
+                                            is AnaerobicWorkout -> workout.workoutType.name
+                                            else -> WorkoutType.AEROBIC.name
+                                        }
+                                    }"
+                                )
                             }
                         )
                     }
@@ -200,7 +202,8 @@ fun WorkoutScreen(
 fun WorkoutGoalBox(
     navController: NavController,
     dailyGoals: List<WorkoutGoal>,
-    weeklyGoals: List<WorkoutGoal>
+    weeklyGoals: List<WorkoutGoal>,
+    viewModel: WorkoutViewModel
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -215,8 +218,16 @@ fun WorkoutGoalBox(
     ) {
         Text(text = "Workout Goals", fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Text(text = "Your workout goal progress:")
-        WorkoutGoalProgressBar(dailyGoals, WorkoutGoalType.DAILY)
-        WorkoutGoalProgressBar(weeklyGoals, WorkoutGoalType.WEEKLY)
+
+        WorkoutGoalProgressBar(workoutGoal = dailyGoals,
+            goalType = WorkoutGoalType.DAILY,
+            onGoalCompleted = {},
+            onGoalNotCompletedYet = {})
+
+        WorkoutGoalProgressBar(workoutGoal = weeklyGoals,
+            goalType = WorkoutGoalType.WEEKLY,
+            onGoalCompleted = { goal -> viewModel.markGoalAsCompleted(goal) },
+            onGoalNotCompletedYet = { goal -> viewModel.markGoalAsNotCompleted(goal) })
 
         Button(onClick = {
             navController.navigate(Screen.WorkoutGoal.route)
@@ -367,8 +378,11 @@ fun WorkoutGridItem(workout: Enum<*>, navController: NavController) {
 @Composable
 private fun WorkoutGoalProgressBar(
     workoutGoal: List<WorkoutGoal>,
-    goalType: WorkoutGoalType
+    goalType: WorkoutGoalType,
+    onGoalCompleted: (WorkoutGoal) -> Unit,
+    onGoalNotCompletedYet: (WorkoutGoal) -> Unit
 ) {
+
     val completedGoals = workoutGoal.count { it.isCompleted }
     val totalGoals = workoutGoal.size
 
@@ -376,6 +390,14 @@ private fun WorkoutGoalProgressBar(
         if (totalGoals == 0) 0f else completedGoals / totalGoals.toFloat()
 
     val goalTypeText = goalType.toString().lowercase()
+
+    workoutGoal.forEach { goal ->
+        if (goal.currentProgress >= goal.goalFrequency && !goal.isCompleted) {
+            onGoalCompleted(goal)
+        } else if (goal.currentProgress < goal.goalFrequency && goal.isCompleted) {
+            onGoalNotCompletedYet(goal)
+        }
+    }
 
     LinearProgressIndicator(
         progress = { calculatedProgress },

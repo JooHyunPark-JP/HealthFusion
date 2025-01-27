@@ -52,6 +52,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        // Call observeAndUpdateProgress to start observing in ViewModel
+        // and update goal progress in real time
+        workoutViewModel.observeAndUpdateProgress()
+
         setContent {
             connectivityManager =
                 getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
