@@ -14,6 +14,7 @@ import com.example.healthfusion.healthFusionMainFunction.sleepTracking.ui.SleepS
 import com.example.healthfusion.healthFusionMainFunction.sleepTracking.ui.SleepViewModel
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AerobicWorkout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AnaerobicWorkout
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoalType
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutEdit
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutGoalList
@@ -39,30 +40,58 @@ fun NavGraph(
                 dateFormatter = DateFormatter()
             )
         }
+
         composable(Screen.Diet.route) {
             DietScreen(viewModel = dietViewModel)
         }
+
         composable(Screen.Sleep.route) {
             SleepScreen(viewModel = sleepViewModel)
         }
+
         composable(Screen.WorkoutGoal.route) {
             WorkoutGoalScreen(viewModel = workoutViewModel, navController = navController)
         }
+
         composable(Screen.Profile.route) {
             ProfileScreen(loginViewModel = loginViewModel)
         }
-        composable(Screen.WorkoutGoalList.route) {
-            WorkoutGoalList(workoutViewModel = workoutViewModel, navController = navController)
+
+        composable(
+            route = Screen.WorkoutGoalList.route,
+            arguments = listOf(
+                navArgument("goalType") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val goalTypeString = backStackEntry.arguments?.getString("goalType")
+            val goalType = WorkoutGoalType.entries.find { it.name == goalTypeString }
+                ?: throw IllegalArgumentException("Invalid or missing goal type")
+            WorkoutGoalList(
+                workoutViewModel = workoutViewModel,
+                navController = navController,
+                goalType = goalType
+            )
         }
 
         composable(
             route = Screen.WorkoutGoalSetting.route,
             arguments = listOf(
-                navArgument("workoutName") { type = NavType.StringType }
+                navArgument("workoutName") { type = NavType.StringType },
+                navArgument("goalType") { type = NavType.StringType }
             )
         ) { backStackEntry ->
+            val goalTypeString = backStackEntry.arguments?.getString("goalType")
+            val goalType = WorkoutGoalType.entries.find { it.name == goalTypeString }
+                ?: throw IllegalArgumentException("Invalid or missing goal type")
             val workoutName = backStackEntry.arguments?.getString("workoutName")
-            WorkoutGoalSettingScreen(workoutViewModel = workoutViewModel, workoutName)
+                ?: throw IllegalArgumentException("Missing workout name")
+
+            WorkoutGoalSettingScreen(
+                workoutViewModel = workoutViewModel,
+                workoutName = workoutName,
+                goalType = goalType,
+                navController = navController
+            )
         }
 
         composable(

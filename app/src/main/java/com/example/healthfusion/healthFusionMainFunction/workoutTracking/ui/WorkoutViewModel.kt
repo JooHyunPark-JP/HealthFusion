@@ -73,9 +73,26 @@ class WorkoutViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     @OptIn(ExperimentalCoroutinesApi::class)
+     val dailyGoalDetails = _userId.flatMapLatest { uid ->
+        uid?.let { workoutGoalDetailsDao.getGoalsByPeriod(it, "daily") } ?: flowOf(emptyList())
+    }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+     val weeklyGoalDetails = _userId.flatMapLatest { uid ->
+        uid?.let { workoutGoalDetailsDao.getGoalsByPeriod(it, "weekly") } ?: flowOf(emptyList())
+    }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    fun getGoalDetailsByType(goalType: WorkoutGoalType): StateFlow<List<WorkoutGoalDetails>> {
+        return when (goalType) {
+            WorkoutGoalType.DAILY -> dailyGoalDetails
+            WorkoutGoalType.WEEKLY -> weeklyGoalDetails
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
     val workoutGoalDetails: StateFlow<List<WorkoutGoalDetails>> = _userId.flatMapLatest { uid ->
         uid?.let {
-            workoutGoalDetailsDao.getGoalsByPeriod(it, "weekly")
+            workoutGoalDetailsDao.getGoalsByPeriod(it, "daily")
         } ?: flowOf(emptyList())
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
@@ -187,6 +204,24 @@ class WorkoutViewModel @Inject constructor(
                     isCompleted = false,
                     userId = uid,
                     type = WorkoutGoalType.DAILY
+                )
+                workoutGoalDao.insert(newGoal)
+            }
+        }
+    }
+
+    private fun syncWorkoutGoalFromDetails(goalDetails: WorkoutGoalDetails) {
+        viewModelScope.launch {
+            _userId.value?.let { uid ->
+                val text = "Do ${goalDetails.workoutName} ${goalDetails.goalFrequency} times per ${goalDetails.goalPeriod}"
+                val newGoal = WorkoutGoal(
+                    text = text,
+                    isCompleted = false,
+                    userId = uid,
+                    type = if (goalDetails.goalPeriod == "daily") WorkoutGoalType.DAILY else WorkoutGoalType.WEEKLY,
+                    workoutName = goalDetails.workoutName,
+                    goalFrequency = goalDetails.goalFrequency,
+                    currentProgress = goalDetails.currentProgress
                 )
                 workoutGoalDao.insert(newGoal)
             }
@@ -309,10 +344,28 @@ class WorkoutViewModel @Inject constructor(
                     goalPeriod = goalPeriod,
                     userId = uid
                 )
+                /*                try {
+                                    val insertedId = workoutGoalDetailsDao.insert(goalDetail)
+                                    Log.d("InsertResult", "Inserted ID: $insertedId")
+                                } catch (e: Exception) {
+                                    Log.e("InsertError", "Failed to insert goalDetail: ${e.localizedMessage}")
+                                }*/
                 workoutGoalDetailsDao.insert(goalDetail)
+
+                syncWorkoutGoalFromDetails(goalDetail)
             }
         }
     }
+
+
+    /*    @OptIn(ExperimentalCoroutinesApi::class)
+        fun getWorkoutGoalDetailsByType(goalType: WorkoutGoalType): StateFlow<List<WorkoutGoalDetails>> {
+            return _userId.flatMapLatest { uid ->
+                uid?.let {
+                    workoutGoalDetailsDao.getGoalsByPeriod(it, goalType.name.lowercase())
+                } ?: flowOf(emptyList())
+            }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+        }*/
 
     // Fetch goals for a specific workout
     fun getWorkoutGoalDetails(userId: String, workoutName: String): Flow<List<WorkoutGoalDetails>> {
@@ -346,9 +399,14 @@ class WorkoutViewModel @Inject constructor(
 
     private fun getCurrentWeekRange(): Pair<Long, Long> {
         val calendar = Calendar.getInstance()
+        // Set the first day of the week is Monday.
+        calendar.firstDayOfWeek = Calendar.MONDAY
+
+        //Move to first day of the week
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
         val startOfWeek = calendar.timeInMillis
 
+        //move to last day of the week
         calendar.add(Calendar.DAY_OF_WEEK, 6)
         val endOfWeek = calendar.timeInMillis
 
@@ -371,12 +429,15 @@ class WorkoutViewModel @Inject constructor(
                     uid, "weekly", startOfWeek, endOfWeek
                 ).firstOrNull()
 
-                val targetGoal = goalDetails?.find { it.workoutName == workoutName }
+                val targetGoalDetails = goalDetails?.find { it.workoutName == workoutName }
 
-                targetGoal?.let { goal ->
+                targetGoalDetails?.let { goal ->
                     val updatedGoal = goal.copy(currentProgress = completedCount)
                     workoutGoalDetailsDao.update(updatedGoal)
+
                 }
+
+                // TODO: Need to add workoutGoalDao.update too here for goal progression
             }
         }
     }

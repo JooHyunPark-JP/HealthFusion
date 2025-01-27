@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoal
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoalType
 import com.example.healthfusion.healthFusionNav.Screen
 import com.example.healthfusion.ui.theme.HealthFusionTheme
 
@@ -53,8 +54,8 @@ fun WorkoutGoalScreen(viewModel: WorkoutViewModel, navController: NavController)
     val dailyGoals by viewModel.dailyGoals.collectAsState()
     val weeklyGoals by viewModel.weeklyGoals.collectAsState()
 
-
     val tabWorkoutPageTitles = listOf("Daily Goal", "Weekly Goal")
+
 
     var selectedTabIndex by remember { mutableIntStateOf(0) }
 
@@ -80,6 +81,7 @@ fun WorkoutGoalScreen(viewModel: WorkoutViewModel, navController: NavController)
                 WorkoutGoalSection(
                     title = "Daily Goal",
                     goals = dailyGoals,
+                    goalType = WorkoutGoalType.DAILY,
                     onAddGoalClick = { newDailyGoalText ->
                         viewModel.addWorkoutGoal(newDailyGoalText)
                     },
@@ -101,6 +103,7 @@ fun WorkoutGoalScreen(viewModel: WorkoutViewModel, navController: NavController)
                 WorkoutGoalSection(
                     title = "Weekly Goal",
                     goals = weeklyGoals,
+                    goalType = WorkoutGoalType.WEEKLY,
                     onAddGoalClick = { newWeeklyGoalText ->
                         viewModel.addWeeklyGoal(newWeeklyGoalText)
                     },
@@ -127,6 +130,7 @@ fun WorkoutGoalScreen(viewModel: WorkoutViewModel, navController: NavController)
 fun WorkoutGoalSection(
     title: String,
     goals: List<WorkoutGoal>,
+    goalType: WorkoutGoalType,
     onAddGoalClick: (String) -> Unit,
     onGoalClick: (WorkoutGoal) -> Unit,
     onGoalDelete: (WorkoutGoal) -> Unit,
@@ -219,7 +223,7 @@ fun WorkoutGoalSection(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Button(onClick = {
-                        navController.navigate(Screen.WorkoutGoalList.route)
+                        navController.navigate(Screen.WorkoutGoalList.createRoute(goalType))
                         showBottomSheet = false
                     }) {
                         Text("Choose workout and frequency")
@@ -262,10 +266,28 @@ fun GoalItem(
             )
         }
 
-        Text(
-            text = goal.text,
+        /*        Text(
+                    text = goal.text,
+                    modifier = Modifier.weight(1f),
+                )*/
+
+        Column(
             modifier = Modifier.weight(1f),
-        )
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(
+                text = goal.text,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp
+            )
+            if (goal.workoutName.isNotEmpty() && goal.goalFrequency > 0) {
+                Text(
+                    text = "Progress: ${goal.currentProgress}/${goal.goalFrequency}",
+                    fontSize = 14.sp,
+                    color = Color.Gray
+                )
+            }
+        }
 
         IconButton(onClick = { onGoalDelete(goal) }) {
             Icon(Icons.Default.Delete, contentDescription = "Delete Goal")

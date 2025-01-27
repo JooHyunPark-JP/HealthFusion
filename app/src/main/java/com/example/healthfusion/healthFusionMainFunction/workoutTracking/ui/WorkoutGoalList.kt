@@ -21,12 +21,17 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AerobicWorkout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AnaerobicWorkout
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoalType
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
 import com.example.healthfusion.healthFusionNav.Screen
 import com.example.healthfusion.ui.theme.HealthFusionTheme
 
 @Composable
-fun WorkoutGoalList(workoutViewModel: WorkoutViewModel, navController: NavController) {
+fun WorkoutGoalList(
+    workoutViewModel: WorkoutViewModel,
+    navController: NavController,
+    goalType: WorkoutGoalType
+) {
     val workouts by workoutViewModel.workouts.collectAsState()
 
     var selectedTabIndex by remember { mutableIntStateOf(0) }
@@ -40,6 +45,7 @@ fun WorkoutGoalList(workoutViewModel: WorkoutViewModel, navController: NavContro
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+
 
             TabRow(selectedTabIndex = selectedTabIndex) {
                 tabTitles.forEachIndexed { index, title ->
@@ -72,10 +78,14 @@ fun WorkoutGoalList(workoutViewModel: WorkoutViewModel, navController: NavContro
                                 is AnaerobicWorkout -> workout.workoutName
                                 else -> "Unknown Workout"
                             }
-                            navController.navigate(Screen.WorkoutGoalSetting.createRoute(workoutName))
+                            navController.navigate(
+                                Screen.WorkoutGoalSetting.createRoute(
+                                    workoutName,
+                                    goalType
+                                )
+                            )
                         }
                     )
-
                 }
             }
         }

@@ -11,6 +11,11 @@ data class WorkoutGoal(
     var isCompleted: Boolean = false,
     val userId: String = "",
     val type: WorkoutGoalType,
+
+
+    val workoutName: String = "", // Syncing with WorkoutGoalDetails
+    val goalFrequency: Int = 0, // Syncing with WorkoutGoalDetails
+    val currentProgress: Int = 0 // Syncing with WorkoutGoalDetails
     // val createdAt: Long = System.currentTimeMillis()
 
 ) {
