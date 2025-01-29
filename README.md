@@ -1,6 +1,6 @@
 # HealthFusion
 
-HealthFusion is a modern Android application that helps users track and manage their health efficiently. With features such as workout tracking, goal setting, and data visualization, the app empowers users to stay on top of their fitness journey. Built using cutting-edge Android technologies, HealthFusion ensures a seamless experience with real-time data synchronization between local (Room Database) and cloud storage (Firebase Firestore), even when offline.
+HealthFusion is a modern Android application that helps users track and manage their health efficiently. With features such as **workout tracking**, **goal setting**, and **data visualization**, the app empowers users to stay on top of their fitness journey. Built using cutting-edge Android technologies, HealthFusion ensures a seamless experience with real-time data synchronization between local (Room Database) and cloud storage (Firebase Firestore), even offline.
 
 ## Features
 
@@ -8,9 +8,11 @@ HealthFusion is a modern Android application that helps users track and manage t
   - **Aerobic Workouts**: Log exercises like running, cycling, and walking with time, distance, and calories burned.
   - **Anaerobic Workouts**: Track strength-based exercises like push-ups and squats, including sets, repetitions, and weights.
 
-- **Simple Goal Setting**:
-  - Set daily and weekly goals (e.g., "Run 30 minutes daily").
-  - Track goal progress with progress bars.
+- **Goal Setting**:
+  - Create custom daily and weekly goals, like "Run 30 minutes daily" or "Do 50 push-ups weekly."
+  - Create daily and weekly goals that automatically track progress based on workout activity, dynamically updating goals as workouts are completed.
+    - Goals are marked as completed automatically once their target is reached on a daily and weekly basis.
+    - Visual indicators, such as progress bars, make it easy to track progress at a glance.
 
 - **Visualization**:
   - Visualize workout data using a line chart.
