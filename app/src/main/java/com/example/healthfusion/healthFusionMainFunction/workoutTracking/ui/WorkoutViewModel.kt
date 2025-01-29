@@ -364,7 +364,7 @@ class WorkoutViewModel @Inject constructor(
 
     fun addWorkoutGoalDetail(
         workoutName: String,
-        workoutType: WorkoutType,
+    //    workoutType: WorkoutType,
         goalFrequency: Int,
         goalType: WorkoutGoalType
     ) {
@@ -372,7 +372,7 @@ class WorkoutViewModel @Inject constructor(
             _userId.value?.let { uid ->
                 val goalDetail = WorkoutGoalDetails(
                     workoutName = workoutName,
-                    workoutType = workoutType,
+             //       workoutType = workoutType,
                     goalFrequency = goalFrequency,
                     goalType = goalType,
                     userId = uid

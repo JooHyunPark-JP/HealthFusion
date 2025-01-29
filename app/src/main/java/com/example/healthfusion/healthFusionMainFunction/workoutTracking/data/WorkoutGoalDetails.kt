@@ -8,7 +8,7 @@ data class WorkoutGoalDetails(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val workoutName: String,
-    val workoutType: WorkoutType,
+ //   val workoutType: WorkoutType,
     val goalFrequency: Int,
     val goalType: WorkoutGoalType,
     val currentProgress: Int = 0,

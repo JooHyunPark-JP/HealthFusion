@@ -70,7 +70,7 @@ fun WorkoutGoalSettingScreen(
             Button(onClick = {
                 workoutViewModel.addWorkoutGoalDetail(
                     workoutName = workoutName ?: "Workout name error",
-                    workoutType = WorkoutType.AEROBIC, // TODO: for now just aerobic... doesnt really need for now.
+                   // workoutType = WorkoutType.AEROBIC, //  doesnt really need for now.
                     goalFrequency = goalFrequency.toIntOrNull() ?: 0,
                     goalType = goalType
                 )
