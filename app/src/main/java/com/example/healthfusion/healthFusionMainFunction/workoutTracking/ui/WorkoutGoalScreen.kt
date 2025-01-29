@@ -16,11 +16,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -38,18 +41,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoal
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutGoalType
+import com.example.healthfusion.healthFusionNav.Screen
 import com.example.healthfusion.ui.theme.HealthFusionTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
-fun WorkoutGoalScreen(viewModel: WorkoutViewModel) {
+fun WorkoutGoalScreen(viewModel: WorkoutViewModel, navController: NavController) {
 
     val dailyGoals by viewModel.dailyGoals.collectAsState()
     val weeklyGoals by viewModel.weeklyGoals.collectAsState()
 
-
     val tabWorkoutPageTitles = listOf("Daily Goal", "Weekly Goal")
+
 
     var selectedTabIndex by remember { mutableIntStateOf(0) }
 
@@ -75,6 +81,7 @@ fun WorkoutGoalScreen(viewModel: WorkoutViewModel) {
                 WorkoutGoalSection(
                     title = "Daily Goal",
                     goals = dailyGoals,
+                    goalType = WorkoutGoalType.DAILY,
                     onAddGoalClick = { newDailyGoalText ->
                         viewModel.addWorkoutGoal(newDailyGoalText)
                     },
@@ -84,6 +91,13 @@ fun WorkoutGoalScreen(viewModel: WorkoutViewModel) {
                     },
                     onGoalDelete = { workoutGoal ->
                         viewModel.deleteWorkoutGoal(workoutGoal)
+                    },
+                    navController = navController,
+                    onGoalCompleted = { goal ->
+                        viewModel.markGoalAsCompleted(goal)
+                    },
+                    onGoalNotCompletedYet = { goal ->
+                        viewModel.markGoalAsNotCompleted(goal)
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -95,6 +109,7 @@ fun WorkoutGoalScreen(viewModel: WorkoutViewModel) {
                 WorkoutGoalSection(
                     title = "Weekly Goal",
                     goals = weeklyGoals,
+                    goalType = WorkoutGoalType.WEEKLY,
                     onAddGoalClick = { newWeeklyGoalText ->
                         viewModel.addWeeklyGoal(newWeeklyGoalText)
                     },
@@ -104,6 +119,14 @@ fun WorkoutGoalScreen(viewModel: WorkoutViewModel) {
                     },
                     onGoalDelete = { workoutGoal ->
                         viewModel.deleteWorkoutGoal(workoutGoal)
+                    },
+                    navController = navController,
+
+                    onGoalCompleted = { goal ->
+                        viewModel.markGoalAsCompleted(goal)
+                    },
+                    onGoalNotCompletedYet = { goal ->
+                        viewModel.markGoalAsNotCompleted(goal)
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -115,19 +138,26 @@ fun WorkoutGoalScreen(viewModel: WorkoutViewModel) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutGoalSection(
     title: String,
     goals: List<WorkoutGoal>,
+    goalType: WorkoutGoalType,
     onAddGoalClick: (String) -> Unit,
     onGoalClick: (WorkoutGoal) -> Unit,
     onGoalDelete: (WorkoutGoal) -> Unit,
+    onGoalCompleted: (WorkoutGoal) -> Unit,
+    onGoalNotCompletedYet: (WorkoutGoal) -> Unit,
+    navController: NavController,
     modifier: Modifier = Modifier
 ) {
 
     var showDialog by rememberSaveable { mutableStateOf(false) }
     val completedGoals = goals.count { it.isCompleted }
     val totalGoals = goals.size
+
+    var showBottomSheet by remember { mutableStateOf(false) }
 
 
     Box(
@@ -160,19 +190,54 @@ fun WorkoutGoalSection(
                     GoalItem(
                         goal = goal,
                         onGoalClick = onGoalClick,
-                        onGoalDelete = onGoalDelete
+                        onGoalDelete = onGoalDelete,
+                        onGoalCompleted = onGoalCompleted,
+                        onGoalNotCompletedYet = onGoalNotCompletedYet
                     )
                 }
             }
         }
 
         FloatingActionButton(
-            onClick = { showDialog = true },
+            onClick = { showBottomSheet = true },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp)
         ) {
             Icon(Icons.Default.Add, contentDescription = "Add Goal")
+        }
+
+        if (showBottomSheet) {
+            ModalBottomSheet(
+                onDismissRequest = { showBottomSheet = false }
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text("Choose an option:", style = MaterialTheme.typography.bodyLarge)
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Button(onClick = {
+                        // Custom goal logic
+                        showBottomSheet = false
+                        showDialog = true
+                    }) {
+                        Text("Write a custom goal")
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Button(onClick = {
+                        navController.navigate(Screen.WorkoutGoalList.createRoute(goalType))
+                        showBottomSheet = false
+                    }) {
+                        Text("Choose workout and frequency")
+                    }
+                }
+            }
         }
 
         if (showDialog) {
@@ -189,14 +254,20 @@ fun WorkoutGoalSection(
 fun GoalItem(
     goal: WorkoutGoal,
     onGoalClick: (WorkoutGoal) -> Unit,
-    onGoalDelete: (WorkoutGoal) -> Unit
+    onGoalDelete: (WorkoutGoal) -> Unit,
+    onGoalCompleted: (WorkoutGoal) -> Unit,
+    onGoalNotCompletedYet: (WorkoutGoal) -> Unit
 ) {
+    val isAutoManaged = goal.workoutName.isNotEmpty() && goal.goalFrequency > 0
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 4.dp)
             .background(if (goal.isCompleted) Color.Gray else Color.Transparent)
-            .clickable { onGoalClick(goal) }
+            .then(
+                if (!isAutoManaged) Modifier.clickable { onGoalClick(goal) }
+                else Modifier
+            )
             .padding(4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -209,10 +280,31 @@ fun GoalItem(
             )
         }
 
-        Text(
-            text = goal.text,
+        Column(
             modifier = Modifier.weight(1f),
-        )
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+
+            Text(
+                text = goal.text,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp
+            )
+            if (isAutoManaged) {
+                Text(
+                    text = "Progress: ${goal.currentProgress}/${goal.goalFrequency}",
+                    fontSize = 14.sp,
+                    color = Color.Gray
+                )
+                if (goal.goalFrequency <= goal.currentProgress && !goal.isCompleted) {
+                    onGoalCompleted(goal)
+                } else if (goal.goalFrequency > goal.currentProgress && goal.isCompleted) {
+                    onGoalNotCompletedYet(goal)
+                }
+
+            }
+
+        }
 
         IconButton(onClick = { onGoalDelete(goal) }) {
             Icon(Icons.Default.Delete, contentDescription = "Delete Goal")

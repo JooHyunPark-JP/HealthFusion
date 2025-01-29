@@ -190,6 +190,8 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
                         "New $displayName data has been created!",
                         Toast.LENGTH_LONG
                     ).show()
+                    //    viewModel.updateCurrentProgress(displayName)
+                    //  viewModel.observeAndUpdateProgress()
                 },
                 modifier = Modifier
                     .fillMaxWidth()
