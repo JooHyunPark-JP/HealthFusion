@@ -40,13 +40,13 @@ interface WorkoutDao {
     @Query(
         """
     SELECT * FROM workout_table 
-    WHERE userId = :userId AND workoutDate BETWEEN :startOfWeek AND :endOfWeek
+    WHERE userId = :userId AND workoutDate BETWEEN :startTime AND :endTime
 """
     )
     fun getWorkoutsByDateRange(
         userId: String,
-        startOfWeek: Long,
-        endOfWeek: Long
+        startTime: Long,
+        endTime: Long
     ): Flow<List<Workout>>
 
 }

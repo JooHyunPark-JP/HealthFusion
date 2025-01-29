@@ -93,8 +93,12 @@ fun WorkoutGoalScreen(viewModel: WorkoutViewModel, navController: NavController)
                         viewModel.deleteWorkoutGoal(workoutGoal)
                     },
                     navController = navController,
-                    onGoalCompleted = {},
-                    onGoalNotCompletedYet = {},
+                    onGoalCompleted = { goal ->
+                        viewModel.markGoalAsCompleted(goal)
+                    },
+                    onGoalNotCompletedYet = { goal ->
+                        viewModel.markGoalAsNotCompleted(goal)
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
@@ -281,22 +285,22 @@ fun GoalItem(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
 
+            Text(
+                text = goal.text,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp
+            )
+            if (isAutoManaged) {
                 Text(
-                    text = goal.text,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                    text = "Progress: ${goal.currentProgress}/${goal.goalFrequency}",
+                    fontSize = 14.sp,
+                    color = Color.Gray
                 )
-                if (isAutoManaged) {
-                    Text(
-                        text = "Progress: ${goal.currentProgress}/${goal.goalFrequency}",
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
-                    if (goal.goalFrequency <= goal.currentProgress && !goal.isCompleted) {
-                        onGoalCompleted(goal)
-                    } else if (goal.goalFrequency > goal.currentProgress && goal.isCompleted) {
-                        onGoalNotCompletedYet(goal)
-                    }
+                if (goal.goalFrequency <= goal.currentProgress && !goal.isCompleted) {
+                    onGoalCompleted(goal)
+                } else if (goal.goalFrequency > goal.currentProgress && goal.isCompleted) {
+                    onGoalNotCompletedYet(goal)
+                }
 
             }
 

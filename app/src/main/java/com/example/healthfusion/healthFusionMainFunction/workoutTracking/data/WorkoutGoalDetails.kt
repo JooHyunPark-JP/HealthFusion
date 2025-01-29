@@ -10,7 +10,7 @@ data class WorkoutGoalDetails(
     val workoutName: String,
     val workoutType: WorkoutType,
     val goalFrequency: Int,
-    val goalPeriod: String,
+    val goalType: WorkoutGoalType,
     val currentProgress: Int = 0,
     val userId: String,
     val createdAt: Long = System.currentTimeMillis()

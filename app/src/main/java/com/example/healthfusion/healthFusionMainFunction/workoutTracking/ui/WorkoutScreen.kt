@@ -221,8 +221,8 @@ fun WorkoutGoalBox(
 
         WorkoutGoalProgressBar(workoutGoal = dailyGoals,
             goalType = WorkoutGoalType.DAILY,
-            onGoalCompleted = {},
-            onGoalNotCompletedYet = {})
+            onGoalCompleted = { goal -> viewModel.markGoalAsCompleted(goal) },
+            onGoalNotCompletedYet = { goal -> viewModel.markGoalAsNotCompleted(goal) })
 
         WorkoutGoalProgressBar(workoutGoal = weeklyGoals,
             goalType = WorkoutGoalType.WEEKLY,
@@ -391,11 +391,14 @@ private fun WorkoutGoalProgressBar(
 
     val goalTypeText = goalType.toString().lowercase()
 
+
     workoutGoal.forEach { goal ->
-        if (goal.currentProgress >= goal.goalFrequency && !goal.isCompleted) {
-            onGoalCompleted(goal)
-        } else if (goal.currentProgress < goal.goalFrequency && goal.isCompleted) {
-            onGoalNotCompletedYet(goal)
+        if (goal.workoutName.isNotEmpty() && goal.goalFrequency > 0) {
+            if (goal.currentProgress >= goal.goalFrequency && !goal.isCompleted) {
+                onGoalCompleted(goal)
+            } else if (goal.currentProgress < goal.goalFrequency && goal.isCompleted) {
+                onGoalNotCompletedYet(goal)
+            }
         }
     }
 

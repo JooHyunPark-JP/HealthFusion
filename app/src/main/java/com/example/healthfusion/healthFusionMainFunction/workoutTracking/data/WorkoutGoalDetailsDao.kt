@@ -20,22 +20,25 @@ interface WorkoutGoalDetailsDao {
     @Query("SELECT * FROM workout_goal_details WHERE userId = :userId AND workoutName = :workoutName")
     fun getWorkoutGoalDetails(userId: String, workoutName: String): Flow<List<WorkoutGoalDetails>>
 
-    @Query("SELECT * FROM workout_goal_details WHERE userId = :userId AND goalPeriod = :goalPeriod")
-    fun getGoalsByPeriod(userId: String, goalPeriod: String): Flow<List<WorkoutGoalDetails>>
+    @Query("SELECT * FROM workout_goal_details WHERE userId = :userId AND goalType = :goalType")
+    fun getGoalsByPeriod(userId: String, goalType: WorkoutGoalType): Flow<List<WorkoutGoalDetails>>
 
     @Query(
         """
     SELECT * FROM workout_goal_details 
-    WHERE userId = :userId AND goalPeriod = :goalPeriod 
+    WHERE userId = :userId AND goalType = :goalType 
     AND :startOfWeek <= createdAt AND createdAt <= :endOfWeek
 """
     )
     fun getGoalsByPeriodAndTimeRange(
         userId: String,
-        goalPeriod: String,
+        goalType: String,
         startOfWeek: Long,
         endOfWeek: Long
     ): Flow<List<WorkoutGoalDetails>>
+
+    @Query("SELECT * FROM workout_goal_details WHERE userId = :userId AND goalType = :goalType")
+    fun getGoalsByType(userId: String, goalType: WorkoutGoalType): Flow<List<WorkoutGoalDetails>>
 
 
     @Delete

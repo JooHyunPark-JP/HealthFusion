@@ -35,17 +35,15 @@ fun WorkoutGoalSettingScreen(
     navController: NavController,
     goalType: WorkoutGoalType
 ) {
-    //val workoutGoalDetails by workoutViewModel.workoutGoalDetails.collectAsState()
 
     val workoutGoalDetails by workoutViewModel.getGoalDetailsByType(goalType).collectAsState()
 
     var goalFrequency by remember { mutableStateOf("") }
 
-    //  val currentWeekGoals by workoutViewModel.currentWeekGoals.collectAsState()
 
     // Check if the workoutName and goalType combination already exists
     val isGoalAlreadySet = workoutGoalDetails.any {
-        it.workoutName == workoutName && it.goalPeriod == goalType.name.lowercase()
+        it.workoutName == workoutName && it.goalType == goalType
     }
 
     HealthFusionTheme {
@@ -72,11 +70,12 @@ fun WorkoutGoalSettingScreen(
             Button(onClick = {
                 workoutViewModel.addWorkoutGoalDetail(
                     workoutName = workoutName ?: "Workout name error",
-                    workoutType = WorkoutType.AEROBIC, // for now just aerobic
+                    workoutType = WorkoutType.AEROBIC, // TODO: for now just aerobic... doesnt really need for now.
                     goalFrequency = goalFrequency.toIntOrNull() ?: 0,
-                    goalPeriod = goalType.name.lowercase()
+                    goalType = goalType
                 )
 
+                //GO back to workoutGoal screen (two stacks popup)
                 navController.navigate(Screen.WorkoutGoal.route) {
                     popUpTo(Screen.WorkoutGoalList.route) { inclusive = true }
                 }
@@ -101,7 +100,7 @@ fun WorkoutGoalSettingScreen(
             ) {
                 items(filteredGoals) { goal ->
                     Text(
-                        text = "Goal: ${goal.goalFrequency} times (Progress: ${goal.currentProgress}), period: ${goal.goalPeriod}",
+                        text = "Goal: ${goal.goalFrequency} times (Progress: ${goal.currentProgress}), period: ${goal.goalType.name.lowercase()}",
                         fontSize = 16.sp
                     )
                 }
