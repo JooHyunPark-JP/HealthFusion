@@ -1,6 +1,6 @@
 # HealthFusion
 
-HealthFusion helps users track and manage their health efficiently. With features such as **workout tracking**, **goal setting**, and **data visualization**. HealthFusion ensures a seamless experience with real-time data synchronization between local (Room Database) and cloud storage (Firebase Firestore), even offline.
+HealthFusion helps users track and manage their health efficiently. With features such as **workout tracking**, **goal setting**, and **data visualization**.
 
 ## Features
 
