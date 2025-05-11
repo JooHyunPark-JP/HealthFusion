@@ -11,9 +11,7 @@ HealthFusion helps users track and manage their health efficiently, With feature
 - **Goal Setting**:
   - Create custom daily and weekly goals, like "Run 30 minutes daily" or "Do 50 push-ups weekly."
   - Create daily and weekly goals that automatically track progress based on workout activity, dynamically updating goals as workouts are completed.
-    - Goals are marked as completed automatically once their target is reached on a daily and weekly basis.
-    - Visual indicators, such as progress bars, make it easy to track progress at a glance.
-
+    
 - **Visualization**:
   - Visualize workout data using a line chart.
   - A calendar view allows users to check each workout’s date easily.
