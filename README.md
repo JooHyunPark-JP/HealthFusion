@@ -1,6 +1,6 @@
 # HealthFusion
 
-HealthFusion is a modern Android application that helps users track and manage their health efficiently. With features such as **workout tracking**, **goal setting**, and **data visualization**. HealthFusion ensures a seamless experience with real-time data synchronization between local (Room Database) and cloud storage (Firebase Firestore), even offline.
+HealthFusion helps users track and manage their health efficiently. With features such as **workout tracking**, **goal setting**, and **data visualization**. HealthFusion ensures a seamless experience with real-time data synchronization between local (Room Database) and cloud storage (Firebase Firestore), even offline.
 
 ## Features
 
@@ -88,8 +88,7 @@ To secure your Firestore database, configure Firestore Security Rules as follows
 
 
 ## Future Features
-- **More workout options**: Different options (eg: Timer, time [minute or hour], distance [km or m])
-- **Diet Tracking**: Log meals and monitor calorie intake.
+- ~~**More workout options**: Different options (eg: Timer, time [minute or hour], distance [km or m])~~
 - **Sleep Tracking**: Track sleep patterns and quality.
 - **Push Notifications**: Get workouts, meals, and sleep reminders.
 - **User Profile Management**: Manage personal health goals.
