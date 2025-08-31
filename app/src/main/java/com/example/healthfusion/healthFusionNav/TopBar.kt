@@ -32,19 +32,19 @@ fun TopBar(navController: NavHostController) {
             )
         }
 
-        currentDestination == Screen.Diet.route -> {
-            CenterAlignedTopAppBar(
-                title = { Text("Diet") },
-                colors = topBarColors
-            )
-        }
+        /*        currentDestination == Screen.Diet.route -> {
+                    CenterAlignedTopAppBar(
+                        title = { Text("Diet") },
+                        colors = topBarColors
+                    )
+                }
 
-        currentDestination == Screen.Sleep.route -> {
-            CenterAlignedTopAppBar(
-                title = { Text("Sleep") },
-                colors = topBarColors
-            )
-        }
+                currentDestination == Screen.Sleep.route -> {
+                    CenterAlignedTopAppBar(
+                        title = { Text("Sleep") },
+                        colors = topBarColors
+                    )
+                }*/
 
         currentDestination == Screen.WorkoutGoal.route -> {
             CenterAlignedTopAppBar(

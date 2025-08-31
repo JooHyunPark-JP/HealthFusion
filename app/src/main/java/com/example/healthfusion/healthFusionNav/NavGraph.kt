@@ -6,11 +6,9 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.healthfusion.healthFusionMainFunction.dietTracking.ui.DietScreen
 import com.example.healthfusion.healthFusionMainFunction.dietTracking.ui.DietViewModel
 import com.example.healthfusion.healthFusionMainFunction.login.ui.LoginViewModel
 import com.example.healthfusion.healthFusionMainFunction.profile.ui.ProfileScreen
-import com.example.healthfusion.healthFusionMainFunction.sleepTracking.ui.SleepScreen
 import com.example.healthfusion.healthFusionMainFunction.sleepTracking.ui.SleepViewModel
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AerobicWorkout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AnaerobicWorkout
@@ -41,13 +39,13 @@ fun NavGraph(
             )
         }
 
-        composable(Screen.Diet.route) {
-            DietScreen(viewModel = dietViewModel)
-        }
+        /*        composable(Screen.Diet.route) {
+                    DietScreen(viewModel = dietViewModel)
+                }
 
-        composable(Screen.Sleep.route) {
-            SleepScreen(viewModel = sleepViewModel)
-        }
+                composable(Screen.Sleep.route) {
+                    SleepScreen(viewModel = sleepViewModel)
+                }*/
 
         composable(Screen.WorkoutGoal.route) {
             WorkoutGoalScreen(viewModel = workoutViewModel, navController = navController)

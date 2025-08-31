@@ -8,6 +8,9 @@ plugins {
     alias(libs.plugins.googleService)
 }
 
+val KEYSTORE_PASSWORD: String by project
+val KEY_PASSWORD: String by project
+
 android {
     namespace = "com.example.healthfusion"
     compileSdk = 34
@@ -25,9 +28,21 @@ android {
         }
     }
 
+
+    signingConfigs {
+        create("release") {
+            storeFile = file("./keystore/nearbynote-release.jks")
+            storePassword = KEYSTORE_PASSWORD
+            keyAlias = "nearbynote"
+            keyPassword = KEY_PASSWORD
+        }
+    }
+
     buildTypes {
-        release {
-            isMinifyEnabled = false
+        getByName("release") {
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -43,6 +58,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"

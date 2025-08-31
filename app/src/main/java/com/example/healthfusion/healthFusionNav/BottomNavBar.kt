@@ -16,8 +16,8 @@ import com.example.healthfusion.R
 fun BottomNavBar(navController: NavController) {
     val items = listOf(
         Screen.Workout,
-        Screen.Diet,
-        Screen.Sleep,
+        /*        Screen.Diet,
+                Screen.Sleep,*/
         Screen.Profile,
     )
     NavigationBar(
@@ -35,15 +35,15 @@ fun BottomNavBar(navController: NavController) {
                             contentDescription = null
                         )
 
-                        is Screen.Diet -> Icon(
-                            painterResource(id = R.drawable.ic_food),
-                            contentDescription = null
-                        )
+                        /*                        is Screen.Diet -> Icon(
+                                                    painterResource(id = R.drawable.ic_food),
+                                                    contentDescription = null
+                                                )
 
-                        is Screen.Sleep -> Icon(
-                            painterResource(id = R.drawable.ic_sleep),
-                            contentDescription = null
-                        )
+                                                is Screen.Sleep -> Icon(
+                                                    painterResource(id = R.drawable.ic_sleep),
+                                                    contentDescription = null
+                                                )*/
 
                         is Screen.Profile -> Icon(
                             painterResource(id = R.drawable.ic_profile),
