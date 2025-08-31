@@ -1,6 +1,5 @@
 # HealthFusion
 
-HealthFusion helps users track and manage their health efficiently, With features such as **workout tracking**, **goal setting**, and **data visualization**.
 
 ## Features
 
