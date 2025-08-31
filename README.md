@@ -1,3 +1,4 @@
+
 # HealthFusion
 
 [**Download APK (Latest)**](../../releases/latest)
@@ -5,6 +6,8 @@
 HealthFusion is an Android app that tracks and manages workouts and goals with an offline-first architecture.  
 Data is stored locally (in the Room) and synchronized to Firebase Firestore when connectivity is available.
 
+## Screenshots
+<img src="./image/image1.png" alt="Example Image" width="200"/> <img src="./image/image2.png" alt="Example Image" width="200"/> <img src="./image/image5.png" alt="Example Image" width="200"/> <img src="./image/image3.png" alt="Example Image" width="200"/> <img src="./image/image6.png" alt="Example Image" width="200"/>
 
 ## Features
 
@@ -33,11 +36,6 @@ Data is stored locally (in the Room) and synchronized to Firebase Firestore when
 - **Firebase Authentication**: User authentication.
 - **Coroutines + Flow**: Asynchronous programming.
 - **Build:** Gradle (Kotlin DSL), KSP
-
-
-## Screenshots
-<img src="./image/image1.png" alt="Example Image" width="200"/> <img src="./image/image2.png" alt="Example Image" width="200"/> <img src="./image/image5.png" alt="Example Image" width="200"/> <img src="./image/image3.png" alt="Example Image" width="200"/> <img src="./image/image6.png" alt="Example Image" width="200"/>
-
 
 ## License
 Distributed under the MIT License. See LICENSE for more information.
