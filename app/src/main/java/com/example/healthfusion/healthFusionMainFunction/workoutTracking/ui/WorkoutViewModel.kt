@@ -348,6 +348,8 @@ class WorkoutViewModel @Inject constructor(
 
 
     fun setUserId(uid: String?) {
+        if (_userId.value == uid) return
+
         _userId.value = uid
 
         // Trigger syncing once the userId is set
