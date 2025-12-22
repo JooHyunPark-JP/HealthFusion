@@ -1,13 +1,13 @@
-package com.example.healthfusion.healthFusionMainFunction.dietTracking.ui
+package com.example.healthfusion.experimental.dietTracking.ui
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.healthfusion.healthFusionData.fireStore.FirestoreRepository
-import com.example.healthfusion.healthFusionMainFunction.dietTracking.data.Diet
-import com.example.healthfusion.healthFusionMainFunction.dietTracking.data.DietDao
-import com.example.healthfusion.healthFusionMainFunction.dietTracking.data.toDTO
-import com.example.healthfusion.healthFusionMainFunction.dietTracking.data.toEntity
+import com.example.healthfusion.experimental.dietTracking.data.Diet
+import com.example.healthfusion.experimental.dietTracking.data.DietDao
+import com.example.healthfusion.experimental.dietTracking.data.toDTO
+import com.example.healthfusion.experimental.dietTracking.data.toEntity
 import com.example.healthfusion.util.DateFormatter
 import com.example.healthfusion.util.NetworkHelper
 import dagger.hilt.android.lifecycle.HiltViewModel

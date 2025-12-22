@@ -1,9 +1,9 @@
 package com.example.healthfusion.healthFusionData.fireStore
 
 import android.util.Log
-import com.example.healthfusion.healthFusionMainFunction.dietTracking.data.DietDTO
+import com.example.healthfusion.experimental.dietTracking.data.DietDTO
 import com.example.healthfusion.healthFusionMainFunction.login.data.User
-import com.example.healthfusion.healthFusionMainFunction.sleepTracking.data.SleepDTO
+import com.example.healthfusion.experimental.sleepTracking.data.SleepDTO
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutDTO
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore

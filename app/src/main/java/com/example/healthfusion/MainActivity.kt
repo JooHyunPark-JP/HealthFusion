@@ -19,11 +19,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import com.example.healthfusion.healthFusionMainFunction.dietTracking.ui.DietViewModel
 import com.example.healthfusion.healthFusionMainFunction.login.navigator.AuthNavGraph
 import com.example.healthfusion.healthFusionMainFunction.login.ui.LoginViewModel
 import com.example.healthfusion.healthFusionMainFunction.login.ui.SignUpViewModel
-import com.example.healthfusion.healthFusionMainFunction.sleepTracking.ui.SleepViewModel
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.WorkoutViewModel
 import com.example.healthfusion.healthFusionNav.BottomNavBar
 import com.example.healthfusion.healthFusionNav.NavGraph
@@ -38,8 +36,6 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
 
     private val workoutViewModel: WorkoutViewModel by viewModels()
-    private val dietViewModel: DietViewModel by viewModels()
-    private val sleepViewModel: SleepViewModel by viewModels()
     private val loginViewModel: LoginViewModel by viewModels()
     private val signUpViewModel: SignUpViewModel by viewModels()
     private lateinit var networkCallback: NetworkCallback
@@ -96,7 +92,8 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                Scaffold(modifier = Modifier.fillMaxSize(),
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
                     topBar = {
                         TopBar(navController)
                     },
@@ -117,14 +114,10 @@ class MainActivity : ComponentActivity() {
 
                             // Set user ID and let the ViewModel handle syncing
                             workoutViewModel.setUserId(currentUserUid)
-                            dietViewModel.setUserId(currentUserUid)
-                            sleepViewModel.setUserId(currentUserUid)
 
                             NavGraph(
                                 navController = navController,
                                 workoutViewModel = workoutViewModel,
-                                dietViewModel = dietViewModel,
-                                sleepViewModel = sleepViewModel,
                                 loginViewModel = loginViewModel
                             )
                         } else {
@@ -143,10 +136,6 @@ class MainActivity : ComponentActivity() {
     private fun syncRoomDatabaseAndFirestoreData() {
         workoutViewModel.syncUnsyncedWorkouts()
         workoutViewModel.syncWorkoutsFromFirestore()
-        sleepViewModel.syncUnsyncedSleepRecords()
-        sleepViewModel.syncSleepsFromFirestore()
-        dietViewModel.syncUnsyncedDiets()
-        dietViewModel.syncDietFromFirestore()
     }
 
     override fun onDestroy() {
