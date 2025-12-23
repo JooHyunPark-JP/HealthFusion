@@ -10,8 +10,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -46,7 +49,13 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-
+enum class WorkoutRange {
+    ONE_MONTH,
+    TWO_MONTH,
+    THREE_MONTHS,
+    SIX_MONTHS,
+    ALL
+}
 @Composable
 fun WorkoutHistoryScreen(
     viewModel: WorkoutViewModel,
@@ -54,6 +63,21 @@ fun WorkoutHistoryScreen(
     modifier: Modifier = Modifier
 ) {
     val workouts by viewModel.workouts.collectAsState()
+
+    var selectedWorkoutNameFilter by remember { mutableStateOf<String?>(null) }
+
+    val workoutTypeChips = remember(workouts) {
+        workouts
+            .groupBy { it.name }
+            .mapNotNull { (name, list) ->
+                val lastDate = list.maxOfOrNull { it.workoutDate }
+                // name: String, lastDate: Long
+                lastDate?.let { name to it }
+            }
+            .sortedByDescending { (_, lastDate) -> lastDate }
+    }
+
+    var selectedRange by remember { mutableStateOf(WorkoutRange.THREE_MONTHS) }
 
     var selectedAerobicWorkout by remember { mutableStateOf<Workout?>(null) }
     var selectedAnaerobicWorkout by remember { mutableStateOf<Workout?>(null) }
@@ -71,12 +95,105 @@ fun WorkoutHistoryScreen(
 
     Column(modifier = Modifier.padding(16.dp)) {
 
+        val now = System.currentTimeMillis()
+        val oneMonthMillis = 30L * 24 * 60 * 60 * 1000
+        val twoMonthMillis = 60L * 24 * 60 * 60 * 1000
+        val threeMonthMillis = 90L * 24 * 60 * 60 * 1000
+        val sixMonthMillis = 180L * 24 * 60 * 60 * 1000
+
         val filteredWorkouts = workouts.filter { workout ->
+
+            val inRange = when (selectedRange) {
+                WorkoutRange.ALL -> true
+                WorkoutRange.ONE_MONTH ->
+                    workout.workoutDate >= now - oneMonthMillis
+                WorkoutRange.TWO_MONTH ->
+                    workout.workoutDate >= now - twoMonthMillis
+                WorkoutRange.THREE_MONTHS ->
+                    workout.workoutDate >= now - threeMonthMillis
+                WorkoutRange.SIX_MONTHS ->
+                    workout.workoutDate >= now - sixMonthMillis
+            }
+
+            inRange &&
             (selectedAerobicWorkout == null || workout.name == selectedAerobicWorkout?.name) &&
-                    (selectedAnaerobicWorkout == null || workout.name == selectedAnaerobicWorkout?.name)
+                    (selectedAnaerobicWorkout == null || workout.name == selectedAnaerobicWorkout?.name) &&
+                    (selectedWorkoutNameFilter == null || workout.name == selectedWorkoutNameFilter)
         }
 
+        if (workoutTypeChips.isNotEmpty()) {
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
+                item {
+                    FilterChip(
+                        selected = selectedWorkoutNameFilter == null,
+                        onClick = { selectedWorkoutNameFilter = null },
+                        label = { Text("All") }
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
 
+                items(workoutTypeChips) { (name, _) ->
+                    val isSelected = selectedWorkoutNameFilter == name
+                    FilterChip(
+                        selected = isSelected,
+                        onClick = {
+                            selectedWorkoutNameFilter =
+                                if (isSelected) null else name
+                        },
+                        label = { Text(name.replace("_", " ")) }
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
+            }
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+        ) {
+            // 1 Month
+            FilterChip(
+                selected = selectedRange == WorkoutRange.ONE_MONTH,
+                onClick = { selectedRange = WorkoutRange.ONE_MONTH },
+                label = { Text("1M") }
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+
+            // 2 Months
+            FilterChip(
+                selected = selectedRange == WorkoutRange.TWO_MONTH,
+                onClick = { selectedRange = WorkoutRange.TWO_MONTH },
+                label = { Text("2M") }
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            // 3 Months
+            FilterChip(
+                selected = selectedRange == WorkoutRange.THREE_MONTHS,
+                onClick = { selectedRange = WorkoutRange.THREE_MONTHS },
+                label = { Text("3M") }
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+
+            // 6 Months
+            FilterChip(
+                selected = selectedRange == WorkoutRange.SIX_MONTHS,
+                onClick = { selectedRange = WorkoutRange.SIX_MONTHS },
+                label = { Text("6M") }
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+
+            // All
+            FilterChip(
+                selected = selectedRange == WorkoutRange.ALL,
+                onClick = { selectedRange = WorkoutRange.ALL },
+                label = { Text("All") }
+            )
+        }
 
         if (selectedAerobicWorkout != null) {
             TabRow(selectedTabIndex = aerobicWorkoutTabIndex) {
@@ -339,7 +456,7 @@ fun AerobicLineChart(
                     color = SolidColor(Color(0xFF23af92)),
                     curvedEdges = true,
                     dotProperties = DotProperties(
-                        enabled = true,
+                        enabled = false,
                         color = SolidColor(Color.White),
                         strokeWidth = 3.dp,
                         radius = 5.dp,
