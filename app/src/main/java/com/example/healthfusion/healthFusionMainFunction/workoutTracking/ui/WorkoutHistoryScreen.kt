@@ -1,5 +1,6 @@
 package com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,6 +21,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -56,6 +58,7 @@ enum class WorkoutRange {
     SIX_MONTHS,
     ALL
 }
+
 @Composable
 fun WorkoutHistoryScreen(
     viewModel: WorkoutViewModel,
@@ -77,14 +80,13 @@ fun WorkoutHistoryScreen(
             .sortedByDescending { (_, lastDate) -> lastDate }
     }
 
-    var selectedRange by remember { mutableStateOf(WorkoutRange.THREE_MONTHS) }
+    var selectedRange by remember { mutableStateOf(WorkoutRange.ALL) }
 
     var selectedAerobicWorkout by remember { mutableStateOf<Workout?>(null) }
     var selectedAnaerobicWorkout by remember { mutableStateOf<Workout?>(null) }
     var expandedAerobic by remember { mutableStateOf(false) }
     var expandedAnaerobic by remember { mutableStateOf(false) }
     var selectedDetailOption by remember { mutableStateOf<String?>(null) }
-    var expandedDetailOptions by remember { mutableStateOf(false) }
 
     var aerobicWorkoutTabIndex by remember { mutableIntStateOf(0) }
     val tabWorkoutPageTitles = listOf("Line Chart", "Workout List")
@@ -107,16 +109,19 @@ fun WorkoutHistoryScreen(
                 WorkoutRange.ALL -> true
                 WorkoutRange.ONE_MONTH ->
                     workout.workoutDate >= now - oneMonthMillis
+
                 WorkoutRange.TWO_MONTH ->
                     workout.workoutDate >= now - twoMonthMillis
+
                 WorkoutRange.THREE_MONTHS ->
                     workout.workoutDate >= now - threeMonthMillis
+
                 WorkoutRange.SIX_MONTHS ->
                     workout.workoutDate >= now - sixMonthMillis
             }
 
             inRange &&
-            (selectedAerobicWorkout == null || workout.name == selectedAerobicWorkout?.name) &&
+                    (selectedAerobicWorkout == null || workout.name == selectedAerobicWorkout?.name) &&
                     (selectedAnaerobicWorkout == null || workout.name == selectedAnaerobicWorkout?.name) &&
                     (selectedWorkoutNameFilter == null || workout.name == selectedWorkoutNameFilter)
         }
@@ -130,7 +135,11 @@ fun WorkoutHistoryScreen(
                 item {
                     FilterChip(
                         selected = selectedWorkoutNameFilter == null,
-                        onClick = { selectedWorkoutNameFilter = null },
+                        onClick = {
+                            selectedWorkoutNameFilter = null
+                            selectedAerobicWorkout = null
+                            selectedDetailOption = null
+                        },
                         label = { Text("All") }
                     )
                     Spacer(modifier = Modifier.width(8.dp))
@@ -138,11 +147,20 @@ fun WorkoutHistoryScreen(
 
                 items(workoutTypeChips) { (name, _) ->
                     val isSelected = selectedWorkoutNameFilter == name
+
                     FilterChip(
                         selected = isSelected,
                         onClick = {
-                            selectedWorkoutNameFilter =
-                                if (isSelected) null else name
+                            val newFilter = if (isSelected) null else name
+                            selectedWorkoutNameFilter = newFilter
+
+                            if (newFilter == null) {
+                                selectedAerobicWorkout = null
+                                selectedDetailOption = null
+                            } else {
+                                selectedAerobicWorkout =
+                                    workouts.firstOrNull { it.name == newFilter }
+                            }
                         },
                         label = { Text(name.replace("_", " ")) }
                     )
@@ -151,48 +169,68 @@ fun WorkoutHistoryScreen(
             }
         }
 
-        Row(
+        if (selectedAerobicWorkout != null) {
+            val workoutEnum =
+                AerobicWorkout.entries.find { it.workoutName == selectedAerobicWorkout?.name }
+
+            val validFieldsForDropdown = workoutEnum?.fields?.filter { fieldInfo ->
+                fieldInfo !in listOf(FieldInfo.SETS, FieldInfo.REPETITIONS)
+            } ?: emptyList()
+
+            LaunchedEffect(selectedAerobicWorkout) {
+                if (validFieldsForDropdown.isNotEmpty()) {
+                    val stillValid = validFieldsForDropdown.any { it.label == selectedDetailOption }
+                    if (!stillValid) {
+                        selectedDetailOption = validFieldsForDropdown.first().label
+                    }
+                } else {
+                    selectedDetailOption = null
+                }
+            }
+
+            if (validFieldsForDropdown.isNotEmpty()) {
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 1.dp)
+                ) {
+                    items(validFieldsForDropdown) { fieldInfo ->
+                        val isSelected = selectedDetailOption == fieldInfo.label
+
+                        FilterChip(
+                            selected = isSelected,
+                            onClick = {
+                                selectedDetailOption = fieldInfo.label
+                            },
+                            label = { Text(fieldInfo.label) }
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
+                }
+            }
+        }
+
+        val rangeOptions = listOf(
+            WorkoutRange.ONE_MONTH to "1M",
+            WorkoutRange.TWO_MONTH to "2M",
+            WorkoutRange.THREE_MONTHS to "3M",
+            WorkoutRange.SIX_MONTHS to "6M",
+            WorkoutRange.ALL to "All"
+        )
+
+        LazyRow(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp)
+                .padding(vertical = 1.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // 1 Month
-            FilterChip(
-                selected = selectedRange == WorkoutRange.ONE_MONTH,
-                onClick = { selectedRange = WorkoutRange.ONE_MONTH },
-                label = { Text("1M") }
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-
-            // 2 Months
-            FilterChip(
-                selected = selectedRange == WorkoutRange.TWO_MONTH,
-                onClick = { selectedRange = WorkoutRange.TWO_MONTH },
-                label = { Text("2M") }
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            // 3 Months
-            FilterChip(
-                selected = selectedRange == WorkoutRange.THREE_MONTHS,
-                onClick = { selectedRange = WorkoutRange.THREE_MONTHS },
-                label = { Text("3M") }
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-
-            // 6 Months
-            FilterChip(
-                selected = selectedRange == WorkoutRange.SIX_MONTHS,
-                onClick = { selectedRange = WorkoutRange.SIX_MONTHS },
-                label = { Text("6M") }
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-
-            // All
-            FilterChip(
-                selected = selectedRange == WorkoutRange.ALL,
-                onClick = { selectedRange = WorkoutRange.ALL },
-                label = { Text("All") }
-            )
+            items(rangeOptions) { (range, label) ->
+                FilterChip(
+                    selected = selectedRange == range,
+                    onClick = { selectedRange = range },
+                    label = { Text(label) }
+                )
+            }
         }
 
         if (selectedAerobicWorkout != null) {
@@ -207,92 +245,126 @@ fun WorkoutHistoryScreen(
             }
         }
 
-        //if user choose Anaerobic workout, show the list
-        if (selectedAnaerobicWorkout != null && filteredWorkouts.isNotEmpty()) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = "Your '${filteredWorkouts.first().name.replace("_", " ")}' data")
-                LazyColumn(
+        when {
+            // if no workout records at all
+            workouts.isEmpty() -> {
+                Text(
+                    text = "No workout history yet.\nStart logging workouts to see your progress.",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(8.dp)
-                ) {
-                    items(filteredWorkouts.size) { index ->
-                        val sortedByDescent = filteredWorkouts.sortedByDescending { it.workoutDate }
-                        val workout = sortedByDescent[index]
-                        WorkoutItem(
-                            workout = workout,
-                            onDeleteClick = { viewModel.deleteWorkout(workout) },
-                            dateFormatter = dateFormatter
-                        )
+                        .height(300.dp),
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            //if user choose Anaerobic workout, show the list
+            selectedAnaerobicWorkout != null && filteredWorkouts.isNotEmpty() -> {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "Your '${
+                            filteredWorkouts.first().name.replace("_", " ")
+                        }' data"
+                    )
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                    ) {
+                        items(filteredWorkouts.size) { index ->
+                            val sortedByDescent =
+                                filteredWorkouts.sortedByDescending { it.workoutDate }
+                            val workout = sortedByDescent[index]
+                            WorkoutItem(
+                                workout = workout,
+                                onDeleteClick = { viewModel.deleteWorkout(workout) },
+                                dateFormatter = dateFormatter
+                            )
+                        }
                     }
                 }
             }
-            // if user choose Aerobic workout, show the line chart
-        } else if (selectedAerobicWorkout != null && filteredWorkouts.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(8.dp))
-            when (aerobicWorkoutTabIndex) {
-                0 -> {
-                    val lineData: List<Double> = filteredWorkouts.map { workout ->
-                        val selectedField =
-                            FieldInfo.entries.find { it.label == selectedDetailOption }
 
-                        // Convert duration from seconds to minutes if the selected option is "Duration"
-                        val rawValue = selectedField?.let { workout.getFieldValue(it) } ?: 0.0
-                        if (selectedDetailOption == "Duration") {
-                            //    rawValue / 60.0
-                            convertDuration(rawValue, selectedUnit)
-                        } else {
-                            rawValue
+            // if user choose Aerobic workout, show the line chart
+            selectedAerobicWorkout != null && filteredWorkouts.isNotEmpty() -> {
+                Spacer(modifier = Modifier.height(8.dp))
+                when (aerobicWorkoutTabIndex) {
+                    0 -> {
+                        val lineData: List<Double> = filteredWorkouts.map { workout ->
+                            val selectedField =
+                                FieldInfo.entries.find { it.label == selectedDetailOption }
+
+// Convert duration from seconds to minutes if the selected option is "Duration"
+                            val rawValue =
+                                selectedField?.let { workout.getFieldValue(it) } ?: 0.0
+                            if (selectedDetailOption == "Duration") {
+                                convertDuration(rawValue, selectedUnit)
+                            } else {
+                                rawValue
+                            }
                         }
+
+                        AerobicLineChart(
+                            lineData = lineData,
+                            selectedDetailOption = selectedDetailOption,
+                            dateLabels = getDateLabels(filteredWorkouts),
+                            filteredWorkouts = filteredWorkouts
+                        )
                     }
 
-                    AerobicLineChart(
-                        lineData = lineData,
-                        selectedDetailOption = selectedDetailOption,
-                        dateLabels = getDateLabels(filteredWorkouts),
-                        filteredWorkouts = filteredWorkouts
-                    )
-                }
-
-                1 -> {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = "Workout Name: ${
-                                filteredWorkouts.first().name.replace(
-                                    "_",
-                                    " "
-                                )
-                            }"
-                        )
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp)
-                        ) {
-                            items(filteredWorkouts.size) { index ->
-                                val sortedByDescent =
-                                    filteredWorkouts.sortedByDescending { it.workoutDate }
-                                val workout = sortedByDescent[index]
-                                WorkoutItem(
-                                    workout = workout,
-                                    showWorkoutName = false,
-                                    onDeleteClick = { viewModel.deleteWorkout(workout) },
-                                    dateFormatter = dateFormatter
-                                )
+                    1 -> {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = "Workout Name: ${
+                                    filteredWorkouts.first().name.replace(
+                                        "_",
+                                        " "
+                                    )
+                                }"
+                            )
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp)
+                            ) {
+                                items(filteredWorkouts.size) { index ->
+                                    val sortedByDescent =
+                                        filteredWorkouts.sortedByDescending { it.workoutDate }
+                                    val workout = sortedByDescent[index]
+                                    WorkoutItem(
+                                        workout = workout,
+                                        showWorkoutName = false,
+                                        onDeleteClick = { viewModel.deleteWorkout(workout) },
+                                        dateFormatter = dateFormatter
+                                    )
+                                }
                             }
                         }
                     }
-
                 }
             }
-        } else {
-            Text(
-                text = "Please choose Workout Type",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(300.dp),
-                textAlign = TextAlign.Center
-            )
+
+            // workout is selected but no data within the range
+            (selectedAerobicWorkout != null || selectedAnaerobicWorkout != null) &&
+                    filteredWorkouts.isEmpty() -> {
+                Text(
+                    text = "No workouts in this period.\nTry a different date range.",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp),
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            // no selected workout type yet
+            else -> {
+                Text(
+                    text = "Please choose Workout Type",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp),
+                    textAlign = TextAlign.Center
+                )
+            }
         }
 
         Spacer(modifier = Modifier.weight(1f))
@@ -370,40 +442,6 @@ fun WorkoutHistoryScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        if (selectedAerobicWorkout != null) {
-
-            val workoutEnum =
-                AerobicWorkout.entries.find { it.workoutName == selectedAerobicWorkout?.name }
-
-            val validFieldsForDropdown = workoutEnum?.fields?.filter { fieldInfo ->
-                fieldInfo !in listOf(FieldInfo.SETS, FieldInfo.REPETITIONS)
-            } ?: emptyList()
-
-            Box {
-                OutlinedButton(
-                    onClick = {
-                        expandedDetailOptions = true
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = selectedDetailOption ?: "View More Options")
-                }
-                DropdownMenu(
-                    expanded = expandedDetailOptions,
-                    onDismissRequest = { expandedDetailOptions = false },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    validFieldsForDropdown.forEach { option ->
-                        DropdownMenuItem(
-                            text = { Text(option.label) },
-                            onClick = {
-                                selectedDetailOption = option.label
-                                expandedDetailOptions = false
-                            })
-                    }
-                }
-            }
-        }
 
         if (selectedDetailOption == "Duration")
             Box(
