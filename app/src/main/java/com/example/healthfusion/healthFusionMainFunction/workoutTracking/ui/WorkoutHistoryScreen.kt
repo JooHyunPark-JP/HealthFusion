@@ -285,7 +285,7 @@ fun WorkoutHistoryScreen(
             }
 
             // if user choose Aerobic workout, show the line chart
-            selectedAerobicWorkout != null && filteredWorkouts.isNotEmpty() -> {
+            selectedAerobicWorkout != null && filteredWorkouts.size >= 2 -> {
                 Spacer(modifier = Modifier.height(8.dp))
                 when (aerobicWorkoutTabIndex) {
                     0 -> {
@@ -341,6 +341,16 @@ fun WorkoutHistoryScreen(
                         }
                     }
                 }
+            }
+
+            selectedAerobicWorkout != null && filteredWorkouts.size == 1 -> {
+                Text(
+                    text = "You need at least two workout data to see the graph.\nTry a different date range or create more workout data.",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp),
+                    textAlign = TextAlign.Center
+                )
             }
 
             // workout is selected but no data within the range
