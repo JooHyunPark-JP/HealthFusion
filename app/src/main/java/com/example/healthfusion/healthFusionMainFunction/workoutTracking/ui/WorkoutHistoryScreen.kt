@@ -37,10 +37,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AerobicWorkout
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AnaerobicStrengthMetric
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.FieldInfo
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.Workout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.getFieldValue
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.valueFor
 import com.example.healthfusion.util.DateFormatter
 import ir.ehsannarmani.compose_charts.LineChart
 import ir.ehsannarmani.compose_charts.models.DotProperties
@@ -88,7 +90,11 @@ fun WorkoutHistoryScreen(
     var expandedAnaerobic by remember { mutableStateOf(false) }
     var selectedDetailOption by remember { mutableStateOf<String?>(null) }
 
-    var aerobicWorkoutTabIndex by remember { mutableIntStateOf(0) }
+    var selectedAnaerobicMetric by remember {
+        mutableStateOf<AnaerobicStrengthMetric?>(null)
+    }
+
+    var workoutTabIndex by remember { mutableIntStateOf(0) }
     val tabWorkoutPageTitles = listOf("Line Chart", "Workout List")
 
     var selectedUnit by remember { mutableStateOf("minutes") }
@@ -139,6 +145,8 @@ fun WorkoutHistoryScreen(
                             selectedWorkoutNameFilter = null
                             selectedAerobicWorkout = null
                             selectedDetailOption = null
+                            selectedAnaerobicWorkout = null
+                            selectedAnaerobicMetric = null
                         },
                         label = { Text("All") }
                     )
@@ -147,7 +155,6 @@ fun WorkoutHistoryScreen(
 
                 items(workoutTypeChips) { (name, _) ->
                     val isSelected = selectedWorkoutNameFilter == name
-
                     FilterChip(
                         selected = isSelected,
                         onClick = {
@@ -156,10 +163,33 @@ fun WorkoutHistoryScreen(
 
                             if (newFilter == null) {
                                 selectedAerobicWorkout = null
+                                selectedAnaerobicWorkout = null
                                 selectedDetailOption = null
+                                selectedAnaerobicMetric = null
                             } else {
-                                selectedAerobicWorkout =
-                                    workouts.firstOrNull { it.name == newFilter }
+                                val selectedWorkout = workouts.firstOrNull { it.name == newFilter }
+                                when (selectedWorkout?.type) {
+                                    WorkoutType.AEROBIC -> {
+                                        selectedAerobicWorkout = selectedWorkout
+                                        selectedAnaerobicWorkout = null
+                                        selectedDetailOption = null
+                                        selectedAnaerobicMetric = null
+                                    }
+
+                                    WorkoutType.ANAEROBIC -> {
+                                        selectedAnaerobicWorkout = selectedWorkout
+                                        selectedAerobicWorkout = null
+                                        selectedAnaerobicMetric = null
+                                        selectedDetailOption = null
+                                    }
+
+                                    else -> {
+                                        selectedAerobicWorkout = null
+                                        selectedAnaerobicWorkout = null
+                                        selectedDetailOption = null
+                                        selectedAnaerobicMetric = null
+                                    }
+                                }
                             }
                         },
                         label = { Text(name.replace("_", " ")) }
@@ -210,6 +240,40 @@ fun WorkoutHistoryScreen(
             }
         }
 
+        //  Anaerobic metric chips (Volume / Top Weight / Reps / Sets)
+        if (selectedAnaerobicWorkout != null) {
+            val strengthMetrics = AnaerobicStrengthMetric.entries.toList()
+
+            LaunchedEffect(selectedAnaerobicWorkout) {
+                if (strengthMetrics.isNotEmpty()) {
+                    if (selectedAnaerobicMetric == null ||
+                        selectedAnaerobicMetric !in strengthMetrics
+                    ) {
+                        selectedAnaerobicMetric = strengthMetrics.first()
+                    }
+                } else {
+                    selectedAnaerobicMetric = null
+                }
+            }
+
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(strengthMetrics) { metric ->
+                    val isSelected = selectedAnaerobicMetric == metric
+
+                    FilterChip(
+                        selected = isSelected,
+                        onClick = { selectedAnaerobicMetric = metric },
+                        label = { Text(metric.shortLabel) } // "Volume", "Top Wt" 등
+                    )
+                }
+            }
+        }
+
         val rangeOptions = listOf(
             WorkoutRange.ONE_MONTH to "1M",
             WorkoutRange.TWO_MONTH to "2M",
@@ -233,12 +297,15 @@ fun WorkoutHistoryScreen(
             }
         }
 
-        if (selectedAerobicWorkout != null) {
-            TabRow(selectedTabIndex = aerobicWorkoutTabIndex) {
+        val isWorkoutSelected =
+            selectedAerobicWorkout != null || selectedAnaerobicWorkout != null
+
+        if (isWorkoutSelected) {
+            TabRow(selectedTabIndex = workoutTabIndex) {
                 tabWorkoutPageTitles.forEachIndexed { index, title ->
                     Tab(
-                        selected = aerobicWorkoutTabIndex == index,
-                        onClick = { aerobicWorkoutTabIndex = index },
+                        selected = workoutTabIndex == index,
+                        onClick = { workoutTabIndex = index },
                         text = { Text(title) }
                     )
                 }
@@ -258,27 +325,53 @@ fun WorkoutHistoryScreen(
             }
 
             //if user choose Anaerobic workout, show the list
+
             selectedAnaerobicWorkout != null && filteredWorkouts.isNotEmpty() -> {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = "Your '${
-                            filteredWorkouts.first().name.replace("_", " ")
-                        }' data"
-                    )
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)
-                    ) {
-                        items(filteredWorkouts.size) { index ->
-                            val sortedByDescent =
-                                filteredWorkouts.sortedByDescending { it.workoutDate }
-                            val workout = sortedByDescent[index]
-                            WorkoutItem(
-                                workout = workout,
-                                onDeleteClick = { viewModel.deleteWorkout(workout) },
-                                dateFormatter = dateFormatter
+
+                when (workoutTabIndex) {
+                    0 -> {
+                        val metric = selectedAnaerobicMetric ?: AnaerobicStrengthMetric.TOTAL_VOLUME
+
+                        val sortedByDate = filteredWorkouts.sortedBy { it.workoutDate }
+
+                        val lineData: List<Double> = sortedByDate.map { workout ->
+                            metric.valueFor(workout)
+                        }
+
+                        AnaerobicLineChart(
+                            lineData = lineData,
+                            metric = metric,
+                            dateLabels = getDateLabels(sortedByDate),
+                            filteredWorkouts = sortedByDate
+                        )
+                    }
+
+                    1 -> {
+                        val sortedByDescent = filteredWorkouts.sortedByDescending { it.workoutDate }
+
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = "Your '${
+                                    sortedByDescent.first().name.replace(
+                                        "_",
+                                        " "
+                                    )
+                                }' data"
                             )
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp)
+                            ) {
+                                items(sortedByDescent.size) { index ->
+                                    val workout = sortedByDescent[index]
+                                    WorkoutItem(
+                                        workout = workout,
+                                        onDeleteClick = { viewModel.deleteWorkout(workout) },
+                                        dateFormatter = dateFormatter
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -287,7 +380,7 @@ fun WorkoutHistoryScreen(
             // if user choose Aerobic workout, show the line chart
             selectedAerobicWorkout != null && filteredWorkouts.size >= 2 -> {
                 Spacer(modifier = Modifier.height(8.dp))
-                when (aerobicWorkoutTabIndex) {
+                when (workoutTabIndex) {
                     0 -> {
                         val lineData: List<Double> = filteredWorkouts.map { workout ->
                             val selectedField =
@@ -363,6 +456,7 @@ fun WorkoutHistoryScreen(
                         .height(300.dp),
                     textAlign = TextAlign.Center
                 )
+
             }
 
             // no selected workout type yet
@@ -557,6 +651,79 @@ fun AerobicLineChart(
                 enabled = true,
                 textStyle = TextStyle.Default.copy(
                     fontSize = 12.sp,
+                    textAlign = TextAlign.Center
+                ),
+                padding = 12.dp,
+                labels = dateLabels,
+                rotationDegreeOnSizeConflict = -45f,
+                forceRotation = false
+            )
+        )
+    }
+}
+
+@Composable
+fun AnaerobicLineChart(
+    lineData: List<Double>,
+    metric: AnaerobicStrengthMetric,
+    dateLabels: List<String>,
+    filteredWorkouts: List<Workout>
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(0.5f)
+    ) {
+        LineChart(
+            data = listOf(
+                Line(
+                    label = metric.label,
+                    values = lineData,
+                    color = SolidColor(Color(0xFF23af92)),
+                    curvedEdges = true,
+                    dotProperties = DotProperties(
+                        enabled = false,
+                        color = SolidColor(Color.White),
+                        strokeWidth = 3.dp,
+                        radius = 5.dp,
+                        strokeColor = SolidColor(Color(0xFF23af92))
+                    ),
+                    popupProperties = PopupProperties(
+                        enabled = true,
+                        containerColor = Color(0xFF23af92),
+                        textStyle = TextStyle.Default.copy(fontSize = 12.sp),
+                        cornerRadius = 6.dp,
+                        contentBuilder = { value ->
+                            val tolerance = 0.01
+
+                            val workout = filteredWorkouts.find {
+                                kotlin.math.abs(
+                                    metric.valueFor(it) - value
+                                ) < tolerance
+                            }
+
+                            workout?.let {
+                                val date = SimpleDateFormat(
+                                    "yyyy-MM-dd",
+                                    Locale.getDefault()
+                                ).format(Date(it.workoutDate))
+
+                                val metricValue = metric.valueFor(it)
+
+                                "$date\n" +
+                                        "${metric.label}: ${"%.1f".format(metricValue)} ${metric.unitLabel}\n" +
+                                        "Workout: ${it.name.replace("_", " ")}"
+                            } ?: "${metric.label}: ${"%.1f".format(value)} ${metric.unitLabel}"
+                        }
+                    )
+                )
+            ),
+            modifier = Modifier.fillMaxWidth(),
+            labelProperties = LabelProperties(
+                enabled = true,
+                textStyle = TextStyle.Default.copy(
+                    fontSize = 12.sp,
+                    color = Color.Gray,
                     textAlign = TextAlign.Center
                 ),
                 padding = 12.dp,
