@@ -14,7 +14,7 @@ enum class AnaerobicStrengthMetric(
 ) {
     TOTAL_VOLUME(
         label = "Total Volume",
-        shortLabel = "Volume",
+        shortLabel = "Volume (Sets * Reps * Weight)",
         unitLabel = "kg·reps"
     ),
     TOP_WEIGHT(
@@ -31,6 +31,12 @@ enum class AnaerobicStrengthMetric(
         label = "Total Sets",
         shortLabel = "Sets",
         unitLabel = "sets"
+    ),
+
+    DURATION(
+        label = "Duration",
+        shortLabel = "Duration",
+        unitLabel = "Duration"
     )
 }
 
@@ -38,7 +44,7 @@ fun AnaerobicStrengthMetric.valueFor(workout: Workout): Double {
     val sets = workout.getFieldValue(FieldInfo.SETS)
     val reps = workout.getFieldValue(FieldInfo.REPETITIONS)
     val weight = workout.getFieldValue(FieldInfo.WEIGHTS)
-
+    val duration = workout.getFieldValue(FieldInfo.DURATION)
 
     return when (this) {
         AnaerobicStrengthMetric.TOTAL_VOLUME -> {
@@ -58,6 +64,10 @@ fun AnaerobicStrengthMetric.valueFor(workout: Workout): Double {
         AnaerobicStrengthMetric.TOTAL_SETS -> {
             // number of sets
             sets
+        }
+
+        AnaerobicStrengthMetric.DURATION -> {
+            duration
         }
     }
 }

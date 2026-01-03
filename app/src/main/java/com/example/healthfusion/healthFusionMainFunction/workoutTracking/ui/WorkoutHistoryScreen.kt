@@ -3,7 +3,6 @@ package com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,10 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -38,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AerobicWorkout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AnaerobicStrengthMetric
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.AnaerobicWorkout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.FieldInfo
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.Workout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
@@ -86,8 +83,6 @@ fun WorkoutHistoryScreen(
 
     var selectedAerobicWorkout by remember { mutableStateOf<Workout?>(null) }
     var selectedAnaerobicWorkout by remember { mutableStateOf<Workout?>(null) }
-    var expandedAerobic by remember { mutableStateOf(false) }
-    var expandedAnaerobic by remember { mutableStateOf(false) }
     var selectedDetailOption by remember { mutableStateOf<String?>(null) }
 
     var selectedAnaerobicMetric by remember {
@@ -98,7 +93,6 @@ fun WorkoutHistoryScreen(
     val tabWorkoutPageTitles = listOf("Line Chart", "Workout List")
 
     var selectedUnit by remember { mutableStateOf("minutes") }
-    var expandedUnitSelection by remember { mutableStateOf(false) }
 
 
     Column(modifier = Modifier.padding(16.dp)) {
@@ -132,170 +126,6 @@ fun WorkoutHistoryScreen(
                     (selectedWorkoutNameFilter == null || workout.name == selectedWorkoutNameFilter)
         }
 
-        if (workoutTypeChips.isNotEmpty()) {
-            LazyRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-            ) {
-                item {
-                    FilterChip(
-                        selected = selectedWorkoutNameFilter == null,
-                        onClick = {
-                            selectedWorkoutNameFilter = null
-                            selectedAerobicWorkout = null
-                            selectedDetailOption = null
-                            selectedAnaerobicWorkout = null
-                            selectedAnaerobicMetric = null
-                        },
-                        label = { Text("All") }
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                }
-
-                items(workoutTypeChips) { (name, _) ->
-                    val isSelected = selectedWorkoutNameFilter == name
-                    FilterChip(
-                        selected = isSelected,
-                        onClick = {
-                            val newFilter = if (isSelected) null else name
-                            selectedWorkoutNameFilter = newFilter
-
-                            if (newFilter == null) {
-                                selectedAerobicWorkout = null
-                                selectedAnaerobicWorkout = null
-                                selectedDetailOption = null
-                                selectedAnaerobicMetric = null
-                            } else {
-                                val selectedWorkout = workouts.firstOrNull { it.name == newFilter }
-                                when (selectedWorkout?.type) {
-                                    WorkoutType.AEROBIC -> {
-                                        selectedAerobicWorkout = selectedWorkout
-                                        selectedAnaerobicWorkout = null
-                                        selectedDetailOption = null
-                                        selectedAnaerobicMetric = null
-                                    }
-
-                                    WorkoutType.ANAEROBIC -> {
-                                        selectedAnaerobicWorkout = selectedWorkout
-                                        selectedAerobicWorkout = null
-                                        selectedAnaerobicMetric = null
-                                        selectedDetailOption = null
-                                    }
-
-                                    else -> {
-                                        selectedAerobicWorkout = null
-                                        selectedAnaerobicWorkout = null
-                                        selectedDetailOption = null
-                                        selectedAnaerobicMetric = null
-                                    }
-                                }
-                            }
-                        },
-                        label = { Text(name.replace("_", " ")) }
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                }
-            }
-        }
-
-        if (selectedAerobicWorkout != null) {
-            val workoutEnum =
-                AerobicWorkout.entries.find { it.workoutName == selectedAerobicWorkout?.name }
-
-            val validFieldsForDropdown = workoutEnum?.fields?.filter { fieldInfo ->
-                fieldInfo !in listOf(FieldInfo.SETS, FieldInfo.REPETITIONS)
-            } ?: emptyList()
-
-            LaunchedEffect(selectedAerobicWorkout) {
-                if (validFieldsForDropdown.isNotEmpty()) {
-                    val stillValid = validFieldsForDropdown.any { it.label == selectedDetailOption }
-                    if (!stillValid) {
-                        selectedDetailOption = validFieldsForDropdown.first().label
-                    }
-                } else {
-                    selectedDetailOption = null
-                }
-            }
-
-            if (validFieldsForDropdown.isNotEmpty()) {
-                LazyRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 1.dp)
-                ) {
-                    items(validFieldsForDropdown) { fieldInfo ->
-                        val isSelected = selectedDetailOption == fieldInfo.label
-
-                        FilterChip(
-                            selected = isSelected,
-                            onClick = {
-                                selectedDetailOption = fieldInfo.label
-                            },
-                            label = { Text(fieldInfo.label) }
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                    }
-                }
-            }
-        }
-
-        //  Anaerobic metric chips (Volume / Top Weight / Reps / Sets)
-        if (selectedAnaerobicWorkout != null) {
-            val strengthMetrics = AnaerobicStrengthMetric.entries.toList()
-
-            LaunchedEffect(selectedAnaerobicWorkout) {
-                if (strengthMetrics.isNotEmpty()) {
-                    if (selectedAnaerobicMetric == null ||
-                        selectedAnaerobicMetric !in strengthMetrics
-                    ) {
-                        selectedAnaerobicMetric = strengthMetrics.first()
-                    }
-                } else {
-                    selectedAnaerobicMetric = null
-                }
-            }
-
-            LazyRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(strengthMetrics) { metric ->
-                    val isSelected = selectedAnaerobicMetric == metric
-
-                    FilterChip(
-                        selected = isSelected,
-                        onClick = { selectedAnaerobicMetric = metric },
-                        label = { Text(metric.shortLabel) } // "Volume", "Top Wt" 등
-                    )
-                }
-            }
-        }
-
-        val rangeOptions = listOf(
-            WorkoutRange.ONE_MONTH to "1M",
-            WorkoutRange.TWO_MONTH to "2M",
-            WorkoutRange.THREE_MONTHS to "3M",
-            WorkoutRange.SIX_MONTHS to "6M",
-            WorkoutRange.ALL to "All"
-        )
-
-        LazyRow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 1.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(rangeOptions) { (range, label) ->
-                FilterChip(
-                    selected = selectedRange == range,
-                    onClick = { selectedRange = range },
-                    label = { Text(label) }
-                )
-            }
-        }
 
         val isWorkoutSelected =
             selectedAerobicWorkout != null || selectedAnaerobicWorkout != null
@@ -462,7 +292,7 @@ fun WorkoutHistoryScreen(
             // no selected workout type yet
             else -> {
                 Text(
-                    text = "Please choose Workout Type",
+                    text = "Please choose Workout Type options below",
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(300.dp),
@@ -473,107 +303,204 @@ fun WorkoutHistoryScreen(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        Row(modifier = Modifier.fillMaxWidth()) {
-            val aerobicWorkout =
-                workouts.filter { it.type == WorkoutType.AEROBIC }.distinctBy { it.name }
-            Box(
-                modifier = Modifier.weight(1f)
+        Text(text = "Workout (Based on recent activity):", modifier = Modifier.fillMaxWidth())
+        if (workoutTypeChips.isNotEmpty()) {
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
             ) {
-                OutlinedButton(
-                    onClick = {
-                        expandedAerobic = true
-                        expandedAnaerobic = false
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = selectedAerobicWorkout?.name?.replace("_", " ") ?: "Select Aerobic")
+                item {
+                    FilterChip(
+                        selected = selectedWorkoutNameFilter == null,
+                        onClick = {
+                            selectedWorkoutNameFilter = null
+                            selectedAerobicWorkout = null
+                            selectedDetailOption = null
+                            selectedAnaerobicWorkout = null
+                            selectedAnaerobicMetric = null
+                        },
+                        label = { Text("All") }
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
                 }
-                DropdownMenu(
-                    expanded = expandedAerobic,
-                    onDismissRequest = { expandedAerobic = false },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    aerobicWorkout.forEach { workout ->
-                        DropdownMenuItem(
-                            text = { Text(workout.name.replace("_", " ")) },
-                            onClick = {
-                                selectedAerobicWorkout = workout
+
+                items(workoutTypeChips) { (name, _) ->
+                    val isSelected = selectedWorkoutNameFilter == name
+                    FilterChip(
+                        selected = isSelected,
+                        onClick = {
+                            val newFilter = if (isSelected) null else name
+                            selectedWorkoutNameFilter = newFilter
+
+                            if (newFilter == null) {
+                                selectedAerobicWorkout = null
                                 selectedAnaerobicWorkout = null
-                                expandedAerobic = false
+                                selectedDetailOption = null
+                                selectedAnaerobicMetric = null
+                            } else {
+                                val selectedWorkout = workouts.firstOrNull { it.name == newFilter }
+                                when (selectedWorkout?.type) {
+                                    WorkoutType.AEROBIC -> {
+                                        selectedAerobicWorkout = selectedWorkout
+                                        selectedAnaerobicWorkout = null
+                                        selectedDetailOption = null
+                                        selectedAnaerobicMetric = null
+                                    }
+
+                                    WorkoutType.ANAEROBIC -> {
+                                        selectedAnaerobicWorkout = selectedWorkout
+                                        selectedAerobicWorkout = null
+                                        selectedAnaerobicMetric = null
+                                        selectedDetailOption = null
+                                    }
+
+                                    else -> {
+                                        selectedAerobicWorkout = null
+                                        selectedAnaerobicWorkout = null
+                                        selectedDetailOption = null
+                                        selectedAnaerobicMetric = null
+                                    }
+                                }
                             }
-                        )
+                        },
+                        label = { Text(name.replace("_", " ")) }
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
+            }
+        }
+
+        if (selectedAerobicWorkout != null) {
+            Text(text = "${selectedAerobicWorkout?.name}:", modifier = Modifier.fillMaxWidth())
+            val workoutEnum =
+                AerobicWorkout.entries.find { it.workoutName == selectedAerobicWorkout?.name }
+
+            val aerobicMetricFields = workoutEnum?.graphFields ?: emptyList()
+
+            LaunchedEffect(selectedAerobicWorkout) {
+                if (aerobicMetricFields.isNotEmpty()) {
+                    val stillValid = aerobicMetricFields.any { it.label == selectedDetailOption }
+                    if (!stillValid) {
+                        selectedDetailOption = aerobicMetricFields.first().label
                     }
+                } else {
+                    selectedDetailOption = null
                 }
             }
 
-            Spacer(modifier = Modifier.width(8.dp))
+            if (aerobicMetricFields.isNotEmpty()) {
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    items(aerobicMetricFields) { fieldInfo ->
+                        val isSelected = selectedDetailOption == fieldInfo.label
 
-            val anaerobicWorkout =
-                workouts.filter { it.type == WorkoutType.ANAEROBIC }.distinctBy { it.name }
-            Box(
-                modifier = Modifier.weight(1f)
-            ) {
-                OutlinedButton(
-                    onClick = {
-                        expandedAnaerobic = true
-                        expandedAerobic = false
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = selectedAnaerobicWorkout?.name?.replace("_", " ")
-                            ?: "Select Anaerobic"
-                    )
-                }
-                DropdownMenu(
-                    expanded = expandedAnaerobic,
-                    onDismissRequest = { expandedAnaerobic = false },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    anaerobicWorkout.forEach { workout ->
-                        DropdownMenuItem(
-                            text = { Text(workout.name.replace("_", " ")) },
+                        FilterChip(
+                            selected = isSelected,
                             onClick = {
-                                selectedAnaerobicWorkout = workout
-                                selectedAerobicWorkout = null
-                                expandedAnaerobic = false
-                            }
+                                selectedDetailOption = fieldInfo.label
+                            },
+                            label = { Text(fieldInfo.label) }
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
+                }
+            }
+        }
+
+        //  Anaerobic metric chips (Volume / Top Weight / Reps / Sets)
+        if (selectedAnaerobicWorkout != null) {
+            Text(text = "${selectedAnaerobicWorkout?.name}:", modifier = Modifier.fillMaxWidth())
+
+
+            val anaerobicConfig = AnaerobicWorkout.entries
+                .find { it.workoutName == selectedAnaerobicWorkout?.name }
+
+            val strengthMetrics = anaerobicConfig?.graphMetrics
+                ?: AnaerobicStrengthMetric.entries.toList()
+
+            LaunchedEffect(selectedAnaerobicWorkout) {
+                if (strengthMetrics.isNotEmpty()) {
+                    if (selectedAnaerobicMetric == null ||
+                        selectedAnaerobicMetric !in strengthMetrics
+                    ) {
+                        selectedAnaerobicMetric = strengthMetrics.first()
+                    }
+                } else {
+                    selectedAnaerobicMetric = null
+                }
+            }
+
+            if (strengthMetrics.isNotEmpty()) {
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(strengthMetrics) { metric ->
+                        val isSelected = selectedAnaerobicMetric == metric
+
+                        FilterChip(
+                            selected = isSelected,
+                            onClick = { selectedAnaerobicMetric = metric },
+                            label = { Text(metric.shortLabel) } // "Volume", "Top Wt" etc
                         )
                     }
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-
-        if (selectedDetailOption == "Duration")
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                OutlinedButton(
-                    onClick = { expandedUnitSelection = true },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = "Unit: ${selectedUnit.replaceFirstChar { it.uppercase() }}")
-                }
-                DropdownMenu(
-                    expanded = expandedUnitSelection,
-                    onDismissRequest = { expandedUnitSelection = false },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    listOf("minutes", "hours").forEach { unit ->
-                        DropdownMenuItem(
-                            text = { Text(unit.replaceFirstChar { it.uppercase() }) },
-                            onClick = {
-                                selectedUnit = unit
-                                expandedUnitSelection = false
-                            }
-                        )
-                    }
-                }
+        val rangeOptions = listOf(
+            WorkoutRange.ONE_MONTH to "1M",
+            WorkoutRange.TWO_MONTH to "2M",
+            WorkoutRange.THREE_MONTHS to "3M",
+            WorkoutRange.SIX_MONTHS to "6M",
+            WorkoutRange.ALL to "All"
+        )
+        Text(text = "${"Filter(Month)"}:", modifier = Modifier.fillMaxWidth())
+        LazyRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 1.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(rangeOptions) { (range, label) ->
+                FilterChip(
+                    selected = selectedRange == range,
+                    onClick = { selectedRange = range },
+                    label = { Text(label) }
+                )
             }
+        }
+
+        /*        if (selectedDetailOption == "Duration"){
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        OutlinedButton(
+                            onClick = { expandedUnitSelection = true },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(text = "Unit: ${selectedUnit.replaceFirstChar { it.uppercase() }}")
+                        }
+                        DropdownMenu(
+                            expanded = expandedUnitSelection,
+                            onDismissRequest = { expandedUnitSelection = false },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            listOf("minutes", "hours").forEach { unit ->
+                                DropdownMenuItem(
+                                    text = { Text(unit.replaceFirstChar { it.uppercase() }) },
+                                    onClick = {
+                                        selectedUnit = unit
+                                        expandedUnitSelection = false
+                                    }
+                                )
+                            }
+                        }
+                    }}*/
     }
 }
 
