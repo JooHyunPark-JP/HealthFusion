@@ -38,7 +38,7 @@ import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.An
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.FieldInfo
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.Workout
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.WorkoutType
-import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.getFieldValue
+import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.getGraphValue
 import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.valueFor
 import com.example.healthfusion.util.DateFormatter
 import ir.ehsannarmani.compose_charts.LineChart
@@ -95,7 +95,7 @@ fun WorkoutHistoryScreen(
     var selectedUnit by remember { mutableStateOf("minutes") }
 
 
-    Column(modifier = Modifier.padding(16.dp)) {
+    Column(modifier = modifier.padding(16.dp)) {
 
         val now = System.currentTimeMillis()
         val oneMonthMillis = 30L * 24 * 60 * 60 * 1000
@@ -157,23 +157,50 @@ fun WorkoutHistoryScreen(
             //if user choose Anaerobic workout, show the list
 
             selectedAnaerobicWorkout != null && filteredWorkouts.isNotEmpty() -> {
-
                 when (workoutTabIndex) {
                     0 -> {
-                        val metric = selectedAnaerobicMetric ?: AnaerobicStrengthMetric.TOTAL_VOLUME
+                        val anaerobicConfig = AnaerobicWorkout.entries
+                            .find { it.workoutName == selectedAnaerobicWorkout?.name }
 
-                        val sortedByDate = filteredWorkouts.sortedBy { it.workoutDate }
+                        val metricsForWorkout = anaerobicConfig?.graphMetrics
+                            ?: AnaerobicStrengthMetric.entries.toList()
 
-                        val lineData: List<Double> = sortedByDate.map { workout ->
-                            metric.valueFor(workout)
+
+                        val metric = when {
+                            metricsForWorkout.isEmpty() -> null
+                            selectedAnaerobicMetric != null &&
+                                    selectedAnaerobicMetric in metricsForWorkout ->
+                                selectedAnaerobicMetric
+
+                            else -> {
+                                val firstMetric = metricsForWorkout.first()
+                                selectedAnaerobicMetric = firstMetric
+                                firstMetric
+                            }
                         }
 
-                        AnaerobicLineChart(
-                            lineData = lineData,
-                            metric = metric,
-                            dateLabels = getDateLabels(sortedByDate),
-                            filteredWorkouts = sortedByDate
-                        )
+                        if (metric != null) {
+                            val sortedByDate = filteredWorkouts.sortedBy { it.workoutDate }
+
+                            val lineData: List<Double> = sortedByDate.map { workout ->
+                                metric.valueFor(workout)
+                            }
+
+                            AnaerobicLineChart(
+                                lineData = lineData,
+                                metric = metric,
+                                dateLabels = getDateLabels(sortedByDate),
+                                filteredWorkouts = sortedByDate
+                            )
+                        } else {
+                            Text(
+                                text = "No metrics available for this workout type.",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(300.dp),
+                                textAlign = TextAlign.Center
+                            )
+                        }
                     }
 
                     1 -> {
@@ -216,9 +243,9 @@ fun WorkoutHistoryScreen(
                             val selectedField =
                                 FieldInfo.entries.find { it.label == selectedDetailOption }
 
-// Convert duration from seconds to minutes if the selected option is "Duration"
+                            // Convert duration from seconds to minutes if the selected option is "Duration"
                             val rawValue =
-                                selectedField?.let { workout.getFieldValue(it) } ?: 0.0
+                                selectedField?.let { workout.getGraphValue(it) } ?: 0.0
                             if (selectedDetailOption == "Duration") {
                                 convertDuration(rawValue, selectedUnit)
                             } else {
@@ -226,11 +253,13 @@ fun WorkoutHistoryScreen(
                             }
                         }
 
+                        val sortedByDate = filteredWorkouts.sortedBy { it.workoutDate }
+
                         AerobicLineChart(
                             lineData = lineData,
                             selectedDetailOption = selectedDetailOption,
                             dateLabels = getDateLabels(filteredWorkouts),
-                            filteredWorkouts = filteredWorkouts
+                            filteredWorkouts = sortedByDate
                         )
                     }
 
@@ -244,14 +273,16 @@ fun WorkoutHistoryScreen(
                                     )
                                 }"
                             )
+
+                            val sortedByDescent =
+                                filteredWorkouts.sortedByDescending { it.workoutDate }
                             LazyColumn(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(8.dp)
                             ) {
                                 items(filteredWorkouts.size) { index ->
-                                    val sortedByDescent =
-                                        filteredWorkouts.sortedByDescending { it.workoutDate }
+
                                     val workout = sortedByDescent[index]
                                     WorkoutItem(
                                         workout = workout,
@@ -545,10 +576,11 @@ fun AerobicLineChart(
                                             ?: 0.0) - value
                                     ) < tolerance
 
-                                    "Duration" -> kotlin.math.abs(
-                                        (it.duration?.toDouble()
-                                            ?: 0.0) - value
-                                    ) < tolerance
+                                    "Duration" -> {
+                                        val raw = (it.duration?.toDouble() ?: 0.0)
+                                        val converted = convertDuration(raw, "minutes")
+                                        kotlin.math.abs(converted - value) < tolerance
+                                    }
 
                                     "Distance" -> kotlin.math.abs(
                                         (it.distance?.toDouble()
@@ -567,7 +599,7 @@ fun AerobicLineChart(
                                         "yyyy-MM-dd",
                                         Locale.getDefault()
                                     ).format(Date(it.workoutDate))
-                                }\nWorkout: ${it.name}\nCalories: ${it.caloriesBurned}\nDuration: ${it.duration} mins"
+                                }\nWorkout: ${it.name}\nCalories: ${it.caloriesBurned}\nDuration: \${convertDuration(it.duration?.toDouble() ?: 0.0, \"minutes\")} mins"
                             } ?: "No data"
                         }
                     )

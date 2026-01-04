@@ -24,7 +24,7 @@ enum class AnaerobicStrengthMetric(
     ),
     TOTAL_REPS(
         label = "Total Reps",
-        shortLabel = "Reps",
+        shortLabel = "Total Repetition (Sets * Reps)",
         unitLabel = "reps"
     ),
     TOTAL_SETS(
