@@ -109,7 +109,8 @@ fun NavGraph(
                 WorkoutEdit(
                     viewModel = workoutViewModel,
                     workoutName = resolvedWorkoutName,
-                    workoutType = workoutType
+                    workoutType = workoutType,
+                    onFinished = {navController.popBackStack()}
                 )
             }
         }

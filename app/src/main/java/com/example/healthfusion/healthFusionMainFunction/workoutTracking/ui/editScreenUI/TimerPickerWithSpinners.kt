@@ -15,10 +15,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -34,19 +30,21 @@ import com.example.healthfusion.healthFusionMainFunction.workoutTracking.data.Fi
 @Composable
 fun TimePickerWithSpinners(inputValues: MutableMap<FieldInfo, String>) {
     // States for hours, minutes, and seconds
-    var selectedHour by remember { mutableIntStateOf(0) }
-    var selectedMinute by remember { mutableIntStateOf(0) }
-    var selectedSecond by remember { mutableIntStateOf(0) }
 
-    fun updateDuration() {
-        val totalSeconds = selectedHour * 3600 + selectedMinute * 60 + selectedSecond
+    val durationSeconds = inputValues[FieldInfo.DURATION]?.toIntOrNull() ?: 0
+
+    val selectedHour = durationSeconds / 3600
+    val selectedMinute = (durationSeconds % 3600) / 60
+    val selectedSecond = durationSeconds % 60
+
+    fun updateDuration(newHour: Int, newMinute: Int, newSecond: Int) {
+        val totalSeconds = newHour * 3600 + newMinute * 60 + newSecond
         inputValues[FieldInfo.DURATION] = totalSeconds.toString()
     }
 
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 4.dp),
+            .fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         ),
@@ -94,7 +92,6 @@ fun TimePickerWithSpinners(inputValues: MutableMap<FieldInfo, String>) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // 스피너 3개
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -102,34 +99,40 @@ fun TimePickerWithSpinners(inputValues: MutableMap<FieldInfo, String>) {
             ) {
                 NumberPickerSpinner(
                     label = "Hour",
-                    suffix = "h",
                     range = 0..23,
                     value = selectedHour,
-                    onValueChange = {
-                        selectedHour = it
-                        updateDuration()
+                    onValueChange = { newHour ->
+                        updateDuration(
+                            newHour,
+                            selectedMinute,
+                            selectedSecond
+                        )
                     }
                 )
 
                 NumberPickerSpinner(
                     label = "Minute",
-                    suffix = "m",
                     range = 0..59,
                     value = selectedMinute,
-                    onValueChange = {
-                        selectedMinute = it
-                        updateDuration()
+                    onValueChange = { newMinute ->
+                        updateDuration(
+                            selectedHour,
+                            newMinute,
+                            selectedSecond
+                        )
                     }
                 )
 
                 NumberPickerSpinner(
                     label = "Second",
-                    suffix = "s",
                     range = 0..59,
                     value = selectedSecond,
-                    onValueChange = {
-                        selectedSecond = it
-                        updateDuration()
+                    onValueChange = { newSecond ->
+                        updateDuration(
+                            selectedHour,
+                            selectedMinute,
+                            newSecond
+                        )
                     }
                 )
             }
@@ -140,7 +143,6 @@ fun TimePickerWithSpinners(inputValues: MutableMap<FieldInfo, String>) {
 @Composable
 fun NumberPickerSpinner(
     label: String,
-    suffix: String,
     range: IntRange,
     value: Int,
     onValueChange: (Int) -> Unit
@@ -173,12 +175,6 @@ fun NumberPickerSpinner(
             modifier = Modifier
                 .padding(vertical = 4.dp)
                 .width(72.dp)
-        )
-
-        Text(
-            text = suffix,
-            fontSize = 11.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }

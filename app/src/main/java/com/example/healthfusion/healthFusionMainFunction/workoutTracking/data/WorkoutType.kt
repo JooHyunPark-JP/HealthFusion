@@ -19,10 +19,10 @@ enum class AerobicWorkout(
         R.drawable.running_pose2,
         WorkoutType.AEROBIC,
         fields = listOf(
+            FieldInfo.TIMER,
             FieldInfo.DURATION,
             FieldInfo.DISTANCE,
             FieldInfo.CALORIES_BURNED,
-            FieldInfo.TIMER
         ),
         graphFields = listOf(
             FieldInfo.DURATION,
@@ -35,10 +35,10 @@ enum class AerobicWorkout(
         R.drawable.cycling_pose,
         WorkoutType.AEROBIC,
         fields = listOf(
+            FieldInfo.TIMER,
             FieldInfo.DURATION,
             FieldInfo.DISTANCE,
             FieldInfo.CALORIES_BURNED,
-            FieldInfo.TIMER
         ),
         graphFields = listOf(
             FieldInfo.DURATION,
@@ -51,10 +51,10 @@ enum class AerobicWorkout(
         R.drawable.walking_pose,
         WorkoutType.AEROBIC,
         fields = listOf(
+            FieldInfo.TIMER,
             FieldInfo.DURATION,
             FieldInfo.DISTANCE,
             FieldInfo.CALORIES_BURNED,
-            FieldInfo.TIMER
         ),
         graphFields = listOf(
             FieldInfo.DURATION,
@@ -67,11 +67,12 @@ enum class AerobicWorkout(
         R.drawable.swimming_pose,
         WorkoutType.AEROBIC,
         fields = listOf(
+            FieldInfo.TIMER,
             FieldInfo.DURATION,
             FieldInfo.DISTANCE,
             FieldInfo.CALORIES_BURNED,
-            FieldInfo.TIMER
-        ),
+
+            ),
         graphFields = listOf(
             FieldInfo.DURATION,
             FieldInfo.DISTANCE,
@@ -101,7 +102,11 @@ enum class AnaerobicWorkout(
         "Push_Up",
         R.drawable.pushup_pose,
         WorkoutType.ANAEROBIC,
-        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.TIMER),
+        fields = listOf(
+            FieldInfo.TIMER,
+            FieldInfo.SETS,
+            FieldInfo.REPETITIONS,
+        ),
         graphMetrics = listOf(
             AnaerobicStrengthMetric.TOTAL_SETS,
             AnaerobicStrengthMetric.TOTAL_REPS
@@ -113,11 +118,11 @@ enum class AnaerobicWorkout(
         R.drawable.squat_pose,
         WorkoutType.ANAEROBIC,
         fields = listOf(
+            FieldInfo.TIMER,
             FieldInfo.SETS,
             FieldInfo.REPETITIONS,
             FieldInfo.WEIGHTS,
             FieldInfo.EQUIPMENT_TYPE,
-            FieldInfo.TIMER
         ),
         graphMetrics = listOf(
             AnaerobicStrengthMetric.TOTAL_VOLUME,
@@ -130,7 +135,11 @@ enum class AnaerobicWorkout(
         "Donkey_Kick",
         R.drawable.donkey_kick_pose,
         WorkoutType.ANAEROBIC,
-        fields = listOf(FieldInfo.SETS, FieldInfo.REPETITIONS, FieldInfo.TIMER),
+        fields = listOf(
+            FieldInfo.TIMER,
+            FieldInfo.SETS,
+            FieldInfo.REPETITIONS,
+        ),
         graphMetrics = listOf(
             AnaerobicStrengthMetric.TOTAL_SETS,
             AnaerobicStrengthMetric.TOTAL_REPS
@@ -142,12 +151,12 @@ enum class AnaerobicWorkout(
         R.drawable.bicep_curl_pose,
         WorkoutType.ANAEROBIC,
         fields = listOf(
+            FieldInfo.TIMER,
             FieldInfo.SETS,
             FieldInfo.REPETITIONS,
             FieldInfo.WEIGHTS,
             FieldInfo.EQUIPMENT_TYPE,
             FieldInfo.GRIP_STYLE,
-            FieldInfo.TIMER
         ),
         graphMetrics = listOf(
             AnaerobicStrengthMetric.TOTAL_VOLUME,
@@ -160,9 +169,9 @@ enum class AnaerobicWorkout(
         R.drawable.plank_pose,
         WorkoutType.ANAEROBIC,
         fields = listOf(
+            FieldInfo.TIMER,
             FieldInfo.SETS,
             FieldInfo.DURATION,
-            FieldInfo.TIMER
         ),
         graphMetrics = listOf(
             AnaerobicStrengthMetric.TOTAL_SETS,
@@ -175,10 +184,10 @@ enum class AnaerobicWorkout(
         R.drawable.hand_grippler_pose,
         WorkoutType.ANAEROBIC,
         fields = listOf(
+            FieldInfo.TIMER,
             FieldInfo.SETS,
             FieldInfo.REPETITIONS,
             FieldInfo.WEIGHTS,
-            FieldInfo.TIMER
         ),
         graphMetrics = listOf(
             AnaerobicStrengthMetric.TOTAL_VOLUME,
@@ -192,12 +201,12 @@ enum class AnaerobicWorkout(
         R.drawable.shoulder_press_pose,
         WorkoutType.ANAEROBIC,
         fields = listOf(
+            FieldInfo.TIMER,
             FieldInfo.SETS,
             FieldInfo.REPETITIONS,
             FieldInfo.WEIGHTS,
             FieldInfo.EQUIPMENT_TYPE,
             FieldInfo.GRIP_STYLE,
-            FieldInfo.TIMER
         ),
         graphMetrics = listOf(
             AnaerobicStrengthMetric.TOTAL_VOLUME,
@@ -211,12 +220,12 @@ enum class AnaerobicWorkout(
         R.drawable.dumbbell_row_pose,
         WorkoutType.ANAEROBIC,
         fields = listOf(
+            FieldInfo.TIMER,
             FieldInfo.SETS,
             FieldInfo.REPETITIONS,
             FieldInfo.WEIGHTS,
             FieldInfo.EQUIPMENT_TYPE,
             FieldInfo.GRIP_STYLE,
-            FieldInfo.TIMER
         ),
         graphMetrics = listOf(
             AnaerobicStrengthMetric.TOTAL_VOLUME,
@@ -230,12 +239,12 @@ enum class AnaerobicWorkout(
         R.drawable.dead_lift_pose,
         WorkoutType.ANAEROBIC,
         fields = listOf(
+            FieldInfo.TIMER,
             FieldInfo.SETS,
             FieldInfo.REPETITIONS,
             FieldInfo.WEIGHTS,
             FieldInfo.EQUIPMENT_TYPE,
             FieldInfo.GRIP_STYLE,
-            FieldInfo.TIMER
         ),
         graphMetrics = listOf(
             AnaerobicStrengthMetric.TOTAL_VOLUME,
@@ -249,12 +258,12 @@ enum class AnaerobicWorkout(
         R.drawable.bench_press_pose,
         WorkoutType.ANAEROBIC,
         fields = listOf(
+            FieldInfo.TIMER,
             FieldInfo.SETS,
             FieldInfo.REPETITIONS,
             FieldInfo.WEIGHTS,
             FieldInfo.EQUIPMENT_TYPE,
             FieldInfo.GRIP_STYLE,
-            FieldInfo.TIMER
         ),
         graphMetrics = listOf(
             AnaerobicStrengthMetric.TOTAL_VOLUME,

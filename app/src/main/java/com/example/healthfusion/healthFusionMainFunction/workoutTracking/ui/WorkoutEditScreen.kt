@@ -4,26 +4,26 @@ import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -56,7 +56,12 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: WorkoutType) {
+fun WorkoutEdit(
+    viewModel: WorkoutViewModel,
+    workoutName: String,
+    workoutType: WorkoutType,
+    onFinished: () -> Unit
+) {
 
     val context = LocalContext.current
 
@@ -98,79 +103,84 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
 
     // UI rendering
     HealthFusionTheme {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 16.dp)
-                .verticalScroll(scrollState),
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = displayName.replace("_", " "),
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
-            )
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Card(
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFEFF5F4)),
-                shape = RoundedCornerShape(8.dp),
-                modifier = Modifier.padding(vertical = 12.dp, horizontal = 4.dp)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 16.dp)
+                    .verticalScroll(scrollState)
+                    .padding(bottom = 88.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                DynamicWorkoutInputFields(
-                    fields = fields.map { fieldInfo ->
-                        WorkoutField(
-                            label = fieldInfo.label,
-                            value = inputValues.getOrDefault(fieldInfo, ""),
-                            type = fieldInfo.type,
-                            onChange = { inputValues[fieldInfo] = it }
-                        )
-                    },
-                    inputValues = inputValues
+                Text(
+                    text = displayName.replace("_", " "),
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
                 )
-            }
 
-            // Date Picker Button
+                Spacer(modifier = Modifier.height(8.dp))
 
-            Button(
-                onClick = { showDatePicker = true },
-                modifier = Modifier.padding(horizontal = 32.dp),
-
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFEFF5F4)),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.padding(vertical = 12.dp, horizontal = 4.dp)
                 ) {
-
-                Icon(
-                    painterResource(id = R.drawable.ic_calendar),
-                    contentDescription = "calendar",
-                    tint = Color.White
-                )
-                Text(" Select Date: ${formatDate(selectedDate)}")
-            }
-
-            // DatePickerDialog
-            if (showDatePicker) {
-                val datePickerDialog = DatePickerDialog(
-                    context,
-                    { _, year, month, dayOfMonth ->
-                        val calendar = Calendar.getInstance()
-                        calendar.set(year, month, dayOfMonth)
-                        selectedDate = calendar.timeInMillis
-                        showDatePicker = false
-                    },
-                    Calendar.getInstance().get(Calendar.YEAR),
-                    Calendar.getInstance().get(Calendar.MONTH),
-                    Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
-                )
-
-                datePickerDialog.setOnDismissListener {
-                    showDatePicker = false
+                    DynamicWorkoutInputFields(
+                        fields = fields.map { fieldInfo ->
+                            WorkoutField(
+                                label = fieldInfo.label,
+                                value = inputValues.getOrDefault(fieldInfo, ""),
+                                type = fieldInfo.type,
+                                onChange = { inputValues[fieldInfo] = it }
+                            )
+                        },
+                        inputValues = inputValues
+                    )
                 }
 
-                datePickerDialog.show()
-            }
+                // Date Picker Button
+                Button(
+                    onClick = { showDatePicker = true },
+                    modifier = Modifier.padding(horizontal = 32.dp),
+                ) {
+                    Icon(
+                        painterResource(id = R.drawable.ic_calendar),
+                        contentDescription = "calendar",
+                        tint = Color.White
+                    )
+                    Text(" Select Date: ${formatDate(selectedDate)}")
+                }
 
-            Spacer(modifier = Modifier.height(8.dp))
-            Button(
+                // DatePickerDialog
+                if (showDatePicker) {
+                    val datePickerDialog = DatePickerDialog(
+                        context,
+                        { _, year, month, dayOfMonth ->
+                            val calendar = Calendar.getInstance()
+                            calendar.set(year, month, dayOfMonth)
+                            selectedDate = calendar.timeInMillis
+                            showDatePicker = false
+                        },
+                        Calendar.getInstance().get(Calendar.YEAR),
+                        Calendar.getInstance().get(Calendar.MONTH),
+                        Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+                    )
+
+                    datePickerDialog.setOnDismissListener {
+                        showDatePicker = false
+                    }
+
+                    datePickerDialog.show()
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+            }
+            FloatingActionButton(
                 onClick = {
                     viewModel.addWorkout(
                         name = displayName,
@@ -185,24 +195,57 @@ fun WorkoutEdit(viewModel: WorkoutViewModel, workoutName: String, workoutType: W
                         equipmentType = inputValues[FieldInfo.EQUIPMENT_TYPE],
                         gripStyle = inputValues[FieldInfo.GRIP_STYLE]
                     )
+
                     Toast.makeText(
                         context,
                         "New $displayName data has been created!",
                         Toast.LENGTH_LONG
                     ).show()
-                    //    viewModel.updateCurrentProgress(displayName)
-                    //  viewModel.observeAndUpdateProgress()
+
+                    onFinished()
                 },
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF23af92)),
-                shape = RoundedCornerShape(8.dp)
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp)
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add", tint = Color.White)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Add Workout", color = Color.White)
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add workout",
+                )
             }
+            /*                Button(
+                                onClick = {
+                                    viewModel.addWorkout(
+                                        name = displayName,
+                                        type = workoutType,
+                                        duration = inputValues[FieldInfo.DURATION]?.toIntOrNull(),
+                                        distance = inputValues[FieldInfo.DISTANCE]?.toIntOrNull(),
+                                        caloriesBurned = inputValues[FieldInfo.CALORIES_BURNED]?.toIntOrNull(),
+                                        set = inputValues[FieldInfo.SETS]?.toIntOrNull(),
+                                        repetition = inputValues[FieldInfo.REPETITIONS]?.toIntOrNull(),
+                                        weight = inputValues[FieldInfo.WEIGHTS]?.toIntOrNull(),
+                                        workoutDate = selectedDate,
+                                        equipmentType = inputValues[FieldInfo.EQUIPMENT_TYPE],
+                                        gripStyle = inputValues[FieldInfo.GRIP_STYLE]
+                                    )
+                                    Toast.makeText(
+                                        context,
+                                        "New $displayName data has been created!",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    //    viewModel.updateCurrentProgress(displayName)
+                                    //  viewModel.observeAndUpdateProgress()
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 32.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF23af92)),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Icon(Icons.Default.Add, contentDescription = "Add", tint = Color.White)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Add Workout", color = Color.White)
+                            }*/
         }
     }
 }
@@ -219,7 +262,7 @@ fun DynamicWorkoutInputFields(
     fields: List<WorkoutField>,
     inputValues: MutableMap<FieldInfo, String>
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         fields.forEach { field ->
             when (field.type) {
 
@@ -227,30 +270,41 @@ fun DynamicWorkoutInputFields(
                     TimePickerWithSpinners(inputValues = inputValues)
                 }
 
-                FieldType.TEXT -> {
-                    TextField(
-                        value = field.value,
-                        onValueChange = field.onChange,
-                        label = { Text(field.label) },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = TextFieldDefaults.colors(
-                            unfocusedContainerColor = Color(0xFFF1F1F1),
-                            focusedContainerColor = Color(0xFFE0E0E0),
-                            unfocusedTextColor = Color.Black,
-                            focusedTextColor = Color.Black,
-                            unfocusedLabelColor = Color.Gray,
-                            focusedLabelColor = Color(0xFF23af92)
-                        )
-                    )
-                }
-
                 FieldType.TIMER -> {
                     TimerComponentWithToggle(
                         field = field,
                         inputValues = inputValues
                     )
-
                 }
+
+                FieldType.TEXT -> {
+                    OutlinedTextField(
+                        value = field.value,
+                        onValueChange = field.onChange,
+                        label = { Text(field.label) },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        shape = RoundedCornerShape(12.dp),
+                        textStyle = MaterialTheme.typography.bodyLarge,
+                        colors = TextFieldDefaults.colors(
+                            //  border color
+                            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                            unfocusedIndicatorColor = MaterialTheme.colorScheme.outline,
+                            disabledIndicatorColor = MaterialTheme.colorScheme.outlineVariant,
+                            errorIndicatorColor = MaterialTheme.colorScheme.error,
+
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            focusedLabelColor = MaterialTheme.colorScheme.primary,
+                            unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            cursorColor = MaterialTheme.colorScheme.primary
+                        )
+                    )
+                }
+
 
                 FieldType.SEGMENTED -> {
                     when (field.label) {

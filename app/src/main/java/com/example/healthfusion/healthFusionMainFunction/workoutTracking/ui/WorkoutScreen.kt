@@ -103,7 +103,7 @@ fun WorkoutScreen(
 
                 if (workouts.isNotEmpty()) {
                     Text(
-                        text = "Your last 3 workouts activities.",
+                        text = "Your last 5 workouts activities:",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -113,7 +113,7 @@ fun WorkoutScreen(
                             .fillMaxWidth()
                             .padding(8.dp)
                     ) {
-                        val sortedByDescent = workouts.sortedByDescending { it.workoutDate }.take(3)
+                        val sortedByDescent = workouts.sortedByDescending { it.workoutDate }.take(5)
                         items(sortedByDescent.size) { index ->
                             val workout = sortedByDescent[index]
                             WorkoutRecentActivityBox(
@@ -125,7 +125,8 @@ fun WorkoutScreen(
                     }
                 } else {
                     Text(
-                        text = "Your last 3 workouts activity: None!",
+                        text = "Your last 5 workouts activities: \nYou do not have any workout activities.  ",
+
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
@@ -219,12 +220,14 @@ fun WorkoutGoalBox(
         Text(text = "Workout Goals", fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Text(text = "Your workout goal progress:")
 
-        WorkoutGoalProgressBar(workoutGoal = dailyGoals,
+        WorkoutGoalProgressBar(
+            workoutGoal = dailyGoals,
             goalType = WorkoutGoalType.DAILY,
             onGoalCompleted = { goal -> viewModel.markGoalAsCompleted(goal) },
             onGoalNotCompletedYet = { goal -> viewModel.markGoalAsNotCompleted(goal) })
 
-        WorkoutGoalProgressBar(workoutGoal = weeklyGoals,
+        WorkoutGoalProgressBar(
+            workoutGoal = weeklyGoals,
             goalType = WorkoutGoalType.WEEKLY,
             onGoalCompleted = { goal -> viewModel.markGoalAsCompleted(goal) },
             onGoalNotCompletedYet = { goal -> viewModel.markGoalAsNotCompleted(goal) })
@@ -295,7 +298,7 @@ fun WorkoutRecentActivityBox(workout: Workout, dateFormatter: DateFormatter) {
                     val formattedDuration =
                         workout.duration?.toLong()?.let { formatSecondsDuration(it) }
                     val value = when (fieldInfo) {
-                        FieldInfo.DURATION -> formattedDuration.toString() ?: "N/A"
+                        FieldInfo.DURATION -> formattedDuration.toString()
                         FieldInfo.DISTANCE -> workout.distance?.toString() ?: "N/A"
                         FieldInfo.CALORIES_BURNED -> workout.caloriesBurned?.toString() ?: "N/A"
                         FieldInfo.SETS -> workout.set?.toString() ?: "N/A"
