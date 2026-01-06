@@ -17,6 +17,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -145,15 +146,22 @@ fun WorkoutEdit(
                 // Date Picker Button
                 Button(
                     onClick = { showDatePicker = true },
-                    modifier = Modifier.padding(horizontal = 32.dp),
+                    modifier = Modifier.padding(horizontal = 32.dp, vertical = 4.dp),
+                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.surfaceVariant)
                 ) {
                     Icon(
                         painterResource(id = R.drawable.ic_calendar),
                         contentDescription = "calendar",
-                        tint = Color.White
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    Text(" Select Date: ${formatDate(selectedDate)}")
+                    Text(
+                        text = " Select Date: ${formatDate(selectedDate)}",
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    )
                 }
+
 
                 // DatePickerDialog
                 if (showDatePicker) {
@@ -213,39 +221,6 @@ fun WorkoutEdit(
                     contentDescription = "Add workout",
                 )
             }
-            /*                Button(
-                                onClick = {
-                                    viewModel.addWorkout(
-                                        name = displayName,
-                                        type = workoutType,
-                                        duration = inputValues[FieldInfo.DURATION]?.toIntOrNull(),
-                                        distance = inputValues[FieldInfo.DISTANCE]?.toIntOrNull(),
-                                        caloriesBurned = inputValues[FieldInfo.CALORIES_BURNED]?.toIntOrNull(),
-                                        set = inputValues[FieldInfo.SETS]?.toIntOrNull(),
-                                        repetition = inputValues[FieldInfo.REPETITIONS]?.toIntOrNull(),
-                                        weight = inputValues[FieldInfo.WEIGHTS]?.toIntOrNull(),
-                                        workoutDate = selectedDate,
-                                        equipmentType = inputValues[FieldInfo.EQUIPMENT_TYPE],
-                                        gripStyle = inputValues[FieldInfo.GRIP_STYLE]
-                                    )
-                                    Toast.makeText(
-                                        context,
-                                        "New $displayName data has been created!",
-                                        Toast.LENGTH_LONG
-                                    ).show()
-                                    //    viewModel.updateCurrentProgress(displayName)
-                                    //  viewModel.observeAndUpdateProgress()
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 32.dp),
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF23af92)),
-                                shape = RoundedCornerShape(8.dp)
-                            ) {
-                                Icon(Icons.Default.Add, contentDescription = "Add", tint = Color.White)
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("Add Workout", color = Color.White)
-                            }*/
         }
     }
 }
