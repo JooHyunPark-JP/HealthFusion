@@ -1,7 +1,7 @@
-package com.example.healthfusion.healthFusionMainFunction.dietTracking.di
+package com.example.healthfusion.experimental.dietTracking.di
 
 import com.example.healthfusion.healthFusionData.AppDatabase
-import com.example.healthfusion.healthFusionMainFunction.dietTracking.data.DietDao
+import com.example.healthfusion.experimental.dietTracking.data.DietDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

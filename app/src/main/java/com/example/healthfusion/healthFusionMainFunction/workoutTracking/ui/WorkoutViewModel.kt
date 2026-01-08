@@ -238,7 +238,9 @@ class WorkoutViewModel @Inject constructor(
                 val singularOrPlural = if (goalDetails.goalFrequency > 1) "times" else "time"
 
                 val text =
-                    "Do ${goalDetails.workoutName} ${goalDetails.goalFrequency} $singularOrPlural per ${goalDetails.goalType.name.lowercase()}"
+                    if (goalDetails.goalType.name.lowercase() == "daily")
+                        "${goalDetails.workoutName}: ${goalDetails.goalFrequency} $singularOrPlural a day"
+                    else "${goalDetails.workoutName}: ${goalDetails.goalFrequency} $singularOrPlural a week"
                 val newGoal = WorkoutGoal(
                     text = text,
                     isCompleted = false,
@@ -308,7 +310,7 @@ class WorkoutViewModel @Inject constructor(
 
     //when firestore has data but room database hasn't, get data from firestore and update room database
     fun syncWorkoutsFromFirestore() {
-        Log.d("checkingloginUID2", "${_userId.value} ")
+        // Log.d("checkingloginUID2", "${_userId.value} ")
         viewModelScope.launch {
             _userId.value?.let { uid ->
                 if (networkHelper.isNetworkConnected()) {
@@ -348,6 +350,8 @@ class WorkoutViewModel @Inject constructor(
 
 
     fun setUserId(uid: String?) {
+        if (_userId.value == uid) return
+
         _userId.value = uid
 
         // Trigger syncing once the userId is set
@@ -364,7 +368,7 @@ class WorkoutViewModel @Inject constructor(
 
     fun addWorkoutGoalDetail(
         workoutName: String,
-    //    workoutType: WorkoutType,
+        //    workoutType: WorkoutType,
         goalFrequency: Int,
         goalType: WorkoutGoalType
     ) {
@@ -372,7 +376,7 @@ class WorkoutViewModel @Inject constructor(
             _userId.value?.let { uid ->
                 val goalDetail = WorkoutGoalDetails(
                     workoutName = workoutName,
-             //       workoutType = workoutType,
+                    //       workoutType = workoutType,
                     goalFrequency = goalFrequency,
                     goalType = goalType,
                     userId = uid

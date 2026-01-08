@@ -1,7 +1,7 @@
-package com.example.healthfusion.healthFusionMainFunction.sleepTracking.di
+package com.example.healthfusion.experimental.sleepTracking.di
 
 import com.example.healthfusion.healthFusionData.AppDatabase
-import com.example.healthfusion.healthFusionMainFunction.sleepTracking.data.SleepDao
+import com.example.healthfusion.experimental.sleepTracking.data.SleepDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

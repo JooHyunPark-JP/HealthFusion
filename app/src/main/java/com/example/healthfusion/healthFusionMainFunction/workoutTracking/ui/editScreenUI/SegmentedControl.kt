@@ -1,12 +1,8 @@
 package com.example.healthfusion.healthFusionMainFunction.workoutTracking.ui.editScreenUI
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -17,32 +13,45 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SegmentedControl(
     options: List<String>,
     selectedOption: String,
     onOptionSelected: (String) -> Unit
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly
+    var selectedIndex by remember {
+        mutableIntStateOf(
+            options.indexOf(selectedOption).takeIf { it >= 0 } ?: 0
+        )
+    }
+
+    SingleChoiceSegmentedButtonRow(
+        modifier = Modifier.fillMaxWidth()
     ) {
-        options.forEach { option ->
-            Button(
-                onClick = { onOptionSelected(option) },
-                colors = if (option == selectedOption) {
-                    ButtonDefaults.buttonColors(containerColor = Color(0xFF23af92))
-                } else {
-                    ButtonDefaults.buttonColors(containerColor = Color.LightGray)
+        options.forEachIndexed { index, option ->
+            SegmentedButton(
+                selected = index == selectedIndex,
+                onClick = {
+                    selectedIndex = index
+                    onOptionSelected(option)
                 },
-                modifier = Modifier.padding(horizontal = 4.dp)
+                shape = SegmentedButtonDefaults.itemShape(
+                    index = index,
+                    count = options.size
+                ),
+                colors = SegmentedButtonDefaults.colors(
+                    activeContainerColor = MaterialTheme.colorScheme.primary,
+                    activeContentColor = MaterialTheme.colorScheme.onPrimary,
+                    inactiveContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    inactiveContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             ) {
                 Text(
                     text = option,
-                    color = if (option == selectedOption) Color.White else Color.Black
+                    style = MaterialTheme.typography.labelLarge
                 )
             }
         }

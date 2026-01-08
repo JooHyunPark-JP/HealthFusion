@@ -30,3 +30,24 @@ fun Workout.getFieldValue(field: FieldInfo): Double {
 
     }
 }
+
+//For now it's only for jumping rope (Aerobic)
+fun Workout.getGraphValue(fieldInfo: FieldInfo): Double {
+    return when (fieldInfo) {
+        FieldInfo.REPETITIONS -> {
+            val isJumpingRope =
+                this.name == AerobicWorkout.JUMPING_ROPE.workoutName &&
+                        this.type == WorkoutType.AEROBIC
+
+            if (isJumpingRope) {
+                AnaerobicStrengthMetric.TOTAL_REPS.valueFor(this)
+            } else {
+                getFieldValue(fieldInfo)
+            }
+        }
+
+        else -> {
+            getFieldValue(fieldInfo)
+        }
+    }
+}

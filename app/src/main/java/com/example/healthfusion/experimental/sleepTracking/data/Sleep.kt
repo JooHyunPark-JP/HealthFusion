@@ -1,4 +1,4 @@
-package com.example.healthfusion.healthFusionMainFunction.sleepTracking.data
+package com.example.healthfusion.experimental.sleepTracking.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
