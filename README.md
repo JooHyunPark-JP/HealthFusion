@@ -7,7 +7,7 @@ HealthFusion is an Android app that tracks and manages workouts and goals with a
 Data is stored locally (in the Room) and synchronized to Firebase Firestore when connectivity is available.
 
 ## Screenshots
-<img src="./image/image7.jpg" alt="Example Image" width="200"/> <img src="./image/image8.jpg" alt="Example Image" width="200"/> <img src="./image/image9.jpg" alt="Example Image" width="200"/> <img src="./image/image10.jpg" alt="Example Image" width="200"/> <img src="./image/image11.jpg" alt="Example Image" width="200"/> <img src="./image/image12.jpg" alt="Example Image" width="200"/> <img src="./image/image13.jpg" alt="Example Image" width="200"/>
+<img src="./image/image14.jpg" alt="Example Image" width="200"/> <img src="./image/image7.jpg" alt="Example Image" width="200"/> <img src="./image/image8.jpg" alt="Example Image" width="200"/> <img src="./image/image9.jpg" alt="Example Image" width="200"/> <img src="./image/image10.jpg" alt="Example Image" width="200"/> <img src="./image/image11.jpg" alt="Example Image" width="200"/> <img src="./image/image12.jpg" alt="Example Image" width="200"/> <img src="./image/image13.jpg" alt="Example Image" width="200"/>
 
 ## Features
 
